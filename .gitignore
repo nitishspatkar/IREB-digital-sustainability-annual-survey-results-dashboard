@@ -1,0 +1,62 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment directories
+venv/
+env/
+ENV/
+.venv/
+venv.bak/
+env.bak/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Translations
+*.mo
+*.pot
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Environment files
+.env
+.env.*
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE directories (VSCode, PyCharm, etc.)
+.vscode/
+.idea/
+
+# Optional: Exclude CSV data files if you don't want to push them
+# data/*.csv
+
+# Other temporary or log files
+*.log
