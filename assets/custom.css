@@ -1,0 +1,48 @@
+:root {
+    --primary: #831E82;
+}
+/* Use the primary color for card headers */
+.card-header {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+}
+
+/* Use the primary color for all headings */
+h1, h2, h3, h4, h5 {
+    color: var(--primary);
+}
+
+/* Optionally, add some custom button or link styling */
+.btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+body {
+    background-color: #f8f9fa; /* light background */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.card {
+    border-radius: 0.5rem;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+.dccGraph {
+    margin-bottom: 1rem;
+}
+
+/* Add extra padding at the top of the container */
+.container-fluid {
+    padding-top: 20px;
+}
+
+/* Adjust tabs spacing */
+.dash-tabs-container {
+    margin-top: 40px;
+    margin-bottom: 40px;
+}

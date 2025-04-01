@@ -6,6 +6,10 @@ import plotly.express as px
 import pandas as pd
 
 from analysis.data_preparation import load_single_year_data
+from rename_config import rename_mapping
+
+# Create reverse mapping to get the full question text for individual card headers
+reverse_mapping = {v: k for k, v in rename_mapping.items()}
 
 # ------------------------------
 # 1) Load 2025 data
@@ -14,28 +18,42 @@ data_folder = "data"
 year = 2025
 df = load_single_year_data(data_folder, year)
 
-# Define which columns are numeric (for histograms)
+# Define which columns are numeric for histogram usage
 numeric_cols = ["years_of_experience", "num_sustainability_trainings"]
 
 # ------------------------------
 # 2) Helper Functions
 # ------------------------------
 def make_bar_chart(df, col, title):
-    """Create a bar chart for a categorical (or single-select) column."""
+    """Create a bar chart for a categorical (or single-select) column using the theme color."""
     counts = df[col].value_counts(dropna=False).reset_index()
     counts.columns = [col, "count"]
-    fig = px.bar(counts, x=col, y="count", title=title, template="plotly_white")
+    fig = px.bar(
+        counts,
+        x=col,
+        y="count",
+        title=title,
+        template="plotly_white",
+        color_discrete_sequence=["#D09ED3"]
+    )
     fig.update_layout(xaxis_title=col.replace("_", " ").title(), yaxis_title="Count")
     return fig
 
 def make_histogram(df, col, title, bins=5):
-    """Create a histogram for a numeric column."""
-    fig = px.histogram(df, x=col, nbins=bins, title=title, template="plotly_white")
+    """Create a histogram for a numeric column using the theme color."""
+    fig = px.histogram(
+        df,
+        x=col,
+        nbins=bins,
+        title=title,
+        template="plotly_white",
+        color_discrete_sequence=["#D09ED3"]
+    )
     fig.update_layout(xaxis_title=col.replace("_", " ").title(), yaxis_title="Frequency")
     return fig
 
 def generate_chart(df, col, title=None):
-    """Automatically generate a histogram if the column is numeric, otherwise a bar chart."""
+    """Automatically generate a histogram if numeric; otherwise, a bar chart."""
     if not title:
         title = f"{col.replace('_', ' ').title()} Distribution"
     if col in numeric_cols:
@@ -43,52 +61,90 @@ def generate_chart(df, col, title=None):
     else:
         return make_bar_chart(df, col, title)
 
+def simplify_label(col):
+    """
+    Simplify multi-select option labels by stripping common prefixes.
+    Adjust as needed for your column naming conventions.
+    """
+    if col.startswith("drive_sustainability_"):
+        return col.replace("drive_sustainability_", "").replace("_", " ").title()
+    elif col.startswith("hinder_"):
+        return col.replace("hinder_", "").replace("_", " ").title()
+    elif col.startswith("resource_need_"):
+        return col.replace("resource_need_", "").replace("_", " ").title()
+    elif col.startswith("org_reason_"):
+        return col.replace("org_reason_", "").replace("_", " ").title()
+    elif col.startswith("org_dim_"):
+        return col.replace("org_dim_", "").replace("_", " ").title()
+    else:
+        return col.replace("_", " ").title()
+
 def make_multi_select_bar(df, cols, title):
     """
     For a group of columns representing a multi-select question, count non-empty responses
-    and return a single bar chart.
+    and return a single bar chart using simplified option labels.
     """
     data = []
     for c in cols:
         count_val = df[c].notna().sum()
-        # Create a nicer label by replacing underscores and capitalizing
-        data.append((c.replace("_", " ").title(), count_val))
+        option_text = simplify_label(c)
+        data.append((option_text, count_val))
     df_data = pd.DataFrame(data, columns=["Option", "Count"])
     fig = px.bar(df_data, x="Option", y="Count", title=title, template="plotly_white")
     fig.update_layout(xaxis_title="Option", yaxis_title="Count")
     return fig
 
 def build_card(col, fig):
-    """Wraps a graph and its header in a Bootstrap card for nice styling."""
+    """
+    Wraps an individual graph in a Bootstrap card.
+    Uses the full question text (from reverse_mapping) for the header.
+    """
+    question_text = reverse_mapping.get(col, col.replace("_", " ").title())
     return dbc.Card(
         [
-            dbc.CardHeader(html.H5(col.replace("_", " ").title(), className="card-title")),
+            dbc.CardHeader(html.H5(question_text, className="card-title")),
             dbc.CardBody(dcc.Graph(figure=fig, config={'displayModeBar': False}))
         ],
         className="mb-4 shadow-sm"
     )
 
-def build_section_two_columns(fig_pairs):
+def build_multi_card(title, fig):
     """
-    Given a list of (column, figure) pairs, splits them into two columns
-    and returns a Dash Bootstrap Row with two Columns containing cards.
+    Wraps an aggregated multi-select graph in a Bootstrap card.
+    Uses the provided title as the header.
     """
-    half = (len(fig_pairs) + 1) // 2
-    left_pairs = fig_pairs[:half]
-    right_pairs = fig_pairs[half:]
+    return dbc.Card(
+        [
+            dbc.CardHeader(html.H5(title, className="card-title")),
+            dbc.CardBody(dcc.Graph(figure=fig, config={'displayModeBar': False}))
+        ],
+        className="mb-4 shadow-sm"
+    )
+
+def build_section_three_columns(fig_pairs):
+    """
+    Given a list of (column, figure) pairs, splits them into three columns
+    and returns a Bootstrap Row with three Columns containing cards.
+    """
+    third = (len(fig_pairs) + 2) // 3  # Round up the split
+    left_pairs = fig_pairs[:third]
+    middle_pairs = fig_pairs[third:2*third]
+    right_pairs = fig_pairs[2*third:]
     
     left_cards = [build_card(col, fig) for col, fig in left_pairs]
+    middle_cards = [build_card(col, fig) for col, fig in middle_pairs]
     right_cards = [build_card(col, fig) for col, fig in right_pairs]
     
     return dbc.Row([
-        dbc.Col(left_cards, width=6),
-        dbc.Col(right_cards, width=6)
+        dbc.Col(left_cards, width=4),
+        dbc.Col(middle_cards, width=4),
+        dbc.Col(right_cards, width=4)
     ], className="mb-4")
 
 # ------------------------------
 # 3) Define Column Groups for Each Tab (Based on Survey Sections)
 # ------------------------------
-# Note: Adjust these lists to match the renamed columns from your CSV.
+# (Adjust these lists to match your renamed DataFrame columns.)
 
 # Tab 1: Demographic
 demographic_cols = [
@@ -110,21 +166,6 @@ awareness_cols = [
     "satisfied_num_trainings",
     "num_sustainability_trainings"
 ]
-# (If training reasons are considered part of awareness, include them as a multi-select group)
-awareness_multi = [
-    "no_training_reason_aware",
-    "no_training_reason_org_no",
-    "no_training_reason_no_opportunity",
-    "no_training_reason_no_need",
-    "no_training_reason_cost",
-    "no_training_reason_other",
-    "no_more_training_reason_aware",
-    "no_more_training_reason_org_no",
-    "no_more_training_reason_no_opportunity",
-    "no_more_training_reason_no_need",
-    "no_more_training_reason_cost",
-    "no_more_training_reason_other"
-]
 
 # Tab 3: The Role of Digital Sustainability in Your Organization
 organization_cols = [
@@ -135,35 +176,41 @@ organization_cols = [
     "org_reports_sustainability",
     "org_offers_sustainability_training",
     "org_training_resources_description",
-    "org_dim_env",
-    "org_dim_social",
-    "org_dim_individual",
-    "org_dim_economic",
-    "org_dim_technical",
-    "org_dim_notsure",
-    "org_dim_other",
+    "customer_requires_sustainability",
+    "why_customers_not_asking"
+]
+org_multi_training = [
     "org_reason_no_training_awareness",
     "org_reason_no_training_need",
     "org_reason_no_training_demand",
     "org_reason_no_training_budget",
     "org_reason_no_training_priority",
     "org_reason_no_training_notsure",
-    "org_reason_no_training_other",
-    "customer_requires_sustainability",
-    "why_customers_not_asking"
+    "org_reason_no_training_other"
+]
+org_multi_dimensions = [
+    "org_dim_env",
+    "org_dim_social",
+    "org_dim_individual",
+    "org_dim_economic",
+    "org_dim_technical",
+    "org_dim_notsure",
+    "org_dim_other"
 ]
 
 # Tab 4: Sustainability in Your Job and Tasks
 job_task_cols = [
     "incorporate_sustainability_in_tasks",
+    "tools_for_sustainability",
+    "tools_description"
+]
+job_task_multi_drives = [
     "drive_sustainability_org_policies",
     "drive_sustainability_personal_beliefs",
     "drive_sustainability_client_req",
     "drive_sustainability_user_req",
     "drive_sustainability_legal_req",
-    "drive_sustainability_other",
-    "tools_for_sustainability",
-    "tools_description"
+    "drive_sustainability_other"
 ]
 job_task_multi_hinder = [
     "hinder_no_interest",
@@ -204,71 +251,80 @@ job_task_multi_support = [
 demographic_figs = [(col, generate_chart(df, col, title=f"{col.replace('_',' ').title()} Distribution"))
                     for col in demographic_cols if col in df.columns]
 
-# General Awareness Figures (Single columns)
+# Awareness Figures (Single columns)
 awareness_figs = [(col, generate_chart(df, col, title=f"{col.replace('_',' ').title()} Distribution"))
                   for col in awareness_cols if col in df.columns]
-# Awareness multi-select: training reasons
-fig_awareness_multi = make_multi_select_bar(df, awareness_multi, "Training Reasons Distribution")
+# (No multi-select aggregate in Awareness in this example)
 
-# Organization Figures
+# Organization Figures (Single columns)
 organization_figs = [(col, generate_chart(df, col, title=f"{col.replace('_',' ').title()} Distribution"))
                      for col in organization_cols if col in df.columns]
+fig_org_training = make_multi_select_bar(df, org_multi_training, "Reasons for Not Offering Training/Resources")
+fig_org_dimensions = make_multi_select_bar(df, org_multi_dimensions, "Sustainability Dimensions Considered")
 
 # Job & Tasks Figures (Single columns)
 job_task_figs = [(col, generate_chart(df, col, title=f"{col.replace('_',' ').title()} Distribution"))
                  for col in job_task_cols if col in df.columns]
-
-# Job & Tasks multi-select groups
-fig_hinders = make_multi_select_bar(df, job_task_multi_hinder, "Hindrances Distribution")
-fig_knowledge = make_multi_select_bar(df, job_task_multi_knowledge, "Knowledge Gaps Distribution")
-fig_support = make_multi_select_bar(df, job_task_multi_support, "Support / Resources Needed Distribution")
+fig_job_drives = make_multi_select_bar(df, job_task_multi_drives, "Drives to Incorporate Sustainability")
+fig_hinders = make_multi_select_bar(df, job_task_multi_hinder, "Hindrances in Role-Specific Tasks")
+fig_job_knowledge = make_multi_select_bar(df, job_task_multi_knowledge, "Knowledge Gaps in Tasks")
+fig_job_support = make_multi_select_bar(df, job_task_multi_support, "Support / Resources Needed")
 
 # ------------------------------
-# 5) Assemble the layout with Tabs and Two-Column Sections
+# 5) Build Dash Layout with Tabs and Three-Column Sections
 # ------------------------------
 external_stylesheets = [dbc.themes.FLATLY]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = "Digital Sustainability Survey (2025) Dashboard"
 
-# Build sections using our two-column layout helper
-demographic_section = build_section_two_columns(demographic_figs)
-awareness_section = build_section_two_columns(awareness_figs)
-organization_section = build_section_two_columns(organization_figs)
-job_task_section = build_section_two_columns(job_task_figs)
+# Build sections for single-select charts using our three-column layout
+demographic_section = build_section_three_columns(demographic_figs)
+awareness_section = build_section_three_columns(awareness_figs)
+organization_section = build_section_three_columns(organization_figs)
+job_task_section = build_section_three_columns(job_task_figs)
 
-# For Job & Tasks, add additional rows for multi-select groups
-job_task_extra = dbc.Row([
-    dbc.Col([
-        html.H5("Hindrances", className="text-center"),
-        dcc.Graph(figure=fig_hinders, config={'displayModeBar': False})
-    ], width=4),
-    dbc.Col([
-        html.H5("Knowledge Gaps", className="text-center"),
-        dcc.Graph(figure=fig_knowledge, config={'displayModeBar': False})
-    ], width=4),
-    dbc.Col([
-        html.H5("Support / Resources", className="text-center"),
-        dcc.Graph(figure=fig_support, config={'displayModeBar': False})
-    ], width=4)
+# Wrap aggregated multi-select graphs in cards for consistent styling.
+org_multi_card_training = build_multi_card("Training/Resources Reasons", fig_org_training)
+org_multi_card_dimensions = build_multi_card("Sustainability Dimensions Considered", fig_org_dimensions)
+
+job_multi_card_drives = build_multi_card("Drives to Incorporate Sustainability", fig_job_drives)
+job_multi_card_hinders = build_multi_card("Hindrances in Role-Specific Tasks", fig_hinders)
+job_multi_card_knowledge = build_multi_card("Knowledge Gaps in Tasks", fig_job_knowledge)
+job_multi_card_support = build_multi_card("Support / Resources Needed", fig_job_support)
+
+# For Organization tab, add a row for the multi-select aggregates
+organization_extra = dbc.Row([
+    dbc.Col(org_multi_card_training, width=6),
+    dbc.Col(org_multi_card_dimensions, width=6)
 ], className="mb-4")
 
-# Create the tab layout with extra spacing above the tabs by wrapping in a Div with margin-top.
+# For Job & Tasks tab, add a row for the multi-select aggregates
+job_task_extra = dbc.Row([
+    dbc.Col(job_multi_card_drives, width=3),
+    dbc.Col(job_multi_card_hinders, width=3),
+    dbc.Col(job_multi_card_knowledge, width=3),
+    dbc.Col(job_multi_card_support, width=3)
+], className="mb-4")
+
+# Assemble the overall layout with tabs and extra spacing
 app.layout = dbc.Container([
     html.H1("Digital Sustainability Survey (2025)", className="text-center my-4"),
     html.Div(
         dcc.Tabs([
             dcc.Tab(label="Demographic", children=demographic_section),
             dcc.Tab(label="General Awareness", children=dbc.Container([
-                build_section_two_columns(awareness_figs),
-                dbc.Row(dbc.Col(dcc.Graph(figure=fig_awareness_multi, config={'displayModeBar': False}), width=12), className="mb-4")
+                awareness_section
             ], fluid=True)),
-            dcc.Tab(label="Role in Organization", children=organization_section),
+            dcc.Tab(label="Role in Organization", children=dbc.Container([
+                organization_section,
+                organization_extra
+            ], fluid=True)),
             dcc.Tab(label="Sustainability in Your Job & Tasks", children=dbc.Container([
                 job_task_section,
                 job_task_extra
             ], fluid=True))
         ]),
-        style={"marginTop": "80px"}
+        style={"marginTop": "40px"}
     )
 ], fluid=True)
 
