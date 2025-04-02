@@ -7,6 +7,8 @@ import pandas as pd
 
 from analysis.data_preparation import load_single_year_data
 from rename_config import rename_mapping
+from collections import defaultdict
+
 
 # Create reverse mapping to get the full question text for individual card headers
 reverse_mapping = {v: k for k, v in rename_mapping.items()}
@@ -79,20 +81,31 @@ def simplify_label(col):
     else:
         return col.replace("_", " ").title()
 
+
 def make_multi_select_bar(df, cols, title):
     """
-    For a group of columns representing a multi-select question, count non-empty responses
-    and return a single bar chart using simplified option labels.
+    For a group of columns representing a multi-select question, count non-empty responses,
+    aggregate counts by a simplified label (so that duplicate labels are combined), and
+    return a single bar chart.
     """
-    data = []
+    counts_dict = defaultdict(int)
     for c in cols:
         count_val = df[c].notna().sum()
+        # Simplify the label (this removes common prefixes)
         option_text = simplify_label(c)
-        data.append((option_text, count_val))
-    df_data = pd.DataFrame(data, columns=["Option", "Count"])
-    fig = px.bar(df_data, x="Option", y="Count", title=title, template="plotly_white")
+        counts_dict[option_text] += count_val
+    df_data = pd.DataFrame(list(counts_dict.items()), columns=["Option", "Count"])
+    fig = px.bar(
+        df_data,
+        x="Option",
+        y="Count",
+        title=title,
+        template="plotly_white",
+        color_discrete_sequence=["#9F3E9F", "#B86CB8", "#D09ED3", "#E4C1F9"]
+    )
     fig.update_layout(xaxis_title="Option", yaxis_title="Count")
     return fig
+
 
 def build_card(col, fig):
     """
@@ -109,10 +122,6 @@ def build_card(col, fig):
     )
 
 def build_multi_card(title, fig):
-    """
-    Wraps an aggregated multi-select graph in a Bootstrap card.
-    Uses the provided title as the header.
-    """
     return dbc.Card(
         [
             dbc.CardHeader(html.H5(title, className="card-title")),
