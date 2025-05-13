@@ -7,6 +7,14 @@
     color: #fff !important;
 }
 
+/* Primary colored card header class */
+.card-header-primary {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
 /* Use the primary color for all headings */
 h1, h2, h3, h4, h5 {
     color: var(--primary);
@@ -45,4 +53,36 @@ body {
 .dash-tabs-container {
     margin-top: 40px;
     margin-bottom: 40px;
+}
+
+/* Sidebar Navigation Links */
+.nav-link-custom {
+    color: white !important; /* Default link color */
+    border-radius: 0.3rem;   /* Slightly rounded corners for the link highlight */
+    margin-bottom: 0.2rem;   /* Small space between nav items */
+    padding-top: 0.5rem !important;    /* Adjust padding as needed */
+    padding-bottom: 0.5rem !important; /* Adjust padding as needed */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; /* Smooth transition */
+}
+
+.nav-link-custom:hover {
+    color: #f0f0f0 !important; /* Slightly lighter white on hover */
+    background-color: rgba(255, 255, 255, 0.1) !important; /* Subtle background on hover */
+}
+
+/* Styling for the active navigation link */
+.nav-link-custom.active {
+    background-color: white !important; /* White background for active link */
+    color: var(--primary) !important;   /* Primary color for text of active link */
+    font-weight: 600;                   /* Slightly bolder font for active link */
+}
+
+/* Ensure icons in active links also take the primary color */
+.nav-link-custom.active .bi {
+    color: var(--primary) !important;
+}
+
+/* Ensure icons in non-active links are white */
+.nav-link-custom .bi {
+    color: white !important;
 }
