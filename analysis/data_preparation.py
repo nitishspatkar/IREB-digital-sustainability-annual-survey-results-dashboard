@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from rename_config import rename_mapping
 
-def load_single_year_data(data_folder: str, year: int) -> pd.DataFrame:
+def load_single_year_data(data_folder, year):
     """
     Loads a single CSV file for the specified year from data_folder,
     applies the rename_mapping from rename_config.py, and returns the final DataFrame.
@@ -19,12 +19,11 @@ def load_single_year_data(data_folder: str, year: int) -> pd.DataFrame:
 
     # 3) Strip any extra whitespace from columns
     df.columns = df.columns.str.strip()
-    
-    # Drop truly identical column names
     df = df.loc[:, ~df.columns.duplicated()]        
 
     # 4) Apply the rename mapping
     df.rename(columns=rename_mapping, inplace=True)
+
 
     # 5) Return the final DataFrame
     return df

@@ -5,20 +5,39 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go  # Added for more advanced plotting
+import re
 
 from analysis.data_preparation import load_single_year_data
 from rename_config import rename_mapping
 from collections import defaultdict
 
 
+# ---- Centralized Color and Style Variables ----
+STYLE_VARS = {
+    "PRIMARY_COLOR": "#831E82",
+    "SECONDARY_COLOR": "#A450A3",
+    "TERTIARY_COLOR": "#C581C4",
+    "QUATERNARY_COLOR": "#E6B3E5",
+    "BACKGROUND_COLOR": "#f8f9fa",
+    "CARD_HEADER_COLOR": "#831E82",
+    "FONT_FAMILY": "Helvetica",
+    "FONT_SIZE": 12,
+    "CARD_MARGIN": "mb-4",
+    "ROW_MARGIN": "mb-5 g-4",
+}
+
+# Color palette for charts
+MULTI_COLOR_PALETTE = [
+    STYLE_VARS["PRIMARY_COLOR"],
+    STYLE_VARS["SECONDARY_COLOR"],
+    STYLE_VARS["TERTIARY_COLOR"],
+    STYLE_VARS["QUATERNARY_COLOR"]
+]
+
+PRIMARY_COLOR = STYLE_VARS["PRIMARY_COLOR"]
+
 # Create reverse mapping to get the full question text for individual card headers
 reverse_mapping = {v: k for k, v in rename_mapping.items()}
-
-# Define color variables using CSS variables
-PRIMARY_COLOR = "#831E82"  # This should match CSS --primary variable
-# Generate a color palette based on the primary color
-MULTI_COLOR_PALETTE = [PRIMARY_COLOR, "#A450A3", "#C581C4", "#E6B3E5"]
-
 
 # ------------------------------
 # 1) Load 2025 data
@@ -706,14 +725,14 @@ def build_demographics_page():
     
     # Make a copy of the dataframe with the numeric column for the histogram
     df_numeric = df.copy()
-    df_numeric["years_of_experience"] = pd.to_numeric(df_numeric["years_of_experience"], errors='coerce')
+    df_numeric["years_of_experience"] = df_numeric["years_of_experience"].apply(parse_experience)
     experience_fig = make_histogram(df_numeric, "years_of_experience", "", kde=True)
     
     # Try map first, fallback to horizontal bar if issues
     try:
-        geo_fig = generate_chart(df, "continent", "", 'map')
+        geo_fig = generate_chart(df, "country_residence_1", "", 'map')
     except:
-        geo_fig = generate_chart(df, "continent", "", 'bar_h')
+        geo_fig = generate_chart(df, "country_residence_1", "", 'bar_h')
     
     role_fig = generate_chart(df, "role", "", 'donut')
     org_fig = generate_chart(df, "organization_type", "", 'donut')
@@ -747,7 +766,7 @@ def build_demographics_page():
     ], className="mb-5 g-3")  # Increased margin-bottom
     
     row2 = dbc.Row([
-        build_chart_card("Geographic Distribution", geo_fig, 12)
+        build_chart_card("Geographic Distribution", geo_fig, 6)
     ], className="mb-5 g-3")  # Increased margin-bottom
     
     # Put the two pie charts side by side in their own row with more spacing
@@ -758,7 +777,7 @@ def build_demographics_page():
     
     # Give the Application Domain bar chart its own row with full width
     row4 = dbc.Row([
-        build_chart_card("Application Domain", domain_fig, 12)
+        build_chart_card("Application Domain", domain_fig, 6)
     ], className="mb-5 g-3")  # Increased margin-bottom
     
     return html.Div([stats_row, row1, row2, row3, row4])
@@ -799,7 +818,7 @@ SIDEBAR_STYLE = {
     "bottom": 0,
     "width": "20rem",
     "padding": "2rem 1rem",
-    "background-color": PRIMARY_COLOR,
+    "background-color": STYLE_VARS["PRIMARY_COLOR"],
     "color": "white",
     "overflow-y": "auto"
 }
@@ -809,7 +828,7 @@ CONTENT_STYLE = {
     "margin-left": "22rem",
     "margin-right": "2rem",
     "padding": "2rem 1rem",
-    "background-color": "#f8f9fa",
+    "background-color": STYLE_VARS["BACKGROUND_COLOR"],
 }
 
 sidebar = html.Div(
@@ -1040,7 +1059,7 @@ def build_organization_page():
         dbc.Col([
             html.H4("Sustainability Dimensions Considered", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
             dcc.Graph(figure=dimensions_fig, config={'displayModeBar': False})
-        ], width=12, className="mb-4")
+        ], width=6, className="mb-5 g-4")
     ], className="mb-5")
     
     # Fifth row - Reasons for no training (only shown if relevant)
@@ -1049,8 +1068,8 @@ def build_organization_page():
             dbc.Col([
                 html.H4("Reasons for Not Offering Training/Resources", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
                 dcc.Graph(figure=no_training_reasons_fig, config={'displayModeBar': False})
-            ], width=12, className="mb-4")
-        ], className="mb-5")
+            ], width=6, className="mb-4")
+        ], className="mb-5 g-4")
         return html.Div([stats_row, row1, row2, row3, row4, row5])
     else:
         return html.Div([stats_row, row1, row2, row3, row4])
@@ -1101,7 +1120,7 @@ def build_job_tasks_page():
         dbc.Col([
             html.H4("What drives you to incorporate sustainability?", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
             dcc.Graph(figure=drivers_fig, config={'displayModeBar': False})
-        ], width=12, className="mb-4")
+        ], width=6, className="mb-4")
     ], className="mb-5")
     
     # Third row - Hindrances
@@ -1109,7 +1128,7 @@ def build_job_tasks_page():
         dbc.Col([
             html.H4("What hinders incorporating sustainability in your tasks?", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
             dcc.Graph(figure=hindrances_fig, config={'displayModeBar': False})
-        ], width=12, className="mb-4")
+        ], width=6, className="mb-4")
     ], className="mb-5")
     
     # Fourth row - Knowledge Gaps and Support Needed
@@ -1117,7 +1136,7 @@ def build_job_tasks_page():
         dbc.Col([
             html.H4("In which areas do you lack knowledge?", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
             dcc.Graph(figure=knowledge_fig, config={'displayModeBar': False})
-        ], width=12, className="mb-4")
+        ], width=6, className="mb-4")
     ], className="mb-5")
     
     # Fifth row - Support/Resources Needed
@@ -1125,10 +1144,59 @@ def build_job_tasks_page():
         dbc.Col([
             html.H4("What support or resources do you need?", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
             dcc.Graph(figure=support_fig, config={'displayModeBar': False})
-        ], width=12, className="mb-4")
+        ], width=6, className="mb-4")
     ], className="mb-5")
     
-    return html.Div([stats_row, row1, row2, row3, row4, row5])
+    # Prepare your chart info as (title, figure) pairs
+    bar_charts = [
+        ("What drives you to incorporate sustainability?", drivers_fig),
+        ("What hinders incorporating sustainability in your tasks?", hindrances_fig),
+        ("In which areas do you lack knowledge?", knowledge_fig),
+        ("What support or resources do you need?", support_fig),
+    ]
+
+    # Use the helper to create two rows with two charts each
+    bar_chart_rows = build_chart_grid(bar_charts, cards_per_row=2)
+
+    return html.Div([stats_row, row1] + bar_chart_rows)
+
+def parse_experience(val):
+    import re
+    import pandas as pd
+
+    def parse_experience(val):
+        if pd.isna(val):
+            return None
+        val = str(val).strip()
+        # If already a number
+        try:
+            return float(val)
+        except:
+            pass
+        # If range like "5-10"
+        match = re.match(r"(\d+)\s*-\s*(\d+)", val)
+        if match:
+            low, high = map(int, match.groups())
+            return (low + high) / 2
+        # If "10+" or "10 or more"
+        match = re.match(r"(\d+)\s*\+|(\d+)\s*or more", val)
+        if match:
+            return float(match.group(1) or match.group(2))
+        return None
+
+def build_chart_grid(chart_info_list, cards_per_row=2):
+    """
+    Given a list of (title, figure) pairs, returns a list of dbc.Row objects,
+    each containing up to `cards_per_row` chart cards.
+    """
+    rows = []
+    for i in range(0, len(chart_info_list), cards_per_row):
+        row_cards = [
+            build_chart_card(title, fig, 12 // cards_per_row)
+            for title, fig in chart_info_list[i:i+cards_per_row]
+        ]
+        rows.append(dbc.Row(row_cards, className="mb-5 g-4"))
+    return rows
 
 if __name__ == "__main__":
     app.run(debug=True)
