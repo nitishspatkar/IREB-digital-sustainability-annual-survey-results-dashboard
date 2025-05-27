@@ -1059,20 +1059,14 @@ def build_organization_page():
         dbc.Col([
             html.H4("Sustainability Dimensions Considered", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
             dcc.Graph(figure=dimensions_fig, config={'displayModeBar': False})
-        ], width=6, className="mb-5 g-4")
+        ], width=6, className="mb-5"),
+        dbc.Col([
+            html.H4("Reasons for Not Offering Training/Resources", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
+            dcc.Graph(figure=no_training_reasons_fig, config={'displayModeBar': False})
+        ], width=6, className="mb-5")
     ], className="mb-5")
     
-    # Fifth row - Reasons for no training (only shown if relevant)
-    if df["org_offers_sustainability_training"].value_counts().get("No", 0) > 0:
-        row5 = dbc.Row([
-            dbc.Col([
-                html.H4("Reasons for Not Offering Training/Resources", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
-                dcc.Graph(figure=no_training_reasons_fig, config={'displayModeBar': False})
-            ], width=6, className="mb-4")
-        ], className="mb-5 g-4")
-        return html.Div([stats_row, row1, row2, row3, row4, row5])
-    else:
-        return html.Div([stats_row, row1, row2, row3, row4])
+    return html.Div([stats_row, row1, row2, row3, row4])
 
 # -----------------------------
 # Build the Job & Tasks page
