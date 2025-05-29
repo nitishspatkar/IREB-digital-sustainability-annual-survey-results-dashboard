@@ -691,12 +691,93 @@ fig_job_support = make_multi_select_bar(df, job_task_multi_support, "Support / R
 # ------------------------------
 # 5) Build Dash Layout with Tabs and Three-Column Sections
 # ------------------------------
-external_stylesheets = [dbc.themes.YETI, dbc.icons.BOOTSTRAP]  # MODIFIED: Added Bootstrap icons
+external_stylesheets = [dbc.themes.YETI, dbc.icons.BOOTSTRAP]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = "Digital Sustainability Insights Dashboard"
 
-# Demographics page key stats and charts
-def build_demographics_page():
+# List available years (scan the data folder or hardcode for now)
+AVAILABLE_YEARS = [2025, 2026]  # Add more as needed
+
+def get_data(year):
+    return load_single_year_data(data_folder, year)
+
+# Sidebar style
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "20rem",
+    "padding": "2rem 1rem",
+    "background-color": STYLE_VARS["PRIMARY_COLOR"],
+    "color": "white",
+    "overflow-y": "auto"
+}
+
+# Content style
+CONTENT_STYLE = {
+    "margin-left": "22rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+    "background-color": STYLE_VARS["BACKGROUND_COLOR"],
+}
+
+sidebar = html.Div(
+    [
+        html.H2("Digital", className="display-5", style={"color": "white"}),
+        html.H4("Sustainability", className="mb-1", style={"color": "white", "font-weight": "lighter"}),
+        html.P("Survey Analysis", className="text-light small", style={"opacity": 0.8}),
+        dcc.Dropdown(
+            id="year-dropdown",
+            options=[{"label": str(y), "value": y} for y in AVAILABLE_YEARS],
+            value=AVAILABLE_YEARS[0],  # Default year
+            clearable=False,
+            style={"marginBottom": "1rem"}
+        ),
+        dbc.Nav(
+            [
+                dbc.NavLink([
+                    html.I(className="bi bi-people-fill me-2"),
+                    "Demographics"
+                ], href="/", active="exact", className="py-2 nav-link-custom"),
+                dbc.NavLink([
+                    html.I(className="bi bi-lightbulb-fill me-2"),
+                    "General Awareness"
+                ], href="/awareness", active="exact", className="py-2 nav-link-custom"),
+                dbc.NavLink([
+                    html.I(className="bi bi-building-fill me-2"),
+                    "Role in Organization"
+                ], href="/organization", active="exact", className="py-2 nav-link-custom"),
+                dbc.NavLink([
+                    html.I(className="bi bi-briefcase-fill me-2"),
+                    "Job & Tasks"
+                ], href="/job-tasks", active="exact", className="py-2 nav-link-custom"),
+            ],
+            vertical=True,
+            className="flex-grow-1"
+        ),
+        html.Hr(style={"border-color": "rgba(255, 255, 255, 0.3)", "margin-top": "auto"}),
+        html.P(
+            "IREB Digital Sustainability",
+            className="small text-center",
+            style={"color": "rgba(255, 255, 255, 0.7)", "margin-top": "1rem"}
+        )
+    ],
+    style=SIDEBAR_STYLE,
+)
+
+content = html.Div(id="page-content", style=CONTENT_STYLE)
+
+app.layout = dbc.Container([
+    dcc.Location(id="url", refresh=False),
+    sidebar,
+    content,
+], fluid=True, style={"min-height": "100vh", "background-color": "#f8f9fa"})
+
+# -----------------------------
+# Refactored page builder functions to accept df as argument
+# -----------------------------
+def build_demographics_page(df):
     # Key statistics for demographics
     most_common_age = df["age_group"].value_counts().idxmax()
     
@@ -782,141 +863,7 @@ def build_demographics_page():
     
     return html.Div([stats_row, row1, row2, row3, row4])
 
-# Sections (figures remain the same, but will use new colors internally)
-demographic_section = build_section_three_columns(demographic_figs)
-awareness_section = build_section_three_columns(awareness_figs)
-organization_section_single = build_section_three_columns(organization_figs)
-job_task_section_single = build_section_three_columns(job_task_figs)
-
-# Multi-select cards (remain the same, but will have styled headers)
-org_multi_card_training = build_multi_card("Training/Resources Reasons", fig_org_training)
-org_multi_card_dimensions = build_multi_card("Sustainability Dimensions Considered", fig_org_dimensions)
-job_multi_card_drives = build_multi_card("Drives to Incorporate Sustainability", fig_job_drives)
-job_multi_card_hinders = build_multi_card("Hindrances in Role-Specific Tasks", fig_hinders)
-job_multi_card_knowledge = build_multi_card("Knowledge Gaps in Tasks", fig_job_knowledge)
-job_multi_card_support = build_multi_card("Support / Resources Needed", fig_job_support)
-
-# Group multi-select cards into rows for layout
-organization_multi_section = dbc.Row([
-    dbc.Col(org_multi_card_training, width=6),
-    dbc.Col(org_multi_card_dimensions, width=6)
-], className="mb-4")
-
-job_task_multi_section = dbc.Row([
-    dbc.Col(job_multi_card_drives, width=6, className="mb-3"),
-    dbc.Col(job_multi_card_hinders, width=6, className="mb-3"),
-    dbc.Col(job_multi_card_knowledge, width=6, className="mb-3"),
-    dbc.Col(job_multi_card_support, width=6, className="mb-3")
-], className="mb-4")
-
-
-# Sidebar style
-SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": 0,
-    "left": 0,
-    "bottom": 0,
-    "width": "20rem",
-    "padding": "2rem 1rem",
-    "background-color": STYLE_VARS["PRIMARY_COLOR"],
-    "color": "white",
-    "overflow-y": "auto"
-}
-
-# Content style
-CONTENT_STYLE = {
-    "margin-left": "22rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-    "background-color": STYLE_VARS["BACKGROUND_COLOR"],
-}
-
-sidebar = html.Div(
-    [
-        html.H2("Digital", className="display-5", style={"color": "white"}),
-        html.H4("Sustainability", className="mb-1", style={"color": "white", "font-weight": "lighter"}),
-        html.P("2025 Survey Analysis", className="text-light small", style={"opacity": 0.8}),
-        html.Hr(style={"border-color": "rgba(255, 255, 255, 0.3)"}),
-        dbc.Nav(
-            [
-                dbc.NavLink([
-                    html.I(className="bi bi-people-fill me-2"),
-                    "Demographics"
-                ], href="/", active="exact", className="py-2 nav-link-custom"),
-                dbc.NavLink([
-                    html.I(className="bi bi-lightbulb-fill me-2"),
-                    "General Awareness"
-                ], href="/awareness", active="exact", className="py-2 nav-link-custom"),
-                dbc.NavLink([
-                    html.I(className="bi bi-building-fill me-2"),
-                    "Role in Organization"
-                ], href="/organization", active="exact", className="py-2 nav-link-custom"),
-                dbc.NavLink([
-                    html.I(className="bi bi-briefcase-fill me-2"),
-                    "Job & Tasks"
-                ], href="/job-tasks", active="exact", className="py-2 nav-link-custom"),
-            ],
-            vertical=True,
-            className="flex-grow-1"
-        ),
-        html.Hr(style={"border-color": "rgba(255, 255, 255, 0.3)", "margin-top": "auto"}),
-        html.P(
-            "IREB Digital Sustainability",
-            className="small text-center",
-            style={"color": "rgba(255, 255, 255, 0.7)", "margin-top": "1rem"}
-        )
-    ],
-    style=SIDEBAR_STYLE,
-)
-
-content = html.Div(id="page-content", style=CONTENT_STYLE)
-
-app.layout = dbc.Container([
-    dcc.Location(id="url", refresh=False),
-    sidebar,
-    content,
-], fluid=True, style={"min-height": "100vh", "background-color": "#f8f9fa"})
-
-
-# Callback to update page content based on sidebar navigation
-@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
-def render_page_content(pathname):
-    page_title_style = {"color": PRIMARY_COLOR, "border-bottom": f"2px solid {PRIMARY_COLOR}", "padding-bottom": "0.5rem"}
-    if pathname == "/":
-        return dbc.Container([
-            html.H3("Demographic Profile", className="mb-4 pt-3", style=page_title_style),
-            build_demographics_page()
-        ], fluid=True)
-    elif pathname == "/awareness":
-        return dbc.Container([
-            html.H3("General Awareness of Sustainability", className="mb-4 pt-3", style=page_title_style),
-            build_awareness_page()
-        ], fluid=True)
-    elif pathname == "/organization":
-        return dbc.Container([
-            html.H3("The Role of Digital Sustainability in Your Organization", className="mb-4 pt-3", style=page_title_style),
-            build_organization_page()
-        ], fluid=True)
-    elif pathname == "/job-tasks":
-        return dbc.Container([
-            html.H3("Sustainability in Your Job and Tasks", className="mb-4 pt-3", style=page_title_style),
-            build_job_tasks_page()
-        ], fluid=True)
-    # If the user tries to reach a different page, return a 404 message
-    return dbc.Container(
-        [
-            html.H1("404: Not found", className="text-danger"),
-            html.Hr(),
-            html.P(f"The pathname {pathname} was not recognised..."),
-            dbc.Button("Go to Homepage", href="/", color="primary", className="mt-3")
-        ],
-        className="py-5 text-center",
-    )
-
-# -----------------------------
-# Build the General Awareness page
-# -----------------------------
-def build_awareness_page():
+def build_awareness_page(df):
     # Calculate key statistics for General Awareness
     heard_of_def_count = df["heard_of_definition"].value_counts().get("Yes", 0)
     total_valid_responses = df["heard_of_definition"].notna().sum()
@@ -975,10 +922,7 @@ def build_awareness_page():
     
     return html.Div([stats_row, row1, row2])
 
-# -----------------------------
-# Build the Organization Role page
-# -----------------------------
-def build_organization_page():
+def build_organization_page(df):
     # Calculate key statistics for Organization section
     has_sustainability_goals = df["org_sustainability_goals"].value_counts().get("Yes", 0)
     total_goals_responses = df["org_sustainability_goals"].notna().sum()
@@ -1068,10 +1012,7 @@ def build_organization_page():
     
     return html.Div([stats_row, row1, row2, row3, row4])
 
-# -----------------------------
-# Build the Job & Tasks page
-# -----------------------------
-def build_job_tasks_page():
+def build_job_tasks_page(df):
     # Calculate key statistics for Job & Tasks section
     incorporates_in_tasks = df["incorporate_sustainability_in_tasks"].value_counts().get("Yes", 0)
     total_tasks_responses = df["incorporate_sustainability_in_tasks"].notna().sum()
@@ -1192,5 +1133,50 @@ def build_chart_grid(chart_info_list, cards_per_row=2):
         rows.append(dbc.Row(row_cards, className="mb-5 g-4"))
     return rows
 
+# ------------------------------
+# 6) Define Callbacks
+# ------------------------------
+# Callback to update page content based on sidebar navigation and year
+@app.callback(
+    Output("page-content", "children"),
+    [Input("url", "pathname"), Input("year-dropdown", "value")]
+)
+def render_page_content(pathname, selected_year):
+    df = get_data(selected_year)
+    page_title_style = {"color": PRIMARY_COLOR, "border-bottom": f"2px solid {PRIMARY_COLOR}", "padding-bottom": "0.5rem"}
+    if pathname == "/":
+        return dbc.Container([
+            html.H3("Demographic Profile", className="mb-4 pt-3", style=page_title_style),
+            build_demographics_page(df)
+        ], fluid=True)
+    elif pathname == "/awareness":
+        return dbc.Container([
+            html.H3("General Awareness of Sustainability", className="mb-4 pt-3", style=page_title_style),
+            build_awareness_page(df)
+        ], fluid=True)
+    elif pathname == "/organization":
+        return dbc.Container([
+            html.H3("The Role of Digital Sustainability in Your Organization", className="mb-4 pt-3", style=page_title_style),
+            build_organization_page(df)
+        ], fluid=True)
+    elif pathname == "/job-tasks":
+        return dbc.Container([
+            html.H3("Sustainability in Your Job and Tasks", className="mb-4 pt-3", style=page_title_style),
+            build_job_tasks_page(df)
+        ], fluid=True)
+    # If the user tries to reach a different page, return a 404 message
+    return dbc.Container(
+        [
+            html.H1("404: Not found", className="text-danger"),
+            html.Hr(),
+            html.P(f"The pathname {pathname} was not recognised..."),
+            dbc.Button("Go to Homepage", href="/", color="primary", className="mt-3")
+        ],
+        className="py-5 text-center",
+    )
+
+# -----------------------------
+# Entry Point
+# -----------------------------
 if __name__ == "__main__":
     app.run(debug=True)
