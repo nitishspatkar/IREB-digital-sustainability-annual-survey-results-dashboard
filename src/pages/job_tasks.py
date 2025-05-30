@@ -72,34 +72,59 @@ def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
         )
     ], className="mb-5 g-4")
     
-    # Multi-select sections
-    row2 = dbc.Row([
-        dbc.Col([
-            html.H4("What drives you to incorporate sustainability?", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
-            dcc.Graph(figure=drivers_fig, config={'displayModeBar': False})
-        ], width=12, className="mb-4")
-    ], className="mb-5")
+    # Multi-select sections with headers
+    section_header_style = {
+        "color": PRIMARY_COLOR,
+        "margin-top": "2rem",
+        "margin-bottom": "1.5rem",
+        "font-size": "1.5rem",
+        "border-bottom": f"2px solid {PRIMARY_COLOR}",
+        "padding-bottom": "0.5rem"
+    }
     
-    row3 = dbc.Row([
-        dbc.Col([
-            html.H4("What hinders incorporating sustainability in your tasks?", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
-            dcc.Graph(figure=hindrances_fig, config={'displayModeBar': False})
-        ], width=12, className="mb-4")
-    ], className="mb-5")
+    # Drivers and Barriers section
+    drivers_barriers_section = html.Div([
+        html.H4("Drivers and Barriers", style=section_header_style),
+        html.P(
+            "Explore what motivates and hinders professionals in incorporating sustainability practices.",
+            className="mb-4",
+            style={"color": "#666"}
+        ),
+        dbc.Row([
+            build_chart_card(
+                "Drivers for Sustainability",
+                drivers_fig,
+                6
+            ),
+            build_chart_card(
+                "Barriers to Implementation",
+                hindrances_fig,
+                6
+            )
+        ], className="mb-5 g-4")
+    ])
     
-    row4 = dbc.Row([
-        dbc.Col([
-            html.H4("In which areas do you lack knowledge?", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
-            dcc.Graph(figure=knowledge_fig, config={'displayModeBar': False})
-        ], width=12, className="mb-4")
-    ], className="mb-5")
-    
-    row5 = dbc.Row([
-        dbc.Col([
-            html.H4("What support or resources do you need?", className="mt-4 mb-3", style={"color": PRIMARY_COLOR}),
-            dcc.Graph(figure=support_fig, config={'displayModeBar': False})
-        ], width=12, className="mb-4")
-    ], className="mb-5")
+    # Knowledge and Support section
+    knowledge_support_section = html.Div([
+        html.H4("Knowledge Gaps and Support Needs", style=section_header_style),
+        html.P(
+            "Identify areas where professionals need more knowledge and support.",
+            className="mb-4",
+            style={"color": "#666"}
+        ),
+        dbc.Row([
+            build_chart_card(
+                "Knowledge Gaps",
+                knowledge_fig,
+                6
+            ),
+            build_chart_card(
+                "Support Needs",
+                support_fig,
+                6
+            )
+        ], className="mb-5 g-4")
+    ])
     
     # Page title style
     page_title_style = {
@@ -109,11 +134,9 @@ def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
     }
     
     return html.Div([
-        html.H3("Sustainability in Your Job and Tasks", className="mb-4 pt-3", style=page_title_style),
+        html.H3("Digital Sustainability in Your Daily Work", className="mb-4 pt-3", style=page_title_style),
         stats_row,
         row1,
-        row2,
-        row3,
-        row4,
-        row5
+        drivers_barriers_section,
+        knowledge_support_section
     ]) 

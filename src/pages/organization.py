@@ -138,13 +138,13 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
         ),
         dbc.Row([
             build_chart_card(
-                "🎯 Dimensions Currently Considered",
+                "Sustainability Dimensions Considered",
                 dimensions_fig,
                 6,
                 className="mb-5"
             ),
             build_chart_card(
-                "❓ Why Organizations Don't Offer Training",
+                "Reasons for Not Offering Training",
                 no_training_reasons_fig,
                 6,
                 className="mb-5"

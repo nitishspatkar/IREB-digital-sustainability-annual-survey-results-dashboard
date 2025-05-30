@@ -8,6 +8,11 @@ from collections import defaultdict
 
 from src.config import PRIMARY_COLOR, MULTI_COLOR_PALETTE, STYLE_VARS, NUMERIC_COLS
 
+# Font size configurations
+TITLE_FONT_SIZE = STYLE_VARS["FONT_SIZE"] + 2  # Slightly larger for titles
+LABEL_FONT_SIZE = STYLE_VARS["FONT_SIZE"]  # Base size for labels
+ANNOTATION_FONT_SIZE = STYLE_VARS["FONT_SIZE"]  # Base size for annotations
+
 def create_no_data_figure(title: Optional[str] = None) -> go.Figure:
     """Create a placeholder figure when no data is available."""
     fig = go.Figure()
@@ -17,7 +22,7 @@ def create_no_data_figure(title: Optional[str] = None) -> go.Figure:
         x=0.5, y=0.5,
         xref="paper", yref="paper",
         showarrow=False,
-        font=dict(size=16, color="gray"),
+        font=dict(size=ANNOTATION_FONT_SIZE, color="gray"),
     )
     
     fig.update_layout(
@@ -27,10 +32,79 @@ def create_no_data_figure(title: Optional[str] = None) -> go.Figure:
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=10, r=10, t=30 if title else 10, b=10),
-        height=300
+        height=300,
+        font=dict(
+            family=STYLE_VARS["FONT_FAMILY"],
+            size=LABEL_FONT_SIZE
+        )
     )
     
     return fig
+
+def simplify_label(col: str) -> str:
+    """Simplify column labels for better visualization.
+    
+    For multi-select questions, extracts only the option part after [...]
+    For regular questions, returns the original text.
+    """
+    # Handle numeric values by converting to string
+    if pd.isna(col):
+        return "N/A"
+    
+    # Convert to string if numeric
+    col = str(col)
+    
+    # First check if it's a multi-select question with square brackets
+    if '[' in col and ']' in col:
+        # Extract text between square brackets
+        start = col.find('[') + 1
+        end = col.rfind(']')  # Use rfind to handle nested brackets
+        if end == -1:  # If no closing bracket found
+            end = len(col)
+        option = col[start:end].strip()
+        
+        # Clean up any trailing spaces or brackets
+        option = option.strip(' ]')
+        
+        # If the option contains explanatory text in parentheses, keep it clean
+        if '(' in option and ')' in option:
+            parts = option.split('(', 1)
+            explanation = parts[1].split(')')[0]
+            return f"{parts[0].strip()} ({explanation})"
+        
+        return option
+    
+    # For regular questions, try to extract just the answer part
+    # Common patterns in the questions
+    patterns = [
+        "What hinders you from incorporating sustainability in your role-specific tasks?",
+        "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?",
+        "What additional support or resources would help you integrate digital sustainability into your work?",
+        "What drives you to incorporate sustainability in your role-related tasks?",
+        "Do you incorporate",
+        "Are there specific",
+        "Does your organization",
+        "How frequently",
+        "Have you participated",
+        "Are you satisfied"
+    ]
+    
+    # Remove any known question patterns
+    text = col
+    for pattern in patterns:
+        text = text.replace(pattern, "").strip()
+    
+    # Remove any remaining question marks and clean up
+    text = text.split('?')[-1].strip()
+    
+    # Clean up any leading/trailing punctuation and whitespace
+    text = text.strip('[]() .,:-')
+    
+    # If the text is empty after cleaning, return the original
+    if not text:
+        return col
+    
+    return text
 
 def make_bar_chart(
     df: pd.DataFrame,
@@ -48,11 +122,14 @@ def make_bar_chart(
     if counts.shape[0] == 0 or (counts.shape[0] == 1 and pd.isna(counts[col].iloc[0])):
         return create_no_data_figure(title)
     
+    # Simplify the labels for display
+    counts['display_label'] = counts[col].apply(simplify_label)
+    
     if horizontal:
         counts = counts.sort_values("count")
         fig = px.bar(
             counts,
-            y=col,
+            y='display_label',  # Use simplified labels
             x="count",
             template="plotly_white",
             color_discrete_sequence=[PRIMARY_COLOR]
@@ -60,22 +137,29 @@ def make_bar_chart(
         fig.update_traces(
             hoverinfo='none',  # Remove hover effect
             text=counts["count"],  # Show count as text
-            textposition='outside'
+            textposition='outside',
+            textfont=dict(size=LABEL_FONT_SIZE)
         )
         fig.update_layout(
-            title=title if title else None,
+            title=dict(
+                text=title if title else None,
+                font=dict(size=TITLE_FONT_SIZE)
+            ),
             yaxis_title=None,
             xaxis_title="Count",
             height=350,
             margin=dict(l=10, r=10, t=30 if title else 10, b=10),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Helvetica", size=12)
+            font=dict(
+                family=STYLE_VARS["FONT_FAMILY"],
+                size=LABEL_FONT_SIZE
+            )
         )
     else:
         fig = px.bar(
             counts,
-            x=col,
+            x='display_label',  # Use simplified labels
             y="count",
             template="plotly_white",
             color_discrete_sequence=[PRIMARY_COLOR]
@@ -83,16 +167,23 @@ def make_bar_chart(
         fig.update_traces(
             hoverinfo='none',  # Remove hover effect
             text=counts["count"],  # Show count as text
-            textposition='outside'
+            textposition='outside',
+            textfont=dict(size=LABEL_FONT_SIZE)
         )
         fig.update_layout(
-            title=title if title else None,
+            title=dict(
+                text=title if title else None,
+                font=dict(size=TITLE_FONT_SIZE)
+            ),
             xaxis_title=None,
             yaxis_title="Count",
             margin=dict(l=10, r=10, t=30 if title else 10, b=10),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Helvetica", size=12)
+            font=dict(
+                family=STYLE_VARS["FONT_FAMILY"],
+                size=LABEL_FONT_SIZE
+            )
         )
     return fig
 
@@ -122,35 +213,75 @@ def make_pie_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> g
     fig.update_traces(
         textposition='inside',
         textinfo='percent+label',  # Show both percentage and label
-        hoverinfo='none'  # Remove hover effect
+        hoverinfo='none',  # Remove hover effect
+        textfont=dict(size=LABEL_FONT_SIZE)
     )
     
     fig.update_layout(
-        title=title if title else None,
+        title=dict(
+            text=title if title else None,
+            font=dict(size=TITLE_FONT_SIZE)
+        ),
         margin=dict(l=10, r=10, t=30 if title else 10, b=100),
         legend=dict(
             orientation="h",
             yanchor="bottom", 
             y=-0.5,
             xanchor="center", 
-            x=0.5
+            x=0.5,
+            font=dict(size=LABEL_FONT_SIZE)
         ),
         paper_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Helvetica", size=12),
+        font=dict(
+            family=STYLE_VARS["FONT_FAMILY"],
+            size=LABEL_FONT_SIZE
+        ),
         height=500
     )
     
     fig.add_annotation(
         text=f"Total<br>{total}",
         x=0.5, y=0.5,
-        font_size=15,
+        font=dict(size=ANNOTATION_FONT_SIZE),
         showarrow=False
     )
     return fig
 
 def make_donut_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> go.Figure:
     """Create a donut chart for a categorical column."""
-    return make_pie_chart(df, col, title)  # Same as pie chart with hole
+    if df[col].notna().sum() == 0:
+        return create_no_data_figure(title)
+    
+    counts = df[col].value_counts(dropna=False)
+    
+    fig = px.pie(
+        names=counts.index.astype(str),
+        values=counts.values,
+        hole=0.5,
+        title=title,
+        color_discrete_sequence=MULTI_COLOR_PALETTE
+    )
+    
+    fig.update_traces(
+        textinfo='percent+label',
+        textfont=dict(size=LABEL_FONT_SIZE)
+    )
+    
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(
+            family=STYLE_VARS["FONT_FAMILY"],
+            size=LABEL_FONT_SIZE
+        ),
+        title=dict(
+            text=title if title else None,
+            font=dict(size=TITLE_FONT_SIZE)
+        ),
+        margin=dict(l=10, r=10, t=30 if title else 10, b=10),
+        hovermode=False
+    )
+    
+    return fig
 
 def make_histogram(
     df: pd.DataFrame,
@@ -181,14 +312,20 @@ def make_histogram(
         ))
         
         fig.update_layout(
-            title=title if title else None,
+            title=dict(
+                text=title if title else None,
+                font=dict(size=TITLE_FONT_SIZE)
+            ),
             xaxis_title=None,
             yaxis_title="Frequency",
             template="plotly_white",
             margin=dict(l=10, r=10, t=30 if title else 10, b=10),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Helvetica", size=12)
+            font=dict(
+                family=STYLE_VARS["FONT_FAMILY"],
+                size=LABEL_FONT_SIZE
+            )
         )
     else:
         fig = px.histogram(
@@ -202,13 +339,19 @@ def make_histogram(
             hoverinfo='none'  # Remove hover effect
         )
         fig.update_layout(
-            title=title if title else None,
+            title=dict(
+                text=title if title else None,
+                font=dict(size=TITLE_FONT_SIZE)
+            ),
             xaxis_title=None,
             yaxis_title="Frequency",
             margin=dict(l=10, r=10, t=30 if title else 10, b=10),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Helvetica", size=12)
+            font=dict(
+                family=STYLE_VARS["FONT_FAMILY"],
+                size=LABEL_FONT_SIZE
+            )
         )
     return fig
 
@@ -217,52 +360,32 @@ def make_world_map(df: pd.DataFrame, col: str, title: Optional[str] = None) -> g
     if df[col].notna().sum() == 0:
         return create_no_data_figure(title)
     
-    counts = df[col].value_counts(dropna=False).reset_index()
-    counts.columns = [col, "count"]
+    counts = df[col].value_counts(dropna=False)
     
-    if counts.shape[0] == 0 or (counts.shape[0] == 1 and pd.isna(counts[col].iloc[0])):
-        return create_no_data_figure(title)
-    
-    if col == "continent":
-        fig = px.choropleth(
-            counts,
-            locations=col,
-            locationmode="country names",
-            color="count",
-            color_continuous_scale=px.colors.sequential.Purp
-        )
-    else:
-        fig = px.choropleth(
-            counts,
-            locations=col,
-            locationmode="country names",
-            color="count",
-            color_continuous_scale=px.colors.sequential.Purp
-        )
-    
-    fig.update_traces(
-        hoverinfo='none'  # Remove hover effect
+    fig = px.choropleth(
+        locations=counts.index,
+        locationmode="country names",
+        color=counts.values,
+        hover_name=counts.index,
+        color_continuous_scale=px.colors.sequential.Plasma,
+        title=title
     )
     
     fig.update_layout(
-        title=title if title else None,
-        geo=dict(
-            showframe=False,
-            showcoastlines=True,
-            projection_type='natural earth',
-            showland=True,
-            showcountries=True,
-            landcolor='rgb(243, 243, 243)',
-            countrycolor='rgb(204, 204, 204)',
-            coastlinecolor='rgb(204, 204, 204)',
-            projection_scale=1.3
+        title=dict(
+            text=title if title else None,
+            font=dict(size=TITLE_FONT_SIZE)
         ),
-        margin=dict(l=0, r=0, t=30 if title else 10, b=0),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Helvetica", size=12),
-        height=600
+        font=dict(
+            family=STYLE_VARS["FONT_FAMILY"],
+            size=LABEL_FONT_SIZE
+        ),
+        margin=dict(l=10, r=10, t=30 if title else 10, b=10),
+        hovermode=False
     )
+    
     return fig
 
 def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str] = None) -> go.Figure:
@@ -273,19 +396,13 @@ def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str
     # Count responses for each option
     counts = []
     for col in cols:
-        # Find the matching column in the dataframe
-        matching_cols = [c for c in df.columns if c.strip() == col.strip()]
-        if matching_cols:
-            col_name = matching_cols[0]
-            option = simplify_label(col_name)
-            
-            # For these specific columns, we're looking for any non-null value as a "yes"
-            count = df[col_name].notna().sum()
+        if col in df:
+            count = df[col].fillna(0).astype(bool).sum()
             total = len(df)
             if total > 0:
                 percentage = (count / total) * 100
                 counts.append({
-                    'option': option,
+                    'option': col,
                     'count': count,
                     'percentage': percentage
                 })
@@ -306,19 +423,26 @@ def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str
         marker_color=PRIMARY_COLOR,
         text=[f"{count} ({percentage:.1f}%)" for count, percentage in zip(counts_df['count'], counts_df['percentage'])],
         textposition='outside',
-        hoverinfo='none'  # Remove hover effect
+        hoverinfo='none',  # Remove hover effect
+        textfont=dict(size=LABEL_FONT_SIZE)
     ))
     
     # Update layout
     fig.update_layout(
-        title=title if title else None,
+        title=dict(
+            text=title if title else None,
+            font=dict(size=TITLE_FONT_SIZE)
+        ),
         xaxis_title="Number of Responses",
         yaxis_title=None,
         template="plotly_white",
         margin=dict(l=10, r=10, t=30 if title else 10, b=10),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Helvetica", size=12),
+        font=dict(
+            family=STYLE_VARS["FONT_FAMILY"],
+            size=LABEL_FONT_SIZE
+        ),
         showlegend=False,
         height=max(300, len(counts) * 40)
     )
@@ -328,36 +452,6 @@ def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str
     fig.update_yaxes(showgrid=False)
     
     return fig
-
-def simplify_label(col: str) -> str:
-    """Simplify column labels for better visualization.
-    
-    For multi-select questions, extracts only the option part after [...]
-    For regular questions, returns the original text.
-    """
-    if '[' in col and ']' in col:
-        # Extract text between square brackets
-        start = col.find('[') + 1
-        end = col.rfind(']')  # Use rfind to handle nested brackets
-        if end == -1:  # If no closing bracket found
-            end = len(col)
-        option = col[start:end].strip()
-        
-        # Clean up any trailing spaces or brackets
-        option = option.strip(' ]')
-        
-        # If the option contains explanatory text in parentheses, keep it
-        if '(' in option and ')' in option:
-            # Keep the first part of the explanation if it's too long
-            parts = option.split('(', 1)
-            if len(parts) == 2:
-                explanation = parts[1].split(',')[0] + ')'  # Keep only the first part
-                option = f"{parts[0].strip()} ({explanation}"
-            return option
-        
-        return option
-    
-    return col.split('?')[0].strip()
 
 def generate_chart(
     df: pd.DataFrame,

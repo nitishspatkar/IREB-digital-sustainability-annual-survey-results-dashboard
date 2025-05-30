@@ -167,7 +167,14 @@ def create_sidebar() -> html.Div:
                 options=[{"label": str(y), "value": y} for y in [2025, 2026]],  # Add more years as needed
                 value=2025,  # Default year
                 clearable=False,
-                style={"marginBottom": "1rem"}
+                style={
+                    "marginBottom": "1rem",
+                    "backgroundColor": "white",
+                    "color": "#333",
+                    "borderRadius": "4px",
+                    "width": "100%"
+                },
+                className="year-dropdown"
             ),
             dbc.Nav(
                 [

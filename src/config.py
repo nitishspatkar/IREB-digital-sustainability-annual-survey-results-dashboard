@@ -9,7 +9,7 @@ STYLE_VARS = {
     "BACKGROUND_COLOR": "#f8f9fa",
     "CARD_HEADER_COLOR": "#831E82",
     "FONT_FAMILY": "Helvetica",
-    "FONT_SIZE": 12,
+    "FONT_SIZE": 14,
     "CARD_MARGIN": "mb-4",
     "ROW_MARGIN": "mb-5 g-4",
 }
