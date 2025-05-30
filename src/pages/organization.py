@@ -137,22 +137,18 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
             style={"color": "#666"}
         ),
         dbc.Row([
-            dbc.Col([
-                html.Div([
-                    html.H5("🎯 Dimensions Currently Considered", 
-                           className="mb-3", 
-                           style={"color": PRIMARY_COLOR}),
-                    dcc.Graph(figure=dimensions_fig, config={'displayModeBar': False})
-                ], style={"background-color": "white", "padding": "20px", "border-radius": "10px", "box-shadow": "0 2px 4px rgba(0,0,0,0.1)"})
-            ], width=6, className="mb-5"),
-            dbc.Col([
-                html.Div([
-                    html.H5("❓ Why Organizations Don't Offer Training", 
-                           className="mb-3", 
-                           style={"color": PRIMARY_COLOR}),
-                    dcc.Graph(figure=no_training_reasons_fig, config={'displayModeBar': False})
-                ], style={"background-color": "white", "padding": "20px", "border-radius": "10px", "box-shadow": "0 2px 4px rgba(0,0,0,0.1)"})
-            ], width=6, className="mb-5")
+            build_chart_card(
+                "🎯 Dimensions Currently Considered",
+                dimensions_fig,
+                6,
+                className="mb-5"
+            ),
+            build_chart_card(
+                "❓ Why Organizations Don't Offer Training",
+                no_training_reasons_fig,
+                6,
+                className="mb-5"
+            )
         ], className="mb-5")
     ])
     

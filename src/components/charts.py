@@ -8,7 +8,7 @@ from collections import defaultdict
 
 from src.config import PRIMARY_COLOR, MULTI_COLOR_PALETTE, STYLE_VARS, NUMERIC_COLS
 
-def create_no_data_figure(title: str = "") -> go.Figure:
+def create_no_data_figure(title: Optional[str] = None) -> go.Figure:
     """Create a placeholder figure when no data is available."""
     fig = go.Figure()
     
@@ -21,12 +21,12 @@ def create_no_data_figure(title: str = "") -> go.Figure:
     )
     
     fig.update_layout(
-        title=title,
+        title=title if title else None,
         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=10, r=10, t=50, b=10),
+        margin=dict(l=10, r=10, t=30 if title else 10, b=10),
         height=300
     )
     
@@ -35,7 +35,7 @@ def create_no_data_figure(title: str = "") -> go.Figure:
 def make_bar_chart(
     df: pd.DataFrame,
     col: str,
-    title: str,
+    title: Optional[str] = None,
     horizontal: bool = False
 ) -> go.Figure:
     """Create a bar chart for a categorical column."""
@@ -54,15 +54,20 @@ def make_bar_chart(
             counts,
             y=col,
             x="count",
-            title=title,
             template="plotly_white",
             color_discrete_sequence=[PRIMARY_COLOR]
         )
+        fig.update_traces(
+            hoverinfo='none',  # Remove hover effect
+            text=counts["count"],  # Show count as text
+            textposition='outside'
+        )
         fig.update_layout(
-            yaxis_title=col.replace("_", " ").title(), 
+            title=title if title else None,
+            yaxis_title=None,
             xaxis_title="Count",
             height=350,
-            margin=dict(l=10, r=10, t=50, b=10),
+            margin=dict(l=10, r=10, t=30 if title else 10, b=10),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Helvetica", size=12)
@@ -72,21 +77,26 @@ def make_bar_chart(
             counts,
             x=col,
             y="count",
-            title=title,
             template="plotly_white",
             color_discrete_sequence=[PRIMARY_COLOR]
         )
+        fig.update_traces(
+            hoverinfo='none',  # Remove hover effect
+            text=counts["count"],  # Show count as text
+            textposition='outside'
+        )
         fig.update_layout(
-            xaxis_title=col.replace("_", " ").title(), 
+            title=title if title else None,
+            xaxis_title=None,
             yaxis_title="Count",
-            margin=dict(l=10, r=10, t=50, b=10),
+            margin=dict(l=10, r=10, t=30 if title else 10, b=10),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Helvetica", size=12)
         )
     return fig
 
-def make_pie_chart(df: pd.DataFrame, col: str, title: str) -> go.Figure:
+def make_pie_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> go.Figure:
     """Create a pie chart for a categorical column."""
     if df[col].notna().sum() == 0:
         return create_no_data_figure(title)
@@ -104,7 +114,6 @@ def make_pie_chart(df: pd.DataFrame, col: str, title: str) -> go.Figure:
         counts,
         names=col,
         values="count",
-        title=title,
         template="plotly_white",
         color_discrete_sequence=MULTI_COLOR_PALETTE,
         hole=0.4
@@ -112,12 +121,13 @@ def make_pie_chart(df: pd.DataFrame, col: str, title: str) -> go.Figure:
     
     fig.update_traces(
         textposition='inside',
-        textinfo='percent',
-        hovertemplate='%{label}<br>Count: %{value}<br>Percentage: %{percent:.1f}%<extra></extra>'
+        textinfo='percent+label',  # Show both percentage and label
+        hoverinfo='none'  # Remove hover effect
     )
     
     fig.update_layout(
-        margin=dict(l=10, r=10, t=50, b=100),
+        title=title if title else None,
+        margin=dict(l=10, r=10, t=30 if title else 10, b=100),
         legend=dict(
             orientation="h",
             yanchor="bottom", 
@@ -138,14 +148,14 @@ def make_pie_chart(df: pd.DataFrame, col: str, title: str) -> go.Figure:
     )
     return fig
 
-def make_donut_chart(df: pd.DataFrame, col: str, title: str) -> go.Figure:
+def make_donut_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> go.Figure:
     """Create a donut chart for a categorical column."""
     return make_pie_chart(df, col, title)  # Same as pie chart with hole
 
 def make_histogram(
     df: pd.DataFrame,
     col: str,
-    title: str,
+    title: Optional[str] = None,
     bins: int = 10,
     kde: bool = True
 ) -> go.Figure:
@@ -165,15 +175,17 @@ def make_histogram(
             nbinsx=bins,
             marker_color=PRIMARY_COLOR,
             opacity=0.7,
-            name="Count"
+            name="Count",
+            hoverinfo='none',  # Remove hover effect
+            showlegend=False
         ))
         
         fig.update_layout(
-            title=title,
-            xaxis_title=col.replace("_", " ").title(),
+            title=title if title else None,
+            xaxis_title=None,
             yaxis_title="Frequency",
             template="plotly_white",
-            margin=dict(l=10, r=10, t=50, b=10),
+            margin=dict(l=10, r=10, t=30 if title else 10, b=10),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Helvetica", size=12)
@@ -183,21 +195,24 @@ def make_histogram(
             df,
             x=numeric_values,
             nbins=bins,
-            title=title,
             template="plotly_white",
             color_discrete_sequence=[PRIMARY_COLOR]
         )
+        fig.update_traces(
+            hoverinfo='none'  # Remove hover effect
+        )
         fig.update_layout(
-            xaxis_title=col.replace("_", " ").title(), 
+            title=title if title else None,
+            xaxis_title=None,
             yaxis_title="Frequency",
-            margin=dict(l=10, r=10, t=50, b=10),
+            margin=dict(l=10, r=10, t=30 if title else 10, b=10),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(family="Helvetica", size=12)
         )
     return fig
 
-def make_world_map(df: pd.DataFrame, col: str, title: str) -> go.Figure:
+def make_world_map(df: pd.DataFrame, col: str, title: Optional[str] = None) -> go.Figure:
     """Create a choropleth map for countries or continents."""
     if df[col].notna().sum() == 0:
         return create_no_data_figure(title)
@@ -214,8 +229,7 @@ def make_world_map(df: pd.DataFrame, col: str, title: str) -> go.Figure:
             locations=col,
             locationmode="country names",
             color="count",
-            color_continuous_scale=px.colors.sequential.Purp,
-            title=title
+            color_continuous_scale=px.colors.sequential.Purp
         )
     else:
         fig = px.choropleth(
@@ -223,11 +237,15 @@ def make_world_map(df: pd.DataFrame, col: str, title: str) -> go.Figure:
             locations=col,
             locationmode="country names",
             color="count",
-            color_continuous_scale=px.colors.sequential.Purp,
-            title=title
+            color_continuous_scale=px.colors.sequential.Purp
         )
     
+    fig.update_traces(
+        hoverinfo='none'  # Remove hover effect
+    )
+    
     fig.update_layout(
+        title=title if title else None,
         geo=dict(
             showframe=False,
             showcoastlines=True,
@@ -237,27 +255,20 @@ def make_world_map(df: pd.DataFrame, col: str, title: str) -> go.Figure:
             landcolor='rgb(243, 243, 243)',
             countrycolor='rgb(204, 204, 204)',
             coastlinecolor='rgb(204, 204, 204)',
-            projection_scale=1.3  # Adjust the zoom level
+            projection_scale=1.3
         ),
-        margin=dict(l=0, r=0, t=50, b=0),
+        margin=dict(l=0, r=0, t=30 if title else 10, b=0),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Helvetica", size=12),
-        height=600  # Increase the height
+        height=600
     )
     return fig
 
-def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: str) -> go.Figure:
+def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str] = None) -> go.Figure:
     """Create a horizontal bar chart for multiple-select questions."""
     if not cols or df.empty:
         return create_no_data_figure(title)
-    
-    # Extract the common question prefix if it exists
-    if len(cols) > 1:
-        first_col = cols[0]
-        if '[' in first_col:
-            question_prefix = first_col[:first_col.find('[')].strip()
-            title = title or question_prefix  # Use the question as title if no title provided
     
     # Count responses for each option
     counts = []
@@ -266,19 +277,7 @@ def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: str) -> go.F
         matching_cols = [c for c in df.columns if c.strip() == col.strip()]
         if matching_cols:
             col_name = matching_cols[0]
-            # Extract just the option part from the column name
-            if '[' in col_name and ']' in col_name:
-                option = col_name[col_name.find('[')+1:col_name.rfind(']')].strip()
-                # Clean up the option text
-                if '(' in option:
-                    # Keep only the main text and first part of explanation
-                    main_text = option.split('(')[0].strip()
-                    explanation = option.split('(')[1].split(',')[0].strip() + ')'
-                    option = f"{main_text} ({explanation}"
-                else:
-                    option = option.strip()
-            else:
-                option = col_name.split('?')[0].strip()
+            option = simplify_label(col_name)
             
             # For these specific columns, we're looking for any non-null value as a "yes"
             count = df[col_name].notna().sum()
@@ -305,23 +304,23 @@ def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: str) -> go.F
         y=counts_df['option'],
         orientation='h',
         marker_color=PRIMARY_COLOR,
-        text=counts_df['percentage'].apply(lambda x: f'{x:.1f}%'),  # Show percentage as text
+        text=[f"{count} ({percentage:.1f}%)" for count, percentage in zip(counts_df['count'], counts_df['percentage'])],
         textposition='outside',
-        hoverinfo='none'  # Disable hover effect
+        hoverinfo='none'  # Remove hover effect
     ))
     
     # Update layout
     fig.update_layout(
-        title=title,
+        title=title if title else None,
         xaxis_title="Number of Responses",
-        yaxis_title="",
+        yaxis_title=None,
         template="plotly_white",
-        margin=dict(l=10, r=10, t=50, b=10),  # Revert to original margins
+        margin=dict(l=10, r=10, t=30 if title else 10, b=10),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Helvetica", size=12),
         showlegend=False,
-        height=max(300, len(counts) * 40)  # Dynamic height based on number of options
+        height=max(300, len(counts) * 40)
     )
     
     # Update axes
@@ -367,9 +366,6 @@ def generate_chart(
     chart_type: str = 'auto'
 ) -> go.Figure:
     """Automatically generate an appropriate chart based on data type."""
-    if not title:
-        title = f"{col.replace('_', ' ').title()} Distribution"
-    
     df_copy = df.copy()
     
     if col in NUMERIC_COLS:

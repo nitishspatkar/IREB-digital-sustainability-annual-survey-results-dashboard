@@ -6,6 +6,12 @@ from dash import html, dcc
 
 from src.config import STYLE_VARS, PRIMARY_COLOR
 
+def clean_title(title: str) -> str:
+    """Clean and standardize title text for consistent display."""
+    # Remove emojis and special characters but keep basic punctuation
+    cleaned = title.replace('🎯', '').replace('❓', '').strip()
+    return cleaned
+
 def build_stat_card(
     title: str,
     value: str,
@@ -17,7 +23,7 @@ def build_stat_card(
     card_content = [
         dbc.CardHeader([
             html.I(className=f"bi {icon_class} me-2"),
-            html.Span(title)
+            html.Span(clean_title(title))
         ], className="d-flex align-items-center"),
         dbc.CardBody([
             html.H2(value, className="card-title text-center mb-0"),
@@ -28,7 +34,7 @@ def build_stat_card(
             ], className="text-center mt-2") if trend else None
         ])
     ]
-    return dbc.Card(card_content, className="shadow-sm h-100")
+    return dbc.Card(card_content, className="shadow-sm h-100 border-0")
 
 def build_chart_card(
     title: str,
@@ -40,13 +46,21 @@ def build_chart_card(
     return dbc.Col(
         dbc.Card([
             dbc.CardHeader(
-                html.H5(title, className="card-title"),
-                className="card-header-primary" 
+                html.H5(clean_title(title), className="card-title mb-0"),
+                className="card-header-primary border-bottom-0",
+                style={"font-size": "1rem", "font-weight": "500"}
             ),
             dbc.CardBody(
-                dcc.Graph(figure=fig, config={'displayModeBar': False})
+                dcc.Graph(
+                    figure=fig,
+                    config={
+                        'displayModeBar': False,
+                        'staticPlot': True  # This disables all interactivity including hover
+                    }
+                ),
+                className="pt-0"  # Remove top padding since header has no border
             )
-        ], className="shadow-sm h-100"),
+        ], className="shadow-sm h-100 border-0"),
         width=column_width,
         className=className
     )
@@ -60,12 +74,22 @@ def build_card(col: str, fig: object, reverse_mapping: Dict[str, str]) -> dbc.Ca
     return dbc.Card(
         [
             dbc.CardHeader(
-                html.H5(question_text, className="card-title"),
-                className="card-header-primary"
+                html.H5(clean_title(question_text), className="card-title mb-0"),
+                className="card-header-primary border-bottom-0",
+                style={"font-size": "1rem", "font-weight": "500"}
             ),
-            dbc.CardBody(dcc.Graph(figure=fig, config={'displayModeBar': False}))
+            dbc.CardBody(
+                dcc.Graph(
+                    figure=fig,
+                    config={
+                        'displayModeBar': False,
+                        'staticPlot': True  # This disables all interactivity including hover
+                    }
+                ),
+                className="pt-0"  # Remove top padding since header has no border
+            )
         ],
-        className="mb-4 shadow-sm"
+        className="mb-4 shadow-sm border-0"
     )
 
 def build_multi_card(title: str, fig: object) -> dbc.Card:
@@ -73,12 +97,22 @@ def build_multi_card(title: str, fig: object) -> dbc.Card:
     return dbc.Card(
         [
             dbc.CardHeader(
-                html.H5(title, className="card-title"),
-                className="card-header-primary"
+                html.H5(clean_title(title), className="card-title mb-0"),
+                className="card-header-primary border-bottom-0",
+                style={"font-size": "1rem", "font-weight": "500"}
             ),
-            dbc.CardBody(dcc.Graph(figure=fig, config={'displayModeBar': False}))
+            dbc.CardBody(
+                dcc.Graph(
+                    figure=fig,
+                    config={
+                        'displayModeBar': False,
+                        'staticPlot': True  # This disables all interactivity including hover
+                    }
+                ),
+                className="pt-0"  # Remove top padding since header has no border
+            )
         ],
-        className="mb-4 shadow-sm"
+        className="mb-4 shadow-sm border-0"
     )
 
 def build_section_three_columns(
