@@ -4,7 +4,12 @@ from typing import List, Dict, Tuple, Union
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 
-from src.config import STYLE_VARS, PRIMARY_COLOR
+from src.config import (
+    STYLE_VARS,
+    PRIMARY_COLOR,
+    AVAILABLE_YEARS,
+    SIDEBAR_STYLE
+)
 
 def clean_title(title: str) -> str:
     """Clean and standardize title text for consistent display."""
@@ -156,64 +161,39 @@ def build_chart_grid(
     return rows
 
 def create_sidebar() -> html.Div:
-    """Create the sidebar navigation component."""
-    return html.Div(
-        [
-            html.H2("Digital", className="display-5", style={"color": "white"}),
-            html.H4("Sustainability", className="mb-1", style={"color": "white", "font-weight": "lighter"}),
-            html.P("Survey Analysis", className="text-light small", style={"opacity": 0.8}),
-            dcc.Dropdown(
-                id="year-dropdown",
-                options=[{"label": str(y), "value": y} for y in [2025, 2026]],  # Add more years as needed
-                value=2025,  # Default year
-                clearable=False,
-                style={
-                    "marginBottom": "1rem",
-                    "backgroundColor": "white",
-                    "color": "#333",
-                    "borderRadius": "4px",
-                    "width": "100%"
-                },
-                className="year-dropdown"
-            ),
-            dbc.Nav(
-                [
-                    dbc.NavLink([
-                        html.I(className="bi bi-people-fill me-2"),
-                        "Demographics"
-                    ], href="/", active="exact", className="py-2 nav-link-custom"),
-                    dbc.NavLink([
-                        html.I(className="bi bi-lightbulb-fill me-2"),
-                        "General Awareness"
-                    ], href="/awareness", active="exact", className="py-2 nav-link-custom"),
-                    dbc.NavLink([
-                        html.I(className="bi bi-building-fill me-2"),
-                        "Role in Organization"
-                    ], href="/organization", active="exact", className="py-2 nav-link-custom"),
-                    dbc.NavLink([
-                        html.I(className="bi bi-briefcase-fill me-2"),
-                        "Job & Tasks"
-                    ], href="/job-tasks", active="exact", className="py-2 nav-link-custom"),
-                ],
-                vertical=True,
-                className="flex-grow-1"
-            ),
-            html.Hr(style={"border-color": "rgba(255, 255, 255, 0.3)", "margin-top": "auto"}),
-            html.P(
-                "IREB Digital Sustainability",
-                className="small text-center",
-                style={"color": "rgba(255, 255, 255, 0.7)", "margin-top": "1rem"}
-            )
-        ],
-        style={
-            "position": "fixed",
-            "top": 0,
-            "left": 0,
-            "bottom": 0,
-            "width": "20rem",
-            "padding": "2rem 1rem",
-            "background-color": PRIMARY_COLOR,
-            "color": "white",
-            "overflow-y": "auto"
-        }
-    ) 
+    """Create the sidebar with navigation and year selection."""
+    return html.Div([
+        html.H2("Digital Sustainability Survey", className="display-7 mb-4"),
+        html.Hr(),
+        dbc.Nav([
+            dbc.NavLink([
+                html.I(className="bi bi-people-fill me-2"),
+                "Demographics"
+            ], href="/", active="exact"),
+            dbc.NavLink([
+                html.I(className="bi bi-lightbulb-fill me-2"),
+                "Awareness"
+            ], href="/awareness", active="exact"),
+            dbc.NavLink([
+                html.I(className="bi bi-building-fill me-2"),
+                "Organization"
+            ], href="/organization", active="exact"),
+            dbc.NavLink([
+                html.I(className="bi bi-person-workspace me-2"),
+                "Job Tasks"
+            ], href="/job-tasks", active="exact"),
+            dbc.NavLink([
+                html.I(className="bi bi-graph-up me-2"),
+                "Insights"
+            ], href="/insights", active="exact"),
+        ], vertical=True, pills=True, className="mb-4"),
+        html.Hr(),
+        html.P("Select Survey Year", className="mb-2"),
+        dcc.Dropdown(
+            id="year-dropdown",
+            options=[{"label": str(year), "value": year} for year in AVAILABLE_YEARS],
+            value=AVAILABLE_YEARS[-1],  # Default to most recent year
+            clearable=False,
+            className="mb-4"
+        )
+    ], style=SIDEBAR_STYLE) 
