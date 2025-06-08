@@ -70,30 +70,25 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
     no_training_reasons_fig = make_multi_select_bar(df, ORG_MULTI_TRAINING, "")
     dimensions_fig = make_multi_select_bar(df, ORG_MULTI_DIMENSIONS, "")
     
-    # First row of charts - 3 key yes/no questions
+    # First row of charts - sustainability goals and CSR team
     row1 = dbc.Row([
         build_chart_card(
             "Does your organization have specific digital sustainability goals?",
             goals_fig,
-            4
+            6
         ),
         build_chart_card(
             "Does your organization have a CSR/sustainability expert or team?",
             csr_fig,
-            4
-        ),
-        build_chart_card(
-            "Does your organization incorporate sustainability in projects?",
-            incorporation_fig,
-            4
+            6
         )
     ], className="mb-5 g-4")
     
-    # Second row of charts - coordination and reporting
+    # Second row - incorporation and coordination
     row2 = dbc.Row([
         build_chart_card(
-            "Is there coordination on sustainability for development projects?",
-            coordination_fig,
+            "Does your organization incorporate sustainability in projects?",
+            incorporation_fig,
             6
         ),
         build_chart_card(
@@ -103,17 +98,26 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
         )
     ], className="mb-5 g-4")
     
-    # Third row of charts - training and customer requirements
+    # Third row - coordination and training
     row3 = dbc.Row([
+        build_chart_card(
+            "Is there coordination on sustainability for development projects?",
+            coordination_fig,
+            6
+        ),
         build_chart_card(
             "Does your organization offer sustainability training?",
             offers_training_fig,
             6
-        ),
+        )
+    ], className="mb-5 g-4")
+    
+    # Fourth row - customer requirements
+    row4 = dbc.Row([
         build_chart_card(
             "Do customers require sustainability considerations?",
             customer_requires_fig,
-            6
+            12
         )
     ], className="mb-5 g-4")
     
@@ -127,7 +131,7 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
         "padding-bottom": "0.5rem"
     }
     
-    # Fourth row - Multi-select data with enhanced visibility
+    # Multi-select data with enhanced visibility
     dimensions_section = html.Div([
         html.H4("Sustainability Dimensions in Software Development", style=section_header_style),
         html.P(
@@ -140,13 +144,15 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
             build_chart_card(
                 "Sustainability Dimensions Considered",
                 dimensions_fig,
-                6,
+                12,
                 className="mb-5"
-            ),
+            )
+        ], className="mb-5"),
+        dbc.Row([
             build_chart_card(
                 "Reasons for Not Offering Training",
                 no_training_reasons_fig,
-                6,
+                12,
                 className="mb-5"
             )
         ], className="mb-5")
@@ -165,5 +171,6 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
         row1,
         row2,
         row3,
+        row4,
         dimensions_section
     ]) 

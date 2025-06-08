@@ -94,12 +94,14 @@ def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
             build_chart_card(
                 "Drivers for Sustainability",
                 drivers_fig,
-                6
-            ),
+                12
+            )
+        ], className="mb-5 g-4"),
+        dbc.Row([
             build_chart_card(
                 "Barriers to Implementation",
                 hindrances_fig,
-                6
+                12
             )
         ], className="mb-5 g-4")
     ])
@@ -116,12 +118,14 @@ def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
             build_chart_card(
                 "Knowledge Gaps",
                 knowledge_fig,
-                6
-            ),
+                12
+            )
+        ], className="mb-5 g-4"),
+        dbc.Row([
             build_chart_card(
                 "Support Needs",
                 support_fig,
-                6
+                12
             )
         ], className="mb-5 g-4")
     ])

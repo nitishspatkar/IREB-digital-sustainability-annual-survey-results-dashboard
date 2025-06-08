@@ -77,7 +77,7 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
         build_chart_card(
             "How frequently do you encounter discussions about digital sustainability?",
             freq_discussions_fig,
-            6
+            12
         )
     ], className="mb-5 g-4")
     
@@ -100,17 +100,19 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
             build_chart_card(
                 "📚 Participation in Sustainability Training Programs",
                 training_fig,
-                4
+                6
             ),
             build_chart_card(
                 "🎯 Training Satisfaction Levels",
                 satisfaction_fig,
-                4
-            ),
+                6
+            )
+        ], className="mb-5 g-4"),
+        dbc.Row([
             build_chart_card(
                 "📊 Distribution of Training Programs Attended",
                 num_trainings_fig,
-                4
+                12
             )
         ], className="mb-5 g-4")
     ])

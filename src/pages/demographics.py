@@ -72,12 +72,16 @@ def build_demographics_page(df: pd.DataFrame) -> html.Div:
         build_chart_card("Geographic Distribution", geo_fig, 12)
     ], className="mb-5 g-3")
     
+    # Split pie charts into separate rows for better visibility with legends
     row3 = dbc.Row([
-        build_chart_card("Professional Role", role_fig, 6),
-        build_chart_card("Organization Type", org_fig, 6)
+        build_chart_card("Professional Role", role_fig, 12)
     ], className="mb-5 g-4")
     
     row4 = dbc.Row([
+        build_chart_card("Organization Type", org_fig, 12)
+    ], className="mb-5 g-4")
+    
+    row5 = dbc.Row([
         build_chart_card("Application Domain", domain_fig, 12)
     ], className="mb-5 g-3")
     
@@ -94,5 +98,6 @@ def build_demographics_page(df: pd.DataFrame) -> html.Div:
         row1,
         row2,
         row3,
-        row4
+        row4,
+        row5
     ]) 

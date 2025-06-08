@@ -210,11 +210,13 @@ def make_pie_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> g
         hole=0.4
     )
     
+    # Always show only percentages on slices and labels in legend
     fig.update_traces(
         textposition='inside',
-        textinfo='percent+label',  # Show both percentage and label
+        textinfo='percent',  # Only show percentage
         hoverinfo='none',  # Remove hover effect
-        textfont=dict(size=LABEL_FONT_SIZE)
+        textfont=dict(size=LABEL_FONT_SIZE),
+        showlegend=True  # Always show legend
     )
     
     fig.update_layout(
@@ -222,13 +224,12 @@ def make_pie_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> g
             text=title if title else None,
             font=dict(size=TITLE_FONT_SIZE)
         ),
-        margin=dict(l=10, r=10, t=30 if title else 10, b=100),
+        margin=dict(l=10, r=120, t=30 if title else 10, b=10),
         legend=dict(
-            orientation="h",
-            yanchor="bottom", 
-            y=-0.5,
-            xanchor="center", 
-            x=0.5,
+            yanchor="middle",
+            y=0.5,
+            xanchor="right",
+            x=1.2,
             font=dict(size=LABEL_FONT_SIZE)
         ),
         paper_bgcolor="rgba(0,0,0,0)",
@@ -262,23 +263,44 @@ def make_donut_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) ->
         color_discrete_sequence=MULTI_COLOR_PALETTE
     )
     
+    # Always show only percentages on slices and labels in legend
     fig.update_traces(
-        textinfo='percent+label',
-        textfont=dict(size=LABEL_FONT_SIZE)
+        textposition='inside',
+        textinfo='percent',  # Only show percentage
+        hoverinfo='none',  # Remove hover effect
+        textfont=dict(size=LABEL_FONT_SIZE),
+        showlegend=True  # Always show legend
     )
     
     fig.update_layout(
+        title=dict(
+            text=title if title else None,
+            font=dict(size=TITLE_FONT_SIZE)
+        ),
+        margin=dict(l=10, r=120, t=30 if title else 10, b=10),
+        legend=dict(
+            yanchor="middle",
+            y=0.5,
+            xanchor="right",
+            x=1.2,
+            font=dict(size=LABEL_FONT_SIZE)
+        ),
         paper_bgcolor="rgba(0,0,0,0)",
         font=dict(
             family=STYLE_VARS["FONT_FAMILY"],
             size=LABEL_FONT_SIZE
         ),
-        title=dict(
-            text=title if title else None,
-            font=dict(size=TITLE_FONT_SIZE)
-        ),
-        margin=dict(l=10, r=10, t=30 if title else 10, b=10),
+        height=500,
         hovermode=False
+    )
+    
+    # Add total in the center
+    total = counts.sum()
+    fig.add_annotation(
+        text=f"Total<br>{total}",
+        x=0.5, y=0.5,
+        font=dict(size=ANNOTATION_FONT_SIZE),
+        showarrow=False
     )
     
     return fig
@@ -401,8 +423,14 @@ def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str
             total = len(df)
             if total > 0:
                 percentage = (count / total) * 100
+                # Extract text within brackets if present, otherwise use full text
+                label = col
+                if '[' in col and ']' in col:
+                    start = col.find('[') + 1
+                    end = col.rfind(']')
+                    label = col[start:end].strip()
                 counts.append({
-                    'option': col,
+                    'option': label,
                     'count': count,
                     'percentage': percentage
                 })
@@ -444,7 +472,7 @@ def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str
             size=LABEL_FONT_SIZE
         ),
         showlegend=False,
-        height=max(300, len(counts) * 40)
+        height=max(300, len(counts) * 40)  # Adjust height based on number of options
     )
     
     # Update axes
