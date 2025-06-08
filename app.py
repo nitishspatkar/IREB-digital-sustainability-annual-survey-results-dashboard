@@ -69,4 +69,4 @@ def render_page_content(pathname: str, selected_year: int) -> html.Div:
     )
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8051)
+    app.run(debug=True, port=8053)
