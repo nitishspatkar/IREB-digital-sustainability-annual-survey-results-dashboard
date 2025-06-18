@@ -33,11 +33,6 @@ body {
 
 .card {
     border-radius: 0.5rem;
-    transition: transform 0.2s ease-in-out;
-}
-
-.card:hover {
-    transform: scale(1.02);
 }
 
 .dccGraph {
@@ -57,7 +52,8 @@ body {
 
 /* Sidebar Navigation Links */
 .nav-link-custom {
-    color: white !important; /* Default link color */
+    color: white !important;
+    background-color: transparent !important;
     border-radius: 0.3rem;   /* Slightly rounded corners for the link highlight */
     margin-bottom: 0.2rem;   /* Small space between nav items */
     padding-top: 0.5rem !important;    /* Adjust padding as needed */
@@ -71,10 +67,13 @@ body {
 }
 
 /* Styling for the active navigation link */
-.nav-link-custom.active {
-    background-color: white !important; /* White background for active link */
-    color: var(--primary) !important;   /* Primary color for text of active link */
-    font-weight: 600;                   /* Slightly bolder font for active link */
+.nav-link-custom.active,
+.nav-link-custom.active:focus,
+.nav-link-custom.active:visited,
+.nav-link-custom.active:active {
+    background-color: white !important;
+    color: var(--primary) !important;
+    font-weight: 600 !important;
 }
 
 /* Ensure icons in active links also take the primary color */
@@ -124,4 +123,16 @@ body {
 /* Ensure dropdown is visible on the purple background */
 .year-dropdown .Select-menu-outer {
     z-index: 1000 !important;
+}
+
+/* Ensure tabs remain white */
+.nav-tabs .nav-link {
+    color: #333 !important;
+    background-color: white !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary) !important;
+    background-color: white !important;
+    border-color: #dee2e6 #dee2e6 white !important;
 }
