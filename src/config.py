@@ -112,12 +112,12 @@ JOB_TASK_COLS = [
 ]
 
 JOB_TASK_MULTI_DRIVES = [
-    'What drives you to incorporate digital sustainability in your role-related tasks?  [Organizational policies ]',
-    'What drives you to incorporate digital sustainability in your role-related tasks?  [Personal beliefs ]',
-    'What drives you to incorporate digital sustainability in your role-related tasks?  [Client requirements ]',
-    'What drives you to incorporate digital sustainability in your role-related tasks?  [User requirements]',
-    'What drives you to incorporate digital sustainability in your role-related tasks?  [Legal requirements ]',
-    'What drives you to incorporate digital sustainability in your role-related tasks?  [Other]'
+    "What drives you to incorporate digital sustainability in your role-related tasks? [Organizational policies ]",
+    "What drives you to incorporate digital sustainability in your role-related tasks? [Personal beliefs ]",
+    "What drives you to incorporate digital sustainability in your role-related tasks? [Client requirements ]",
+    "What drives you to incorporate digital sustainability in your role-related tasks? [User requirements]",
+    "What drives you to incorporate digital sustainability in your role-related tasks? [Legal requirements ]",
+    "What drives you to incorporate digital sustainability in your role-related tasks? [Other]"
 ]
 
 JOB_TASK_MULTI_HINDER = [

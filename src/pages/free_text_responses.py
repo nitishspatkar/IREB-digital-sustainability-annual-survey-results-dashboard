@@ -27,6 +27,8 @@ FREE_TEXT_COLS = [
     'hinder_other',
     'lack_knowledge_other',
     'resource_need_other',
+    'support_other',
+    'num_sustainability_trainings',
     # Add more if needed
 ]
 

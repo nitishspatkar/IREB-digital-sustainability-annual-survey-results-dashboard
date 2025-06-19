@@ -46,6 +46,15 @@ def clean_column_name(col: str) -> str:
     cleaned = cleaned.replace('"', '').replace("'", '')
     return cleaned
 
+def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
+    """Normalize DataFrame column names: strip, replace all whitespace (including non-breaking spaces) with a single space."""
+    df = df.copy()
+    df.columns = [
+        " ".join(str(col).split())  # collapse all whitespace to single space
+        for col in df.columns
+    ]
+    return df
+
 def load_single_year_data(data_folder: str, year: int) -> pd.DataFrame:
     """
     Load survey data for a specific year.
@@ -79,6 +88,9 @@ def load_single_year_data(data_folder: str, year: int) -> pd.DataFrame:
     
     # Apply rename mapping
     df = df.rename(columns=rename_mapping)
+    
+    # Clean column names
+    df = clean_column_names(df)
     
     return df
 

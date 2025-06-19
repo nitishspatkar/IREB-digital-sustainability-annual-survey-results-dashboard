@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from rename_config import rename_mapping
 
 from src.components.charts import generate_chart, make_histogram
-from dashboard_components import build_chart_card, build_stat_card
+from src.components.layout import build_chart_card, build_stat_card
 from src.utils.data_processing import process_numeric_column
 from src.config import PRIMARY_COLOR, DEMOGRAPHIC_COLS
 

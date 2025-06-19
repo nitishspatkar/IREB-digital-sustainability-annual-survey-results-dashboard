@@ -10,7 +10,7 @@ from src.config import PRIMARY_COLOR, MULTI_COLOR_PALETTE, STYLE_VARS, NUMERIC_C
 
 # Font size configurations
 TITLE_FONT_SIZE = STYLE_VARS["FONT_SIZE"] + 2  # Slightly larger for titles
-LABEL_FONT_SIZE = STYLE_VARS["FONT_SIZE"]  # Base size for labels
+LABEL_FONT_SIZE = STYLE_VARS["FONT_SIZE"] + 4  # Larger size for bar chart labels
 ANNOTATION_FONT_SIZE = STYLE_VARS["FONT_SIZE"]  # Base size for annotations
 
 def create_no_data_figure(title: Optional[str] = None) -> go.Figure:
@@ -419,7 +419,7 @@ def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str
     counts = []
     for col in cols:
         if col in df:
-            count = df[col].fillna(0).astype(bool).sum()
+            count = df[col].astype(str).str.strip().str.lower().eq('yes').sum()
             total = len(df)
             if total > 0:
                 percentage = (count / total) * 100
@@ -503,7 +503,6 @@ def generate_chart(
             try:
                 return make_world_map(df_copy, col, title)
             except Exception as e:
-                print(f"Error creating map for {col}: {str(e)}")
                 return make_bar_chart(df_copy, col, title, horizontal=True)
         else:
             unique_count = df_copy[col].nunique()
@@ -519,7 +518,6 @@ def generate_chart(
         if col in NUMERIC_COLS:
             return make_histogram(df_copy, col, title)
         else:
-            print(f"Warning: Tried to make histogram of non-numeric column {col}")
             return make_bar_chart(df_copy, col, title)
     elif chart_type == 'pie':
         return make_pie_chart(df_copy, col, title)
