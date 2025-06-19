@@ -57,7 +57,7 @@ def build_demographics_page(df: pd.DataFrame) -> html.Div:
     
     # Create charts with appropriate visualization types
     age_fig = generate_chart(df, "age_group", "", 'bar_h')
-    experience_fig = make_histogram(df, "years_of_experience", "", kde=True)
+    experience_fig = generate_chart(df, "years_of_experience", "", 'bar_h')
     
     # Try map first, fallback to horizontal bar if issues
     try:
