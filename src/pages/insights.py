@@ -16,6 +16,7 @@ from src.components.charts import (
 )
 from src.components.layout import build_stat_card, build_chart_card
 from src.config import PRIMARY_COLOR
+from dashboard_components import build_stat_card, build_chart_card
 
 def create_awareness_implementation_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing relationship between definition awareness and implementation."""

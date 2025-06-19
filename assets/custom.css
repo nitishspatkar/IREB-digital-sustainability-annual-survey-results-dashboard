@@ -50,79 +50,100 @@ body {
     margin-bottom: 40px;
 }
 
+/* Sidebar Styles */
+.sidebar {
+    background: #fff !important;
+    border-right: 1px solid #e5e5e5 !important;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
 /* Sidebar Navigation Links */
 .nav-link-custom {
-    color: white !important;
-    background-color: transparent !important;
-    border-radius: 0.3rem;   /* Slightly rounded corners for the link highlight */
-    margin-bottom: 0.2rem;   /* Small space between nav items */
-    padding-top: 0.5rem !important;    /* Adjust padding as needed */
-    padding-bottom: 0.5rem !important; /* Adjust padding as needed */
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; /* Smooth transition */
+    color: #831E82 !important;
+    background: transparent !important;
+    border-radius: 0.4rem !important;
+    margin-bottom: 0.3rem !important;
+    font-size: 1rem !important;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    padding: 0.6rem 1rem !important;
+    transition: background 0.2s, color 0.2s;
 }
 
 .nav-link-custom:hover {
-    color: #f0f0f0 !important; /* Slightly lighter white on hover */
-    background-color: rgba(255, 255, 255, 0.1) !important; /* Subtle background on hover */
+    background: #f3e6f7 !important;
+    color: #831E82 !important;
 }
 
-/* Styling for the active navigation link */
-.nav-link-custom.active,
-.nav-link-custom.active:focus,
-.nav-link-custom.active:visited,
-.nav-link-custom.active:active {
-    background-color: white !important;
-    color: var(--primary) !important;
+.nav-link-custom.active, .nav-link-custom.active:focus, .nav-link-custom.active:visited, .nav-link-custom.active:active {
+    background: #831E82 !important;
+    color: #fff !important;
     font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(131,30,130,0.08);
 }
 
-/* Ensure icons in active links also take the primary color */
-.nav-link-custom.active .bi {
-    color: var(--primary) !important;
-}
-
-/* Ensure icons in non-active links are white */
 .nav-link-custom .bi {
-    color: white !important;
+    color: #831E82 !important;
+    font-size: 1.1rem !important;
+    margin-right: 0.5rem !important;
 }
 
-/* Custom styles for the year dropdown */
+.nav-link-custom.active .bi {
+    color: #fff !important;
+}
+
+/* Sidebar Brand Title */
+.display-7 {
+    color: #831E82 !important;
+    font-weight: bold !important;
+    font-size: 1.4rem !important;
+    letter-spacing: 0.01em;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Sidebar Divider */
+.sidebar hr {
+    border-top: 1px solid #e5e5e5 !important;
+}
+
+/* Year Dropdown */
 .year-dropdown .Select-control {
-    background-color: white !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background-color: #faf9fd !important;
+    border: 1.5px solid #831E82 !important;
+    color: #222 !important;
+    font-weight: 500 !important;
+}
+
+.year-dropdown .Select-value,
+.year-dropdown .Select-value-label,
+.year-dropdown .Select-placeholder,
+.year-dropdown input {
+    color: #222 !important;
+    font-weight: 500 !important;
 }
 
 .year-dropdown .Select-menu-outer {
-    background-color: white !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    background-color: #fff !important;
+    border: 1.5px solid #831E82 !important;
+    box-shadow: 0 2px 8px rgba(131,30,130,0.10) !important;
 }
 
 .year-dropdown .Select-option {
-    background-color: white !important;
-    color: #333 !important;
-    padding: 8px 12px !important;
+    background-color: #fff !important;
+    color: #222 !important;
+    font-weight: 500 !important;
 }
 
-.year-dropdown .Select-option:hover {
-    background-color: #f8f9fa !important;
+.year-dropdown .Select-option:hover, .year-dropdown .Select-option.is-focused {
+    background-color: #f3e6f7 !important;
+    color: #831E82 !important;
 }
 
-.year-dropdown .Select-value {
-    color: #333 !important;
-}
-
-.year-dropdown .Select-value-label {
-    color: #333 !important;
-}
-
-.year-dropdown .Select-arrow {
-    border-color: #333 transparent transparent !important;
-}
-
-/* Ensure dropdown is visible on the purple background */
-.year-dropdown .Select-menu-outer {
-    z-index: 1000 !important;
+.year-dropdown .Select-option.is-selected {
+    background-color: #831E82 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
 }
 
 /* Ensure tabs remain white */
@@ -135,4 +156,14 @@ body {
     color: var(--primary) !important;
     background-color: white !important;
     border-color: #dee2e6 #dee2e6 white !important;
+}
+
+/* Make dropdown text more visible */
+.year-dropdown .Select-control,
+.year-dropdown .Select-value,
+.year-dropdown .Select-value-label,
+.year-dropdown .Select-placeholder,
+.year-dropdown input {
+    color: #831E82 !important;
+    font-weight: 500 !important;
 }

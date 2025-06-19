@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 from dash import html
 
 from src.components.charts import generate_chart, make_histogram
-from src.components.layout import build_stat_card, build_chart_card
+from dashboard_components import build_chart_card, build_stat_card
 from src.utils.data_processing import process_numeric_column
 from src.config import PRIMARY_COLOR, DEMOGRAPHIC_COLS
 

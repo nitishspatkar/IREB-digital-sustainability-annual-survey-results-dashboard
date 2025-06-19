@@ -8,6 +8,7 @@ from src.components.charts import generate_chart, make_donut_chart, make_histogr
 from src.components.layout import build_stat_card, build_chart_card
 from src.utils.data_processing import process_numeric_column
 from src.config import PRIMARY_COLOR, AWARENESS_COLS
+from dashboard_components import build_stat_card, build_chart_card
 
 def build_awareness_page(df: pd.DataFrame) -> html.Div:
     """Build the general awareness page layout."""

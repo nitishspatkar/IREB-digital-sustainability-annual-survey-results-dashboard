@@ -9,7 +9,7 @@ from src.components.charts import (
     make_donut_chart,
     make_multi_select_bar
 )
-from src.components.layout import build_stat_card, build_chart_card
+from dashboard_components import build_chart_card
 from src.config import (
     PRIMARY_COLOR,
     ORGANIZATION_COLS,

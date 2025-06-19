@@ -1,22 +1,44 @@
-"""Layout components for the dashboard."""
+"""Reusable dashboard layout and chart card components for Dash/Plotly apps."""
 
 from typing import List, Dict, Tuple, Union
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 
-from src.config import (
-    STYLE_VARS,
-    PRIMARY_COLOR,
-    AVAILABLE_YEARS,
-    SIDEBAR_STYLE
-)
+# ---- Centralized Color and Style Variables ----
+STYLE_VARS = {
+    "PRIMARY_COLOR": "#831E82",
+    "SECONDARY_COLOR": "#A450A3",
+    "TERTIARY_COLOR": "#C581C4",
+    "QUATERNARY_COLOR": "#E6B3E5",
+    "BACKGROUND_COLOR": "#f8f9fa",
+    "CARD_HEADER_COLOR": "#831E82",
+    "FONT_FAMILY": "Helvetica",
+    "FONT_SIZE": 20,
+    "CARD_MARGIN": "mb-4",
+    "ROW_MARGIN": "mb-5 g-4",
+}
+PRIMARY_COLOR = STYLE_VARS["PRIMARY_COLOR"]
 
+# Sidebar style for navigation
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "18rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+    "border-right": "1px solid #dee2e6",
+    "overflow-y": "auto"
+}
+
+# ---- Helper Functions ----
 def clean_title(title: str) -> str:
     """Clean and standardize title text for consistent display."""
-    # Remove emojis and special characters but keep basic punctuation
     cleaned = title.replace('🎯', '').replace('❓', '').strip()
     return cleaned
 
+# ---- Card and Chart Wrappers ----
 def build_stat_card(
     title: str,
     value: str,
@@ -48,24 +70,24 @@ def build_chart_card(
     className: str = "mb-4"
 ) -> dbc.Col:
     """Wraps a plotly figure in a Bootstrap card with custom styling."""
+    show_header = bool(title and title.strip())
+    fig.update_layout(
+        font=dict(family=STYLE_VARS["FONT_FAMILY"], size=STYLE_VARS["FONT_SIZE"]),
+    )
+    card_content = []
+    if show_header:
+        card_content.append(dbc.CardHeader(title, style={"background": PRIMARY_COLOR, "color": "white", "font-weight": "bold"}))
+    card_content.append(
+        dbc.CardBody(
+            dcc.Graph(figure=fig, config={'displayModeBar': False}),
+            style={"background": STYLE_VARS["BACKGROUND_COLOR"]}
+        )
+    )
     return dbc.Col(
-        dbc.Card([
-            dbc.CardHeader(
-                html.H5(clean_title(title), className="card-title mb-0"),
-                className="card-header-primary border-bottom-0",
-                style={"font-size": "1rem", "font-weight": "500"}
-            ),
-            dbc.CardBody(
-                dcc.Graph(
-                    figure=fig,
-                    config={
-                        'displayModeBar': False,
-                        'staticPlot': True  # This disables all interactivity including hover
-                    }
-                ),
-                className="pt-0"  # Remove top padding since header has no border
-            )
-        ], className="shadow-sm h-100 border-0"),
+        dbc.Card(
+            card_content,
+            className="shadow-sm h-100"
+        ),
         width=column_width,
         className=className
     )
@@ -88,10 +110,10 @@ def build_card(col: str, fig: object, reverse_mapping: Dict[str, str]) -> dbc.Ca
                     figure=fig,
                     config={
                         'displayModeBar': False,
-                        'staticPlot': True  # This disables all interactivity including hover
+                        'staticPlot': True
                     }
                 ),
-                className="pt-0"  # Remove top padding since header has no border
+                className="pt-0"
             )
         ],
         className="mb-4 shadow-sm border-0"
@@ -111,10 +133,10 @@ def build_multi_card(title: str, fig: object) -> dbc.Card:
                     figure=fig,
                     config={
                         'displayModeBar': False,
-                        'staticPlot': True  # This disables all interactivity including hover
+                        'staticPlot': True
                     }
                 ),
-                className="pt-0"  # Remove top padding since header has no border
+                className="pt-0"
             )
         ],
         className="mb-4 shadow-sm border-0"
@@ -128,7 +150,7 @@ def build_section_three_columns(
     Given a list of (column, figure) pairs, splits them into three columns
     and returns a Bootstrap Row with three Columns containing cards.
     """
-    third = (len(fig_pairs) + 2) // 3  # Round up the split
+    third = (len(fig_pairs) + 2) // 3
     left_pairs = fig_pairs[:third]
     middle_pairs = fig_pairs[third:2*third]
     right_pairs = fig_pairs[2*third:]
@@ -158,42 +180,4 @@ def build_chart_grid(
             for title, fig in chart_info_list[i:i+cards_per_row]
         ]
         rows.append(dbc.Row(row_cards, className="mb-5 g-4"))
-    return rows
-
-def create_sidebar() -> html.Div:
-    """Create the sidebar with navigation and year selection."""
-    return html.Div([
-        html.H2("Digital Sustainability Survey", className="display-7 mb-4"),
-        html.Hr(),
-        dbc.Nav([
-            dbc.NavLink([
-                html.I(className="bi bi-people-fill me-2"),
-                "Demographics"
-            ], href="/", active="exact", className="nav-link-custom"),
-            dbc.NavLink([
-                html.I(className="bi bi-lightbulb-fill me-2"),
-                "Awareness"
-            ], href="/awareness", active="exact", className="nav-link-custom"),
-            dbc.NavLink([
-                html.I(className="bi bi-building-fill me-2"),
-                "Organization"
-            ], href="/organization", active="exact", className="nav-link-custom"),
-            dbc.NavLink([
-                html.I(className="bi bi-person-workspace me-2"),
-                "Job Tasks"
-            ], href="/job-tasks", active="exact", className="nav-link-custom"),
-            dbc.NavLink([
-                html.I(className="bi bi-graph-up me-2"),
-                "Insights"
-            ], href="/insights", active="exact", className="nav-link-custom"),
-        ], vertical=True, pills=True, className="mb-4"),
-        html.Hr(),
-        html.P("Select Survey Year", className="mb-2"),
-        dcc.Dropdown(
-            id="year-dropdown",
-            options=[{"label": str(year), "value": year} for year in AVAILABLE_YEARS],
-            value=AVAILABLE_YEARS[-1],  # Default to most recent year
-            clearable=False,
-            className="mb-4 year-dropdown"
-        )
-    ], className="sidebar", style=SIDEBAR_STYLE) 
+    return rows 
