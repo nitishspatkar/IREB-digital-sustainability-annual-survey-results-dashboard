@@ -215,7 +215,7 @@ def make_pie_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> g
         textposition='inside',
         textinfo='percent',  # Only show percentage
         hoverinfo='none',  # Remove hover effect
-        textfont=dict(size=LABEL_FONT_SIZE),
+        textfont=dict(size=LABEL_FONT_SIZE + 4),
         showlegend=True  # Always show legend
     )
     
@@ -230,7 +230,7 @@ def make_pie_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> g
             y=0.5,
             xanchor="right",
             x=1.2,
-            font=dict(size=LABEL_FONT_SIZE)
+            font=dict(size=LABEL_FONT_SIZE + 4)
         ),
         paper_bgcolor="rgba(0,0,0,0)",
         font=dict(
@@ -268,7 +268,7 @@ def make_donut_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) ->
         textposition='inside',
         textinfo='percent',  # Only show percentage
         hoverinfo='none',  # Remove hover effect
-        textfont=dict(size=LABEL_FONT_SIZE),
+        textfont=dict(size=LABEL_FONT_SIZE + 4),
         showlegend=True  # Always show legend
     )
     
@@ -283,7 +283,7 @@ def make_donut_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) ->
             y=0.5,
             xanchor="right",
             x=1.2,
-            font=dict(size=LABEL_FONT_SIZE)
+            font=dict(size=LABEL_FONT_SIZE + 4)
         ),
         paper_bgcolor="rgba(0,0,0,0)",
         font=dict(

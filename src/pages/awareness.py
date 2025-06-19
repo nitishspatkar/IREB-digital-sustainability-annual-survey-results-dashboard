@@ -67,21 +67,23 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
     training_fig = make_donut_chart(df, training_col, "")
     satisfaction_fig = make_donut_chart(df, "Are you satisfied with the number of trainings or educational programs you participated in?", "")
     num_trainings_fig = make_histogram(df, num_trainings_col, "", bins=6)
-    
-    # First row of charts
+
+    # Pie charts in three columns
+    pie_row = dbc.Row([
+        build_chart_card("Are you familiar with the definition of Digital Sustainability?", definition_fig, 4),
+        build_chart_card("Participation in Sustainability Training Programs", training_fig, 4),
+        build_chart_card("Training Satisfaction Levels", satisfaction_fig, 4),
+    ], className="mb-5 g-4")
+
+    # First row of charts (bar chart)
     row1 = dbc.Row([
-        build_chart_card(
-            "Are you familiar with the definition of Digital Sustainability?",
-            definition_fig,
-            6
-        ),
         build_chart_card(
             "How frequently do you encounter discussions about digital sustainability?",
             freq_discussions_fig,
             12
         )
     ], className="mb-5 g-4")
-    
+
     # Training section header style
     section_header_style = {
         "color": PRIMARY_COLOR,
@@ -91,33 +93,21 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
         "border-bottom": f"2px solid {PRIMARY_COLOR}",
         "padding-bottom": "0.5rem"
     }
-    
-    # Training section with header
+
+    # Training section with header and histogram
     training_section = html.Div([
         html.H4("Training and Education in Digital Sustainability", style=section_header_style),
         html.P("Explore participation rates in sustainability training programs and satisfaction levels among participants.", 
                className="mb-4", style={"color": "#666"}),
         dbc.Row([
             build_chart_card(
-                "📚 Participation in Sustainability Training Programs",
-                training_fig,
-                6
-            ),
-            build_chart_card(
-                "🎯 Training Satisfaction Levels",
-                satisfaction_fig,
-                6
-            )
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "📊 Distribution of Training Programs Attended",
+                "Distribution of Training Programs Attended",
                 num_trainings_fig,
                 12
             )
         ], className="mb-5 g-4")
     ])
-    
+
     # Page title style
     page_title_style = {
         "color": PRIMARY_COLOR,
@@ -128,6 +118,7 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
     return html.Div([
         html.H3("General Awareness of Sustainability", className="mb-4 pt-3", style=page_title_style),
         stats_row,
+        pie_row,
         row1,
         training_section
     ]) 
