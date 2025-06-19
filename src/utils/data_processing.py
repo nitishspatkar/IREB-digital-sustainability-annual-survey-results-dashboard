@@ -71,14 +71,6 @@ def load_single_year_data(data_folder: str, year: int) -> pd.DataFrame:
         escapechar='\\',     # Handle escaped characters
     )
     
-    # Print original column names for debugging
-    print("\nOriginal columns with detailed info:")
-    for i, col in enumerate(df.columns):
-        print(f"{i+1}. Length: {len(col)}")
-        print(f"   Raw: {repr(col)}")
-        print(f"   Cleaned: {repr(clean_column_name(col))}")
-        print()
-    
     # Clean up column names
     df.columns = [clean_column_name(col) for col in df.columns]
     
@@ -87,11 +79,6 @@ def load_single_year_data(data_folder: str, year: int) -> pd.DataFrame:
     
     # Apply rename mapping
     df = df.rename(columns=rename_mapping)
-    
-    # Print final column names for debugging
-    print("\nFinal cleaned columns:")
-    for i, col in enumerate(df.columns):
-        print(f"{i+1}. {repr(col)}")
     
     return df
 

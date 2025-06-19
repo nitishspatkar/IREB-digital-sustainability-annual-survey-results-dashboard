@@ -26,16 +26,8 @@ reverse_mapping = {v: k for k, v in rename_mapping.items()}
 
 def build_organization_page(df: pd.DataFrame) -> html.Div:
     """Build the organization page layout."""
-    # Debug: Print all column names
-    print("\nAvailable columns in DataFrame:")
-    for i, col in enumerate(df.columns):
-        print(f"{i+1}. {repr(col)}")
-    
     # Find dimension columns by partial match
     dimension_cols = [col for col in df.columns if "dimensions of sustainability" in col and any(dim in col for dim in ["Environmental", "Social", "Individual", "Economic", "Technical"])]
-    print("\nFound dimension columns:")
-    for col in dimension_cols:
-        print(repr(col))
     
     # Define column names
     goals_col = "org_sustainability_goals"

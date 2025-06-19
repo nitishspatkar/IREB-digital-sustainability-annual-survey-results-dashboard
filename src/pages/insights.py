@@ -284,12 +284,6 @@ def create_role_drivers_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing sustainability drivers by role."""
     role_col = "role"
     
-    # Debug: Print all column names to find the exact driver column names
-    print("\nAll columns in DataFrame:")
-    for col in df.columns:
-        if "drive" in col.lower():
-            print(f"Found driver column: {repr(col)}")
-    
     # Use the exact driver columns from JOB_TASK_MULTI_DRIVES
     driver_cols = [
         'What drives you to incorporate digital sustainability in your role-related tasks?  [Organizational policies ]',
@@ -300,17 +294,12 @@ def create_role_drivers_chart(df: pd.DataFrame) -> go.Figure:
     ]
     
     # Verify each driver column exists
-    print("\nVerifying driver columns:")
     available_driver_cols = []
     for col in driver_cols:
         if col in df.columns:
-            print(f"Found: {repr(col)}")
             available_driver_cols.append(col)
-        else:
-            print(f"Missing: {repr(col)}")
     
     if not available_driver_cols:
-        print("No driver columns found. Creating empty chart.")
         fig = go.Figure()
         fig.update_layout(
             title="No driver data available",
@@ -340,21 +329,18 @@ def create_role_drivers_chart(df: pd.DataFrame) -> go.Figure:
     driver_percentages = {}
     for driver_col in available_driver_cols:
         try:
-            # Create contingency table for this driver
             contingency = pd.crosstab(
                 df[role_col],
                 df[driver_col],
                 normalize='index'
             ) * 100
-            # Get the percentage of "Selected" responses
             if "Selected" in contingency.columns:
                 driver_name = driver_col.split('[')[-1].split(']')[0].strip()
                 driver_percentages[driver_labels.get(driver_name, driver_name)] = contingency["Selected"]
-        except Exception as e:
-            print(f"Error processing driver column {driver_col}: {str(e)}")
+        except Exception:
+            pass
     
     if not driver_percentages:
-        print("No valid driver data found. Creating empty chart.")
         fig = go.Figure()
         fig.update_layout(
             title="No driver data available",
@@ -403,12 +389,6 @@ def create_role_barriers_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing sustainability barriers by role."""
     role_col = "role"
     
-    # Debug: Print all column names to find the exact barrier column names
-    print("\nAll columns in DataFrame:")
-    for col in df.columns:
-        if "hinder" in col.lower():
-            print(f"Found barrier column: {repr(col)}")
-    
     # Use a subset of barriers for better visualization, with exact column names
     barrier_cols = [
         "What hinders you from incorporating sustainability in your role-specific tasks?\xa0  [Lack of knowledge or awareness (e.g., not knowing enough about sustainability impact or best practices)]",
@@ -419,17 +399,12 @@ def create_role_barriers_chart(df: pd.DataFrame) -> go.Figure:
     ]
     
     # Verify each barrier column exists
-    print("\nVerifying barrier columns:")
     available_barrier_cols = []
     for col in barrier_cols:
         if col in df.columns:
-            print(f"Found: {repr(col)}")
             available_barrier_cols.append(col)
-        else:
-            print(f"Missing: {repr(col)}")
     
     if not available_barrier_cols:
-        print("No barrier columns found. Creating empty chart.")
         fig = go.Figure()
         fig.update_layout(
             title="No barrier data available",
@@ -459,24 +434,18 @@ def create_role_barriers_chart(df: pd.DataFrame) -> go.Figure:
     barrier_percentages = {}
     for barrier_col in available_barrier_cols:
         try:
-            # Create contingency table for this barrier
             contingency = pd.crosstab(
                 df[role_col],
                 df[barrier_col],
                 normalize='index'
             ) * 100
-            # Get the percentage of "Selected" responses
             if "Selected" in contingency.columns:
                 barrier_name = barrier_col.split('[')[-1].split(']')[0].strip()
                 barrier_percentages[barrier_labels.get(barrier_name, barrier_name)] = contingency["Selected"]
-            else:
-                print(f"Warning: 'Selected' not found in columns for {barrier_col}")
-                print(f"Available columns: {contingency.columns.tolist()}")
-        except Exception as e:
-            print(f"Error processing barrier column {barrier_col}: {str(e)}")
+        except Exception:
+            pass
     
     if not barrier_percentages:
-        print("No valid barrier data found. Creating empty chart.")
         fig = go.Figure()
         fig.update_layout(
             title="No barrier data available",
@@ -547,18 +516,16 @@ def create_barriers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
     barrier_percentages = {}
     for barrier_col in barrier_cols:
         try:
-            # Create contingency table for this barrier
             contingency = pd.crosstab(
                 df[org_type_col],
                 df[barrier_col],
                 normalize='index'
             ) * 100
-            # Get the percentage of "Selected" responses
             if "Selected" in contingency.columns:
                 barrier_name = barrier_col.split('[')[-1].split(']')[0].strip()
                 barrier_percentages[barrier_labels.get(barrier_name, barrier_name)] = contingency["Selected"]
-        except Exception as e:
-            print(f"Error processing barrier column {barrier_col}: {str(e)}")
+        except Exception:
+            pass
     
     if not barrier_percentages:
         return create_no_data_figure("No barrier data available")
@@ -617,18 +584,16 @@ def create_drivers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
     driver_percentages = {}
     for driver_col in driver_cols:
         try:
-            # Create contingency table for this driver
             contingency = pd.crosstab(
                 df[org_type_col],
                 df[driver_col],
                 normalize='index'
             ) * 100
-            # Get the percentage of "Selected" responses
             if "Selected" in contingency.columns:
                 driver_name = driver_col.split('[')[-1].split(']')[0].strip()
                 driver_percentages[driver_labels.get(driver_name, driver_name)] = contingency["Selected"]
-        except Exception as e:
-            print(f"Error processing driver column {driver_col}: {str(e)}")
+        except Exception:
+            pass
     
     if not driver_percentages:
         return create_no_data_figure("No driver data available")
@@ -712,16 +677,8 @@ def create_barriers_drivers_correlation_chart(df: pd.DataFrame) -> go.Figure:
 def build_insights_page(df: pd.DataFrame) -> html.Div:
     """Build the insights page layout with cross-question analysis."""
     
-    # Debug: Print all column names
-    print("\nAvailable columns in DataFrame:")
-    for i, col in enumerate(df.columns):
-        print(f"{i+1}. {repr(col)}")
-    
     # Find awareness column by partial match
     awareness_cols = [col for col in df.columns if "umbrella term" in col]
-    print("\nFound awareness columns:")
-    for col in awareness_cols:
-        print(repr(col))
     
     if not awareness_cols:
         return html.Div("Error: Could not find the definition awareness column. Please check the data.")

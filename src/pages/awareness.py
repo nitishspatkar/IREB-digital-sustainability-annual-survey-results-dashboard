@@ -12,19 +12,12 @@ from dashboard_components import build_stat_card, build_chart_card
 
 def build_awareness_page(df: pd.DataFrame) -> html.Div:
     """Build the general awareness page layout."""
-    # Debug: Print all column names
-    print("\nAvailable columns in DataFrame:")
-    for i, col in enumerate(df.columns):
-        print(f"{i+1}. {repr(col)}")
-    
     # Find the definition column by partial match
     definition_cols = [col for col in df.columns if "umbrella term" in col]
     if not definition_cols:
-        print("\nNo column found containing 'umbrella term'")
         return html.Div("Error: Could not find definition column")
     
     definition_col = definition_cols[0]
-    print(f"\nUsing definition column: {repr(definition_col)}")
     
     # Calculate key statistics
     heard_of_def_count = df[definition_col].value_counts().get("Yes", 0)
