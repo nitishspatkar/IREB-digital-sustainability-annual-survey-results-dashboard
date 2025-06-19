@@ -186,6 +186,10 @@ def create_sidebar() -> html.Div:
                 html.I(className="bi bi-graph-up me-2"),
                 "Insights"
             ], href="/insights", active="exact", className="nav-link-custom"),
+            dbc.NavLink([
+                html.I(className="bi bi-chat-left-text me-2"),
+                "Free Text Responses"
+            ], href="/free-text", active="exact", className="nav-link-custom"),
         ], vertical=True, pills=True, className="mb-4"),
         html.Hr(),
         html.P("Select Survey Year", className="mb-2"),

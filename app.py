@@ -13,6 +13,7 @@ from src.pages.awareness import build_awareness_page
 from src.pages.organization import build_organization_page
 from src.pages.job_tasks import build_job_tasks_page
 from src.pages.insights import build_insights_page
+from src.pages.free_text_responses import build_free_text_responses_page
 
 # Initialize the Dash app
 external_stylesheets = [dbc.themes.YETI, dbc.icons.BOOTSTRAP]
@@ -56,6 +57,8 @@ def render_page_content(pathname: str, selected_year: int) -> html.Div:
         return dbc.Container([build_job_tasks_page(df)], fluid=True)
     elif pathname == "/insights":
         return dbc.Container([build_insights_page(df)], fluid=True)
+    elif pathname == "/free-text":
+        return dbc.Container([build_free_text_responses_page(df)], fluid=True)
     
     # If the pathname is not recognized, return a 404 page
     return dbc.Container(
