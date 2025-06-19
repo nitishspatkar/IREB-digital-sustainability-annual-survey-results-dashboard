@@ -31,12 +31,12 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
     total_valid_responses = df[definition_col].notna().sum()
     heard_of_def_percentage = round((heard_of_def_count / total_valid_responses * 100) if total_valid_responses > 0 else 0)
     
-    training_col = "Have you participated in one or more training or educational programs on digital sustainability?"
+    training_col = "participated_sustainability_training"
     training_participation = df[training_col].value_counts().get("Yes", 0)
     training_total = df[training_col].notna().sum()
     training_percentage = round((training_participation / training_total * 100) if training_total > 0 else 0)
     
-    num_trainings_col = "How many times training(s) or educational program(s) on digital sustainability did you participate in?"
+    num_trainings_col = "num_sustainability_trainings"
     avg_trainings_numeric = process_numeric_column(df, num_trainings_col)
     avg_trainings = round(avg_trainings_numeric.mean(), 1) if not pd.isna(avg_trainings_numeric.mean()) else "N/A"
     
@@ -63,9 +63,9 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
     
     # Create visualizations
     definition_fig = make_donut_chart(df, definition_col, "")
-    freq_discussions_fig = generate_chart(df, "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?", "", 'bar_h')
+    freq_discussions_fig = generate_chart(df, "frequency_sustainability_discussions", "", 'bar_h')
     training_fig = make_donut_chart(df, training_col, "")
-    satisfaction_fig = make_donut_chart(df, "Are you satisfied with the number of trainings or educational programs you participated in?", "")
+    satisfaction_fig = make_donut_chart(df, "satisfied_num_trainings", "")
     num_trainings_fig = make_histogram(df, num_trainings_col, "", bins=6)
 
     # Pie charts in three columns
@@ -75,14 +75,18 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
         build_chart_card("Training Satisfaction Levels", satisfaction_fig, 4),
     ], className="mb-5 g-4")
 
-    # First row of charts (bar chart)
-    row1 = dbc.Row([
-        build_chart_card(
-            "How frequently do you encounter discussions about digital sustainability?",
-            freq_discussions_fig,
-            12
-        )
-    ], className="mb-5 g-4")
+    # Bar charts in two columns
+    bar_charts = [
+        ("How frequently do you encounter discussions about digital sustainability?", freq_discussions_fig),
+        ("Distribution of Training Programs Attended", num_trainings_fig)
+    ]
+    bar_rows = []
+    for i in range(0, len(bar_charts), 2):
+        row = dbc.Row([
+            build_chart_card(bar_charts[i][0], bar_charts[i][1], 6),
+            build_chart_card(bar_charts[i+1][0], bar_charts[i+1][1], 6) if i+1 < len(bar_charts) else None
+        ], className="mb-5 g-4")
+        bar_rows.append(row)
 
     # Training section header style
     section_header_style = {
@@ -119,6 +123,5 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
         html.H3("General Awareness of Sustainability", className="mb-4 pt-3", style=page_title_style),
         stats_row,
         pie_row,
-        row1,
-        training_section
+        *bar_rows
     ]) 

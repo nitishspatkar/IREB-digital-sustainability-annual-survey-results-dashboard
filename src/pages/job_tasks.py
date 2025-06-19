@@ -3,6 +3,10 @@
 import pandas as pd
 import dash_bootstrap_components as dbc
 from dash import html, dcc
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from rename_config import rename_mapping
 
 from src.components.charts import (
     generate_chart,
@@ -19,15 +23,18 @@ from src.config import (
     JOB_TASK_MULTI_SUPPORT
 )
 
+# Build reverse mapping from short name to original question
+reverse_mapping = {v: k for k, v in rename_mapping.items()}
+
 def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
     """Build the job tasks page layout."""
     # Calculate key statistics
-    tasks_col = "Do you incorporate digital sustainability considerations in your role-specific tasks?"
+    tasks_col = "incorporate_sustainability_in_tasks"
     incorporates_in_tasks = df[tasks_col].value_counts().get("Yes", 0)
     total_tasks_responses = df[tasks_col].notna().sum()
     incorporate_percentage = round((incorporates_in_tasks / total_tasks_responses * 100) if total_tasks_responses > 0 else 0)
     
-    tools_col = "Are there specific tools, software, or frameworks that help you incorporate sustainability into your tasks? (E.g., gathering and managing requirements, writing sustainability-focused tests, optimizing code for less energy consumption.)"
+    tools_col = "tools_for_sustainability"
     uses_tools = df[tools_col].value_counts().get("Yes", 0)
     total_tools_responses = df[tools_col].notna().sum()
     tools_percentage = round((uses_tools / total_tools_responses * 100) if total_tools_responses > 0 else 0)
@@ -58,21 +65,24 @@ def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
     knowledge_fig = make_multi_select_bar(df, JOB_TASK_MULTI_KNOWLEDGE, "")
     support_fig = make_multi_select_bar(df, JOB_TASK_MULTI_SUPPORT, "")
     
-    # First row of charts - two main questions
-    row1 = dbc.Row([
-        build_chart_card(
-            "Do you incorporate sustainability in your tasks?",
-            incorporate_fig,
-            6
-        ),
-        build_chart_card(
-            "Do you use specific tools for sustainability?",
-            tools_fig,
-            6
-        )
-    ], className="mb-5 g-4")
-    
-    # Multi-select sections with headers
+    # Bar charts in two columns (donut and multi-select bar charts)
+    bar_charts = [
+        (reverse_mapping.get(tasks_col, tasks_col), incorporate_fig),
+        (reverse_mapping.get(tools_col, tools_col), tools_fig),
+        (reverse_mapping.get(JOB_TASK_MULTI_DRIVES[0], "Drivers for Sustainability"), drivers_fig),
+        (reverse_mapping.get(JOB_TASK_MULTI_HINDER[0], "Barriers to Implementation"), hindrances_fig),
+        (reverse_mapping.get(JOB_TASK_MULTI_KNOWLEDGE[0], "Knowledge Gaps"), knowledge_fig),
+        (reverse_mapping.get(JOB_TASK_MULTI_SUPPORT[0], "Support Needs"), support_fig)
+    ]
+    bar_rows = []
+    for i in range(0, len(bar_charts), 2):
+        row = dbc.Row([
+            build_chart_card(bar_charts[i][0], bar_charts[i][1], 6),
+            build_chart_card(bar_charts[i+1][0], bar_charts[i+1][1], 6) if i+1 < len(bar_charts) else None
+        ], className="mb-5 g-4")
+        bar_rows.append(row)
+
+    # Section headers
     section_header_style = {
         "color": PRIMARY_COLOR,
         "margin-top": "2rem",
@@ -81,54 +91,6 @@ def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
         "border-bottom": f"2px solid {PRIMARY_COLOR}",
         "padding-bottom": "0.5rem"
     }
-    
-    # Drivers and Barriers section
-    drivers_barriers_section = html.Div([
-        html.H4("Drivers and Barriers", style=section_header_style),
-        html.P(
-            "Explore what motivates and hinders professionals in incorporating sustainability practices.",
-            className="mb-4",
-            style={"color": "#666"}
-        ),
-        dbc.Row([
-            build_chart_card(
-                "Drivers for Sustainability",
-                drivers_fig,
-                12
-            )
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Barriers to Implementation",
-                hindrances_fig,
-                12
-            )
-        ], className="mb-5 g-4")
-    ])
-    
-    # Knowledge and Support section
-    knowledge_support_section = html.Div([
-        html.H4("Knowledge Gaps and Support Needs", style=section_header_style),
-        html.P(
-            "Identify areas where professionals need more knowledge and support.",
-            className="mb-4",
-            style={"color": "#666"}
-        ),
-        dbc.Row([
-            build_chart_card(
-                "Knowledge Gaps",
-                knowledge_fig,
-                12
-            )
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Support Needs",
-                support_fig,
-                12
-            )
-        ], className="mb-5 g-4")
-    ])
     
     # Page title style
     page_title_style = {
@@ -140,7 +102,5 @@ def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
     return html.Div([
         html.H3("Digital Sustainability in Your Daily Work", className="mb-4 pt-3", style=page_title_style),
         stats_row,
-        row1,
-        drivers_barriers_section,
-        knowledge_support_section
+        *bar_rows
     ]) 

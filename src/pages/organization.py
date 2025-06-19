@@ -3,6 +3,10 @@
 import pandas as pd
 import dash_bootstrap_components as dbc
 from dash import html
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from rename_config import rename_mapping
 
 from src.components.charts import (
     generate_chart,
@@ -16,6 +20,9 @@ from src.config import (
     ORG_MULTI_TRAINING,
     ORG_MULTI_DIMENSIONS
 )
+
+# Build reverse mapping from short name to original question
+reverse_mapping = {v: k for k, v in rename_mapping.items()}
 
 def build_organization_page(df: pd.DataFrame) -> html.Div:
     """Build the organization page layout."""
@@ -31,10 +38,10 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
         print(repr(col))
     
     # Define column names
-    goals_col = "Does your organization have specific digital sustainability goals or benchmarks for software development projects?"
-    csr_col = "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?"
-    practices_col = "Does your organization incorporate sustainable development practices?"
-    coordination_col = "Do different departments in your organization coordinate on sustainability for software development projects?"
+    goals_col = "org_sustainability_goals"
+    csr_col = "org_csr_expert_team"
+    practices_col = "org_incorporates_sustainability"
+    coordination_col = "org_coordination_on_sustainability"
     
     # Calculate statistics
     total_orgs = len(df)
@@ -81,13 +88,13 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
     
     # Create rows for pie charts (2 per row)
     row1 = dbc.Row([
-        build_chart_card("Sustainability Goals", goals_fig, 6),
-        build_chart_card("CSR Team", csr_fig, 6)
+        build_chart_card(reverse_mapping.get(goals_col, "Sustainability Goals"), goals_fig, 6),
+        build_chart_card(reverse_mapping.get(csr_col, "CSR Team"), csr_fig, 6)
     ], className="mb-5 g-3")
     
     row2 = dbc.Row([
-        build_chart_card("Sustainable Practices", practices_fig, 6),
-        build_chart_card("Cross-Department Coordination", coordination_fig, 6)
+        build_chart_card(reverse_mapping.get(practices_col, "Sustainable Practices"), practices_fig, 6),
+        build_chart_card(reverse_mapping.get(coordination_col, "Cross-Department Coordination"), coordination_fig, 6)
     ], className="mb-5 g-3")
     
     # Calculate percentage for each dimension using found columns
@@ -108,9 +115,17 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
     # Create horizontal bar chart for dimensions
     dim_fig = generate_chart(dim_data, 'Dimension', 'Percentage', 'bar_h')
     
-    row3 = dbc.Row([
-        build_chart_card("Sustainability Dimensions Considered", dim_fig, 12)
-    ], className="mb-5 g-3")
+    # Bar charts in two columns (currently only one, but future-proof)
+    bar_charts = [
+        (reverse_mapping.get(dimension_cols[0], "Sustainability Dimensions Considered") if dimension_cols else "Sustainability Dimensions Considered", dim_fig)
+    ]
+    bar_rows = []
+    for i in range(0, len(bar_charts), 2):
+        row = dbc.Row([
+            build_chart_card(bar_charts[i][0], bar_charts[i][1], 6),
+            build_chart_card(bar_charts[i+1][0], bar_charts[i+1][1], 6) if i+1 < len(bar_charts) else None
+        ], className="mb-5 g-3")
+        bar_rows.append(row)
     
     # Page title style
     page_title_style = {
@@ -124,5 +139,5 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
         stats_row,
         row1,
         row2,
-        row3
+        *bar_rows
     ]) 

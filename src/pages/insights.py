@@ -27,7 +27,7 @@ def create_awareness_implementation_chart(df: pd.DataFrame) -> go.Figure:
     
     # Use the first matching column
     awareness_col = awareness_cols[0]
-    implementation_col = "Does your organization incorporate sustainable development practices?"
+    implementation_col = "incorporate_sustainability_in_tasks"
     
     # Create contingency table
     contingency = pd.crosstab(
@@ -63,8 +63,8 @@ def create_awareness_implementation_chart(df: pd.DataFrame) -> go.Figure:
 def create_training_implementation_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing relationship between training participation and implementation."""
     # Cross-tabulate training participation with implementation
-    training_col = "Have you participated in one or more training or educational programs on digital sustainability?"
-    implementation_col = "Does your organization incorporate sustainable development practices?"
+    training_col = "participated_sustainability_training"
+    implementation_col = "incorporate_sustainability_in_tasks"
     
     # Create contingency table
     contingency = pd.crosstab(
@@ -100,8 +100,8 @@ def create_training_implementation_chart(df: pd.DataFrame) -> go.Figure:
 def create_discussion_implementation_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing relationship between discussion frequency and implementation."""
     # Cross-tabulate discussion frequency with implementation
-    discussion_col = "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?"
-    implementation_col = "Does your organization incorporate sustainable development practices?"
+    discussion_col = "frequency_sustainability_discussions"
+    implementation_col = "incorporate_sustainability_in_tasks"
     
     # Create contingency table
     contingency = pd.crosstab(
@@ -136,8 +136,8 @@ def create_discussion_implementation_chart(df: pd.DataFrame) -> go.Figure:
 
 def create_org_type_sustainability_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing sustainability practices by organization type."""
-    org_type_col = "Which of the following organizational types best describes your organization?"
-    practices_col = "Does your organization incorporate sustainable development practices?"
+    org_type_col = "organization_type"
+    practices_col = "incorporate_sustainability_in_tasks"
     
     # Create contingency table
     contingency = pd.crosstab(
@@ -173,8 +173,8 @@ def create_org_type_sustainability_chart(df: pd.DataFrame) -> go.Figure:
 
 def create_org_goals_practices_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing relationship between sustainability goals and practices."""
-    goals_col = "Does your organization have specific digital sustainability goals or benchmarks for software development projects?"
-    practices_col = "Does your organization incorporate sustainable development practices?"
+    goals_col = "org_sustainability_goals"
+    practices_col = "incorporate_sustainability_in_tasks"
     
     # Create contingency table
     contingency = pd.crosstab(
@@ -209,8 +209,8 @@ def create_org_goals_practices_chart(df: pd.DataFrame) -> go.Figure:
 
 def create_org_csr_practices_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing relationship between having CSR team and practices."""
-    csr_col = "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?"
-    practices_col = "Does your organization incorporate sustainable development practices?"
+    csr_col = "org_csr_expert_team"
+    practices_col = "incorporate_sustainability_in_tasks"
     
     # Create contingency table
     contingency = pd.crosstab(
@@ -245,7 +245,7 @@ def create_org_csr_practices_chart(df: pd.DataFrame) -> go.Figure:
 
 def create_role_implementation_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing sustainability implementation by role."""
-    role_col = "Which of the following best describes your current role in the organization?"
+    role_col = "role"
     implementation_col = "Do you incorporate digital sustainability considerations in your role-specific tasks?"
     
     # Create contingency table
@@ -282,7 +282,7 @@ def create_role_implementation_chart(df: pd.DataFrame) -> go.Figure:
 
 def create_role_drivers_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing sustainability drivers by role."""
-    role_col = "Which of the following best describes your current role in the organization?"
+    role_col = "role"
     
     # Debug: Print all column names to find the exact driver column names
     print("\nAll columns in DataFrame:")
@@ -401,7 +401,7 @@ def create_role_drivers_chart(df: pd.DataFrame) -> go.Figure:
 
 def create_role_barriers_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing sustainability barriers by role."""
-    role_col = "Which of the following best describes your current role in the organization?"
+    role_col = "role"
     
     # Debug: Print all column names to find the exact barrier column names
     print("\nAll columns in DataFrame:")
@@ -523,7 +523,7 @@ def create_role_barriers_chart(df: pd.DataFrame) -> go.Figure:
 
 def create_barriers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
     """Create a heatmap showing barriers by organization type."""
-    org_type_col = "Which of the following organizational types best describes your organization?"
+    org_type_col = "organization_type"
     
     # Use the same barrier columns as in create_role_barriers_chart
     barrier_cols = [
@@ -593,7 +593,7 @@ def create_barriers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
 
 def create_drivers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
     """Create a heatmap showing drivers by organization type."""
-    org_type_col = "Which of the following organizational types best describes your organization?"
+    org_type_col = "organization_type"
     
     # Use the same driver columns as in create_role_drivers_chart
     driver_cols = [
@@ -728,7 +728,7 @@ def build_insights_page(df: pd.DataFrame) -> html.Div:
     
     # Use the first matching column
     awareness_col = awareness_cols[0]
-    implementation_col = "Does your organization incorporate sustainable development practices?"
+    implementation_col = "incorporate_sustainability_in_tasks"
     
     # Page title style
     page_title_style = {
@@ -843,8 +843,8 @@ def build_insights_page(df: pd.DataFrame) -> html.Div:
     org_csr_fig = create_org_csr_practices_chart(df)
     
     # Calculate key statistics for organizational factors
-    has_goals_count = df["Does your organization have specific digital sustainability goals or benchmarks for software development projects?"].value_counts().get("Yes", 0)
-    has_csr_count = df["Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?"].value_counts().get("Yes", 0)
+    has_goals_count = df["org_sustainability_goals"].value_counts().get("Yes", 0)
+    has_csr_count = df["org_csr_expert_team"].value_counts().get("Yes", 0)
     total_orgs = len(df)
     
     goals_pct = round((has_goals_count / total_orgs * 100) if total_orgs > 0 else 0)

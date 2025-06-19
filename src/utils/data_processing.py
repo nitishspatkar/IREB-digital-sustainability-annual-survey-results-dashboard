@@ -5,6 +5,7 @@ import re
 from typing import Optional, Union, List
 import os
 from src.config import STYLE_VARS, PRIMARY_COLOR
+from rename_config import rename_mapping
 
 def dedup_column_names(columns: List[str]) -> List[str]:
     """
@@ -84,6 +85,9 @@ def load_single_year_data(data_folder: str, year: int) -> pd.DataFrame:
     # Handle duplicate column names with our own function
     df.columns = dedup_column_names(list(df.columns))
     
+    # Apply rename mapping
+    df = df.rename(columns=rename_mapping)
+    
     # Print final column names for debugging
     print("\nFinal cleaned columns:")
     for i, col in enumerate(df.columns):
@@ -136,7 +140,7 @@ def process_numeric_column(df: pd.DataFrame, col: str) -> pd.Series:
     Returns:
         Series with processed numeric values
     """
-    if col == "How many years of professional experience do you have in IT/software engineering?":
+    if col == "years_of_experience":
         return df[col].apply(parse_experience)
     else:
         return pd.to_numeric(df[col], errors='coerce')
