@@ -5,6 +5,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from rename_config import rename_mapping
+from src.config_styles import CARD_STYLE, HEADER_STYLE, RESPONSE_STYLE
 
 # Build reverse mapping from short name to original question
 reverse_mapping = {v: k for k, v in rename_mapping.items()}
@@ -28,34 +29,6 @@ FREE_TEXT_COLS = [
     'resource_need_other',
     # Add more if needed
 ]
-
-CARD_STYLE = {
-    "marginBottom": "2rem",
-    "boxShadow": "0 2px 8px rgba(131,30,130,0.08)",
-    "borderRadius": "0.75rem",
-    "border": "none",
-    "background": "#fff"
-}
-
-RESPONSE_STYLE = {
-    "background": "#f8f9fa",
-    "borderRadius": "0.5rem",
-    "padding": "0.75rem 1rem",
-    "marginBottom": "0.5rem",
-    "fontFamily": "Helvetica, Arial, sans-serif",
-    "fontSize": "1rem",
-    "color": "#333"
-}
-
-HEADER_STYLE = {
-    "background": "#831E82",
-    "color": "#fff",
-    "borderTopLeftRadius": "0.75rem",
-    "borderTopRightRadius": "0.75rem",
-    "padding": "0.75rem 1rem",
-    "fontWeight": 600,
-    "fontSize": "1.1rem"
-}
 
 def build_free_text_responses_page(df: pd.DataFrame) -> html.Div:
     cards = []
