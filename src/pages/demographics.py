@@ -2,11 +2,12 @@
 
 import pandas as pd
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import html, dcc
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from rename_config import rename_mapping
+from dash import dash_table
 
 from src.components.charts import generate_chart, make_histogram
 from src.components.layout import build_chart_card, build_stat_card
@@ -65,6 +66,47 @@ def build_demographics_page(df: pd.DataFrame) -> html.Div:
     except:
         geo_fig = generate_chart(df, "country_residence_1", "", 'bar_h')
     
+    # Prepare country count table for map
+    country_counts = df["country_residence_1"].value_counts().reset_index()
+    country_counts.columns = ["Country", "Count"]
+
+    # Only show table if map is rendered (not fallback bar chart)
+    if hasattr(geo_fig.layout, "geo") and geo_fig.layout.geo is not None:
+        geo_fig.update_layout(height=600)  # Make the map taller
+        row2 = dbc.Row([
+            dbc.Col(
+                dbc.Card([
+                    dbc.CardHeader(
+                        reverse_mapping.get("country_residence_1", "Geographic Distribution"),
+                        className="chart-card-header"
+                    ),
+                    dbc.CardBody(
+                        dbc.Row([
+                            dbc.Col(
+                                dash_table.DataTable(
+                                    data=country_counts.to_dict('records'),
+                                    columns=[{"name": i, "id": i} for i in country_counts.columns],
+                                    style_table={'height': '600px', 'overflowY': 'auto'},
+                                    style_cell={'fontFamily': 'inherit', 'fontSize': '16px', 'padding': '8px'},
+                                    style_header={'backgroundColor': '#f8f9fa', 'fontWeight': 'bold'},
+                                    style_data={'backgroundColor': 'white'},
+                                    page_size=20
+                                ),
+                                width=4
+                            ),
+                            dbc.Col(
+                                dcc.Graph(figure=geo_fig),
+                                width=8
+                            )
+                        ])
+                    )
+                ], className="mb-5"),
+                width=12
+            )
+        ])
+    else:
+        row2 = None
+    
     role_fig = generate_chart(df, "role", "", 'donut')
     org_fig = generate_chart(df, "organization_type", "", 'donut')
     domain_fig = generate_chart(df, "application_domain", "", 'bar_h')
@@ -79,10 +121,6 @@ def build_demographics_page(df: pd.DataFrame) -> html.Div:
     if not (hasattr(geo_fig.layout, "geo") and geo_fig.layout.geo is not None):
         bar_charts.insert(2, (reverse_mapping.get("country_residence_1", "Geographic Distribution"), geo_fig))
         row2 = None
-    else:
-        row2 = dbc.Row([
-            build_chart_card(reverse_mapping.get("country_residence_1", "Geographic Distribution"), geo_fig, 12)
-        ], className="mb-5 g-3")
 
     # Render bar charts in two columns
     bar_rows = []

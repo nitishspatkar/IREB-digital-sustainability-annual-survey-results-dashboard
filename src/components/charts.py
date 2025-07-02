@@ -378,21 +378,24 @@ def make_histogram(
     return fig
 
 def make_world_map(df: pd.DataFrame, col: str, title: Optional[str] = None) -> go.Figure:
-    """Create a choropleth map for countries or continents."""
+    """Create a choropleth map for countries or continents with improved colors and hover info."""
     if df[col].notna().sum() == 0:
         return create_no_data_figure(title)
     
-    counts = df[col].value_counts(dropna=False)
+    counts = df[col].value_counts(dropna=False).reset_index()
+    counts.columns = ['country', 'count']
     
     fig = px.choropleth(
-        locations=counts.index,
-        locationmode="country names",
-        color=counts.values,
-        hover_name=counts.index,
-        color_continuous_scale=px.colors.sequential.Plasma,
+        counts,
+        locations='country',
+        locationmode='country names',
+        color='count',
+        color_continuous_scale='Viridis',
+        range_color=(counts['count'].min(), counts['count'].max()),
+        hover_name='country',
+        hover_data={'count': True, 'country': False},
         title=title
     )
-    
     fig.update_layout(
         title=dict(
             text=title if title else None,
@@ -405,9 +408,13 @@ def make_world_map(df: pd.DataFrame, col: str, title: Optional[str] = None) -> g
             size=LABEL_FONT_SIZE
         ),
         margin=dict(l=10, r=10, t=30 if title else 10, b=10),
-        hovermode=False
+        height=500,
+        coloraxis_colorbar=dict(
+            title="Respondents",
+            tickvals=[counts['count'].min(), counts['count'].max()],
+            ticktext=[str(counts['count'].min()), str(counts['count'].max())]
+        )
     )
-    
     return fig
 
 def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str] = None) -> go.Figure:
