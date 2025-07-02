@@ -104,8 +104,6 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
             for col in dimension_cols
         ]
     })
-    print('Sustainability dimension counts (2025):')
-    print(dim_data)
     # Create horizontal bar chart for dimensions (using counts) - use px.bar directly
     dim_fig = px.bar(
         dim_data,
