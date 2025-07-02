@@ -7,18 +7,19 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from rename_config import rename_mapping
-
-from src.components.charts import (
-    generate_chart,
-    make_donut_chart,
-    make_multi_select_bar
-)
-from src.components.layout import build_chart_card, build_stat_card
+import plotly.express as px
 from src.config import (
     PRIMARY_COLOR,
     ORGANIZATION_COLS,
     ORG_MULTI_TRAINING,
-    ORG_MULTI_DIMENSIONS
+    ORG_MULTI_DIMENSIONS,
+    STYLE_VARS
+)
+from src.components.layout import build_chart_card, build_stat_card
+from src.components.charts import (
+    generate_chart,
+    make_donut_chart,
+    make_multi_select_bar
 )
 
 # Build reverse mapping from short name to original question
@@ -89,7 +90,7 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
         build_chart_card(reverse_mapping.get(coordination_col, "Cross-Department Coordination"), coordination_fig, 6)
     ], className="mb-5 g-3")
     
-    # Calculate percentage for each dimension using found columns
+    # Calculate count for each dimension using found columns
     dim_data = pd.DataFrame({
         'Dimension': [
             'Environmental',
@@ -98,18 +99,45 @@ def build_organization_page(df: pd.DataFrame) -> html.Div:
             'Economic',
             'Technical'
         ],
-        'Percentage': [
-            (df[col].value_counts().get("Selected", 0) / total_orgs) * 100
+        'Count': [
+            df[col].astype(str).str.strip().str.lower().eq('yes').sum()
             for col in dimension_cols
         ]
     })
-    
-    # Create horizontal bar chart for dimensions
-    dim_fig = generate_chart(dim_data, 'Dimension', 'Percentage', 'bar_h')
+    print('Sustainability dimension counts (2025):')
+    print(dim_data)
+    # Create horizontal bar chart for dimensions (using counts) - use px.bar directly
+    dim_fig = px.bar(
+        dim_data,
+        y='Dimension',
+        x='Count',
+        orientation='h',
+        template="plotly_white",
+        color_discrete_sequence=[PRIMARY_COLOR]
+    )
+    dim_fig.update_traces(
+        hoverinfo='none',
+        text=dim_data["Count"],
+        textposition='outside',
+        textfont=dict(size=STYLE_VARS["FONT_SIZE"] + 4)
+    )
+    dim_fig.update_layout(
+        title=None,
+        yaxis_title=None,
+        xaxis_title="Count",
+        height=350,
+        margin=dict(l=10, r=10, t=30, b=10),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(
+            family=STYLE_VARS["FONT_FAMILY"],
+            size=STYLE_VARS["FONT_SIZE"] + 4
+        )
+    )
     
     # Bar charts in two columns (currently only one, but future-proof)
     bar_charts = [
-        (reverse_mapping.get(dimension_cols[0], "Sustainability Dimensions Considered") if dimension_cols else "Sustainability Dimensions Considered", dim_fig)
+        ("Which dimensions of sustainability are actively considered in your organization's software development projects?", dim_fig)
     ]
     bar_rows = []
     for i in range(0, len(bar_charts), 2):

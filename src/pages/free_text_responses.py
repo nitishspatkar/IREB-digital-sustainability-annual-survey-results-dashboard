@@ -28,12 +28,14 @@ FREE_TEXT_COLS = [
     'lack_knowledge_other',
     'resource_need_other',
     'support_other',
-    'num_sustainability_trainings',
+    # 'num_sustainability_trainings',  # Remove from free text
     # Add more if needed
 ]
 
 def build_free_text_responses_page(df: pd.DataFrame) -> html.Div:
     cards = []
+    # Do NOT render num_sustainability_trainings as a bar chart here anymore
+    # Only render all other free-text columns as cards
     for col in FREE_TEXT_COLS:
         if col in df.columns:
             responses = df[col].dropna().astype(str).str.strip()

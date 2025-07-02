@@ -196,7 +196,7 @@ def create_sidebar() -> html.Div:
         dcc.Dropdown(
             id="year-dropdown",
             options=[{"label": str(year), "value": year} for year in AVAILABLE_YEARS],
-            value=AVAILABLE_YEARS[-1],  # Default to most recent year
+            value=2025 if 2025 in AVAILABLE_YEARS else AVAILABLE_YEARS[-1],  # Default to 2025 if available
             clearable=False,
             className="mb-4 year-dropdown"
         )

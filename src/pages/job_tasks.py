@@ -65,22 +65,27 @@ def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
     knowledge_fig = make_multi_select_bar(df, JOB_TASK_MULTI_KNOWLEDGE, "")
     support_fig = make_multi_select_bar(df, JOB_TASK_MULTI_SUPPORT, "")
     
-    # Bar charts in two columns (donut and multi-select bar charts)
-    bar_charts = [
-        (reverse_mapping.get(tasks_col, tasks_col), incorporate_fig),
-        (reverse_mapping.get(tools_col, tools_col), tools_fig),
-        (reverse_mapping.get(JOB_TASK_MULTI_DRIVES[0], "Drivers for Sustainability"), drivers_fig),
-        (reverse_mapping.get(JOB_TASK_MULTI_HINDER[0], "Barriers to Implementation"), hindrances_fig),
-        (reverse_mapping.get(JOB_TASK_MULTI_KNOWLEDGE[0], "Knowledge Gaps"), knowledge_fig),
-        (reverse_mapping.get(JOB_TASK_MULTI_SUPPORT[0], "Support Needs"), support_fig)
-    ]
-    bar_rows = []
-    for i in range(0, len(bar_charts), 2):
-        row = dbc.Row([
-            build_chart_card(bar_charts[i][0], bar_charts[i][1], 6),
-            build_chart_card(bar_charts[i+1][0], bar_charts[i+1][1], 6) if i+1 < len(bar_charts) else None
+    # Render donut charts in a row
+    donut_row = dbc.Row([
+        build_chart_card(reverse_mapping.get(tasks_col, tasks_col), incorporate_fig, 6),
+        build_chart_card(reverse_mapping.get(tools_col, tools_col), tools_fig, 6)
+    ], className="mb-5 g-4")
+
+    # Render multi-select bar charts in single columns (full width)
+    multi_rows = [
+        dbc.Row([
+            build_chart_card(reverse_mapping.get(JOB_TASK_MULTI_DRIVES[0], "Drivers for Sustainability"), drivers_fig, 12)
+        ], className="mb-5 g-4"),
+        dbc.Row([
+            build_chart_card(reverse_mapping.get(JOB_TASK_MULTI_HINDER[0], "Barriers to Implementation"), hindrances_fig, 12)
+        ], className="mb-5 g-4"),
+        dbc.Row([
+            build_chart_card(reverse_mapping.get(JOB_TASK_MULTI_KNOWLEDGE[0], "Knowledge Gaps"), knowledge_fig, 12)
+        ], className="mb-5 g-4"),
+        dbc.Row([
+            build_chart_card(reverse_mapping.get(JOB_TASK_MULTI_SUPPORT[0], "Support Needs"), support_fig, 12)
         ], className="mb-5 g-4")
-        bar_rows.append(row)
+    ]
 
     # Section headers
     section_header_style = {
@@ -102,5 +107,6 @@ def build_job_tasks_page(df: pd.DataFrame) -> html.Div:
     return html.Div([
         html.H3("Digital Sustainability in Your Daily Work", className="mb-4 pt-3", style=page_title_style),
         stats_row,
-        *bar_rows
+        donut_row,
+        *multi_rows
     ]) 

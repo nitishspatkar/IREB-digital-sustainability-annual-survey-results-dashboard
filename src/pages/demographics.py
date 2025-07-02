@@ -93,11 +93,15 @@ def build_demographics_page(df: pd.DataFrame) -> html.Div:
         ], className="mb-5 g-3")
         bar_rows.append(row)
 
-    # Pie charts in two columns
-    pie_row = dbc.Row([
-        build_chart_card(reverse_mapping.get("role", "Professional Role"), role_fig, 6),
-        build_chart_card(reverse_mapping.get("organization_type", "Organization Type"), org_fig, 6)
-    ], className="mb-5 g-4")
+    # Pie charts in single columns (full width)
+    pie_row = html.Div([
+        dbc.Row([
+            build_chart_card(reverse_mapping.get("role", "Professional Role"), role_fig, 12)
+        ], className="mb-5 g-4"),
+        dbc.Row([
+            build_chart_card(reverse_mapping.get("organization_type", "Organization Type"), org_fig, 12)
+        ], className="mb-5 g-4")
+    ])
     
     # Page title style
     page_title_style = {

@@ -8,6 +8,10 @@ from src.components.charts import generate_chart, make_donut_chart, make_histogr
 from src.components.layout import build_stat_card, build_chart_card
 from src.utils.data_processing import process_numeric_column
 from src.config import PRIMARY_COLOR, AWARENESS_COLS
+from rename_config import rename_mapping
+
+# Build reverse mapping from short name to original question
+reverse_mapping = {v: k for k, v in rename_mapping.items()}
 
 def build_awareness_page(df: pd.DataFrame) -> html.Div:
     """Build the general awareness page layout."""
@@ -79,6 +83,19 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
         ], className="mb-5 g-4")
         bar_rows.append(row)
 
+    # Add bar chart for number of trainings participated
+    if 'num_sustainability_trainings' in df.columns:
+        num_trainings_fig = generate_chart(df, 'num_sustainability_trainings', '', 'bar_h')
+        num_trainings_row = dbc.Row([
+            build_chart_card(
+                reverse_mapping.get('num_sustainability_trainings', 'How many times training(s) or educational program(s) on digital sustainability did you participate in?'),
+                num_trainings_fig,
+                12
+            )
+        ], className="mb-5 g-4")
+    else:
+        num_trainings_row = None
+
     # Training section header style
     section_header_style = {
         "color": PRIMARY_COLOR,
@@ -114,5 +131,6 @@ def build_awareness_page(df: pd.DataFrame) -> html.Div:
         html.H3("General Awareness of Sustainability", className="mb-4 pt-3", style=page_title_style),
         stats_row,
         pie_row,
-        *bar_rows
+        *bar_rows,
+        num_trainings_row if num_trainings_row else None
     ]) 
