@@ -163,6 +163,19 @@ def build_chart_grid(
 def create_sidebar() -> html.Div:
     """Create the sidebar with navigation and year selection."""
     return html.Div([
+        # Logo at the top
+        html.Div([
+            html.Img(
+                src="/assets/IREB_RGB.jpg",
+                alt="IREB Logo",
+                style={
+                    "width": "100%",
+                    "max-width": "200px",
+                    "height": "auto",
+                    "margin-bottom": "20px"
+                }
+            )
+        ], className="text-center mb-3"),
         html.H2("Digital Sustainability Survey", className="display-7 mb-4"),
         html.Hr(),
         dbc.Nav([
