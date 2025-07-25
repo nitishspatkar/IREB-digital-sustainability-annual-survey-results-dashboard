@@ -60,7 +60,7 @@ def build_chart_card(
                     figure=fig,
                     config={
                         'displayModeBar': False,
-                        'staticPlot': True  # This disables all interactivity including hover
+                        'responsive': True
                     }
                 ),
                 className="pt-0"  # Remove top padding since header has no border
@@ -88,7 +88,7 @@ def build_card(col: str, fig: object, reverse_mapping: Dict[str, str]) -> dbc.Ca
                     figure=fig,
                     config={
                         'displayModeBar': False,
-                        'staticPlot': True  # This disables all interactivity including hover
+                        'responsive': True
                     }
                 ),
                 className="pt-0"  # Remove top padding since header has no border
@@ -111,7 +111,7 @@ def build_multi_card(title: str, fig: object) -> dbc.Card:
                     figure=fig,
                     config={
                         'displayModeBar': False,
-                        'staticPlot': True  # This disables all interactivity including hover
+                        'responsive': True
                     }
                 ),
                 className="pt-0"  # Remove top padding since header has no border

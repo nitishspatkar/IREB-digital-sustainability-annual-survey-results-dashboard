@@ -135,7 +135,7 @@ def make_bar_chart(
             color_discrete_sequence=[PRIMARY_COLOR]
         )
         fig.update_traces(
-            hoverinfo='none',  # Remove hover effect
+            hovertemplate='<b>%{y}</b><br>Count: %{x}<extra></extra>',
             text=counts["count"],  # Show count as text
             textposition='outside',
             textfont=dict(size=LABEL_FONT_SIZE)
@@ -165,7 +165,7 @@ def make_bar_chart(
             color_discrete_sequence=[PRIMARY_COLOR]
         )
         fig.update_traces(
-            hoverinfo='none',  # Remove hover effect
+            hovertemplate='<b>%{x}</b><br>Count: %{y}<extra></extra>',
             text=counts["count"],  # Show count as text
             textposition='outside',
             textfont=dict(size=LABEL_FONT_SIZE)
@@ -188,7 +188,7 @@ def make_bar_chart(
     return fig
 
 def make_pie_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> go.Figure:
-    """Create a pie chart for a categorical column."""
+    """Create a pie chart for a categorical column with improved label handling."""
     if df[col].notna().sum() == 0:
         return create_no_data_figure(title)
     
@@ -201,106 +201,157 @@ def make_pie_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> g
     total = counts["count"].sum()
     counts["percentage"] = counts["count"] / total * 100
     
+    # Store original labels for hover and truncated for legend
+    counts['original_labels'] = counts[col].astype(str)
+    counts['display_labels'] = counts[col].astype(str).apply(lambda x: truncate_text(x))
+    
+    # Calculate dynamic margins based on label lengths
+    max_label_length = max(len(label) for label in counts['display_labels']) if len(counts) > 0 else 20
+    right_margin = min(max(120, max_label_length * 8), 300)  # Dynamic margin, capped at 300
+    
     fig = px.pie(
         counts,
-        names=col,
+        names='display_labels',
         values="count",
         template="plotly_white",
         color_discrete_sequence=MULTI_COLOR_PALETTE,
         hole=0.4
     )
     
-    # Always show only percentages on slices and labels in legend
+    # Show only percentages on slices with custom hover showing full labels
     fig.update_traces(
         textposition='inside',
-        textinfo='percent',  # Only show percentage
-        hoverinfo='none',  # Remove hover effect
-        textfont=dict(size=LABEL_FONT_SIZE + 4),
-        showlegend=True  # Always show legend
+        textinfo='percent',  # Only show percentage on slice
+        hovertemplate='<b>%{customdata}</b><br>' +
+                      'Count: %{value}<br>' +
+                      'Percentage: %{percent}<br>' +
+                      '<extra></extra>',  # Remove default hover box
+        customdata=counts['original_labels'],  # Use original full labels for hover
+        textfont=dict(size=LABEL_FONT_SIZE + 2, color='white', family=STYLE_VARS["FONT_FAMILY"]),
+        showlegend=True,  # Always show legend
+        marker=dict(line=dict(color='white', width=2))  # Add white border for better contrast
     )
     
+    # Position legend outside chart area to avoid overlap
     fig.update_layout(
         title=dict(
             text=title if title else None,
-            font=dict(size=TITLE_FONT_SIZE)
+            font=dict(size=TITLE_FONT_SIZE, family=STYLE_VARS["FONT_FAMILY"])
         ),
-        margin=dict(l=10, r=120, t=30 if title else 10, b=10),
+        margin=dict(l=20, r=right_margin, t=40 if title else 20, b=20),
         legend=dict(
-            yanchor="middle",
-            y=0.5,
-            xanchor="right",
-            x=1.2,
-            font=dict(size=LABEL_FONT_SIZE + 4)
+            orientation="v",
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=1.02,  # Position legend outside the chart
+            font=dict(size=LABEL_FONT_SIZE, family=STYLE_VARS["FONT_FAMILY"]),
+            bgcolor="rgba(255,255,255,0.8)",
+            bordercolor="rgba(0,0,0,0.1)",
+            borderwidth=1
         ),
         paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         font=dict(
             family=STYLE_VARS["FONT_FAMILY"],
             size=LABEL_FONT_SIZE
         ),
-        height=500
+        height=450  # Consistent height with donut chart
     )
     
+    # Add total in the center with better styling
     fig.add_annotation(
-        text=f"Total<br>{total}",
+        text=f"<b>Total</b><br><span style='font-size:24px'>{total}</span>",
         x=0.5, y=0.5,
-        font=dict(size=ANNOTATION_FONT_SIZE),
-        showarrow=False
+        font=dict(size=ANNOTATION_FONT_SIZE + 2, family=STYLE_VARS["FONT_FAMILY"], color=PRIMARY_COLOR),
+        showarrow=False,
+        align="center"
     )
     return fig
 
+def truncate_text(text: str, max_length: int = 35) -> str:
+    """Truncate text to a maximum length for better display."""
+    if len(text) <= max_length:
+        return text
+    return text[:max_length-3] + "..."
+
 def make_donut_chart(df: pd.DataFrame, col: str, title: Optional[str] = None) -> go.Figure:
-    """Create a donut chart for a categorical column."""
+    """Create a donut chart for a categorical column with improved label handling."""
     if df[col].notna().sum() == 0:
         return create_no_data_figure(title)
     
     counts = df[col].value_counts(dropna=False)
     
+    # Store original labels for hover and truncated for legend
+    original_labels = [str(label) for label in counts.index]
+    truncated_labels = [truncate_text(str(label)) for label in counts.index]
+    
+    # Calculate percentages
+    total = counts.sum()
+    percentages = [(count / total * 100) for count in counts.values]
+    
+    # Calculate dynamic margins based on label lengths
+    max_label_length = max(len(label) for label in truncated_labels) if truncated_labels else 20
+    right_margin = min(max(120, max_label_length * 8), 300)  # Dynamic margin, capped at 300
+    
     fig = px.pie(
-        names=counts.index.astype(str),
+        names=truncated_labels,
         values=counts.values,
         hole=0.5,
         title=title,
         color_discrete_sequence=MULTI_COLOR_PALETTE
     )
     
-    # Always show only percentages on slices and labels in legend
+    # Show only percentages on slices with custom hover showing full labels
     fig.update_traces(
         textposition='inside',
-        textinfo='percent',  # Only show percentage
-        hoverinfo='none',  # Remove hover effect
-        textfont=dict(size=LABEL_FONT_SIZE + 4),
-        showlegend=True  # Always show legend
+        textinfo='percent',  # Only show percentage on slice
+        hovertemplate='<b>%{customdata}</b><br>' +
+                      'Count: %{value}<br>' +
+                      'Percentage: %{percent}<br>' +
+                      '<extra></extra>',  # Remove default hover box
+        customdata=original_labels,  # Use original full labels for hover
+        textfont=dict(size=LABEL_FONT_SIZE + 2, color='white', family=STYLE_VARS["FONT_FAMILY"]),
+        showlegend=True,  # Always show legend
+        marker=dict(line=dict(color='white', width=2))  # Add white border for better contrast
     )
     
+    # Position legend outside chart area to avoid overlap
     fig.update_layout(
         title=dict(
             text=title if title else None,
-            font=dict(size=TITLE_FONT_SIZE)
+            font=dict(size=TITLE_FONT_SIZE, family=STYLE_VARS["FONT_FAMILY"])
         ),
-        margin=dict(l=10, r=120, t=30 if title else 10, b=10),
+        margin=dict(l=20, r=right_margin, t=40 if title else 20, b=20),
         legend=dict(
-            yanchor="middle",
-            y=0.5,
-            xanchor="right",
-            x=1.2,
-            font=dict(size=LABEL_FONT_SIZE + 4)
+            orientation="v",
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=1.02,  # Position legend outside the chart
+            font=dict(size=LABEL_FONT_SIZE, family=STYLE_VARS["FONT_FAMILY"]),
+            bgcolor="rgba(255,255,255,0.8)",
+            bordercolor="rgba(0,0,0,0.1)",
+            borderwidth=1
         ),
         paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         font=dict(
             family=STYLE_VARS["FONT_FAMILY"],
             size=LABEL_FONT_SIZE
         ),
-        height=500,
+        height=450,  # Slightly reduced height for better proportions
         hovermode=False
     )
     
-    # Add total in the center
+    # Add total in the center with better styling
     total = counts.sum()
     fig.add_annotation(
-        text=f"Total<br>{total}",
+        text=f"<b>Total</b><br><span style='font-size:24px'>{total}</span>",
         x=0.5, y=0.5,
-        font=dict(size=ANNOTATION_FONT_SIZE),
-        showarrow=False
+        font=dict(size=ANNOTATION_FONT_SIZE + 2, family=STYLE_VARS["FONT_FAMILY"], color=PRIMARY_COLOR),
+        showarrow=False,
+        align="center"
     )
     
     return fig
@@ -329,7 +380,7 @@ def make_histogram(
             marker_color=PRIMARY_COLOR,
             opacity=0.7,
             name="Count",
-            hoverinfo='none',  # Remove hover effect
+            hovertemplate='Range: %{x}<br>Count: %{y}<extra></extra>',
             showlegend=False
         ))
         
@@ -358,7 +409,7 @@ def make_histogram(
             color_discrete_sequence=[PRIMARY_COLOR]
         )
         fig.update_traces(
-            hoverinfo='none'  # Remove hover effect
+            hovertemplate='Range: %{x}<br>Count: %{y}<extra></extra>'
         )
         fig.update_layout(
             title=dict(
@@ -458,7 +509,8 @@ def make_multi_select_bar(df: pd.DataFrame, cols: List[str], title: Optional[str
         marker_color=PRIMARY_COLOR,
         text=[f"{count} ({percentage:.1f}%)" for count, percentage in zip(counts_df['count'], counts_df['percentage'])],
         textposition='outside',
-        hoverinfo='none',  # Remove hover effect
+        hovertemplate='<b>%{y}</b><br>Count: %{x}<br>Percentage: %{customdata:.1f}%<extra></extra>',
+        customdata=counts_df['percentage'],
         textfont=dict(size=LABEL_FONT_SIZE)
     ))
     

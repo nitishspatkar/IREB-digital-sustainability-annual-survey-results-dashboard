@@ -2,7 +2,7 @@
 
 import pandas as pd
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import html, dcc
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
@@ -16,6 +16,36 @@ from src.components.charts import (
 )
 from src.components.layout import build_stat_card, build_chart_card
 from src.config import PRIMARY_COLOR
+
+def build_enhanced_stat_card(title: str, value: str, icon: str, gradient: str, description: str) -> dbc.Col:
+    """Build an enhanced statistics card with gradient background and icon."""
+    return dbc.Col([
+        dbc.Card([
+            dbc.CardBody([
+                html.Div([
+                    html.Div([
+                        html.I(className=f"bi {icon}", style={
+                            "fontSize": "2.5rem",
+                            "color": "white",
+                            "opacity": "0.9",
+                            "marginRight": "1rem"
+                        })
+                    ]),
+                    html.Div([
+                        html.H2(value, className="stat-value mb-1"),
+                        html.H6(title, className="stat-title mb-0"),
+                        html.Small(description, className="stat-description")
+                    ], className="flex-grow-1")
+                ], className="d-flex align-items-center h-100")
+            ])
+        ], className="stat-card h-100", style={
+            "background": gradient,
+            "border": "none",
+            "borderRadius": "15px",
+            "boxShadow": "0 8px 25px rgba(131, 30, 130, 0.15)",
+            "color": "white"
+        })
+    ], width=12, lg=6, className="mb-4")
 
 def create_awareness_implementation_chart(df: pd.DataFrame) -> go.Figure:
     """Create a chart showing relationship between definition awareness and implementation."""
@@ -45,6 +75,9 @@ def create_awareness_implementation_chart(df: pd.DataFrame) -> go.Figure:
             y=contingency[implementation_status],
             text=[f"{val:.1f}%" for val in contingency[implementation_status]],
             textposition='auto',
+            hovertemplate=f'<b>{implementation_status}</b><br>' +
+                         'Awareness: %{x}<br>' +
+                         'Percentage: %{y:.1f}%<extra></extra>'
         ))
     
     fig.update_layout(
@@ -54,7 +87,9 @@ def create_awareness_implementation_chart(df: pd.DataFrame) -> go.Figure:
         yaxis_title="Percentage",
         showlegend=True,
         legend_title="Implementation Status",
-        template="plotly_white"
+        template="plotly_white",
+        height=400,
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -82,6 +117,9 @@ def create_training_implementation_chart(df: pd.DataFrame) -> go.Figure:
             y=contingency[implementation_status],
             text=[f"{val:.1f}%" for val in contingency[implementation_status]],
             textposition='auto',
+            hovertemplate=f'<b>{implementation_status}</b><br>' +
+                         'Training: %{x}<br>' +
+                         'Percentage: %{y:.1f}%<extra></extra>'
         ))
     
     fig.update_layout(
@@ -91,7 +129,9 @@ def create_training_implementation_chart(df: pd.DataFrame) -> go.Figure:
         yaxis_title="Percentage",
         showlegend=True,
         legend_title="Implementation Status",
-        template="plotly_white"
+        template="plotly_white",
+        height=400,
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -119,6 +159,9 @@ def create_discussion_implementation_chart(df: pd.DataFrame) -> go.Figure:
             y=contingency[implementation_status],
             text=[f"{val:.1f}%" for val in contingency[implementation_status]],
             textposition='auto',
+            hovertemplate=f'<b>{implementation_status}</b><br>' +
+                         'Discussion Frequency: %{x}<br>' +
+                         'Percentage: %{y:.1f}%<extra></extra>'
         ))
     
     fig.update_layout(
@@ -128,7 +171,9 @@ def create_discussion_implementation_chart(df: pd.DataFrame) -> go.Figure:
         yaxis_title="Percentage",
         showlegend=True,
         legend_title="Implementation Status",
-        template="plotly_white"
+        template="plotly_white",
+        height=400,
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -155,6 +200,9 @@ def create_org_type_sustainability_chart(df: pd.DataFrame) -> go.Figure:
             y=contingency[practice_status],
             text=[f"{val:.1f}%" for val in contingency[practice_status]],
             textposition='auto',
+            hovertemplate=f'<b>{practice_status}</b><br>' +
+                         'Organization: %{x}<br>' +
+                         'Percentage: %{y:.1f}%<extra></extra>'
         ))
     
     fig.update_layout(
@@ -165,7 +213,9 @@ def create_org_type_sustainability_chart(df: pd.DataFrame) -> go.Figure:
         showlegend=True,
         legend_title="Implementation Status",
         template="plotly_white",
-        xaxis={'tickangle': -45}
+        xaxis={'tickangle': -45},
+        height=400,
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -192,6 +242,9 @@ def create_org_goals_practices_chart(df: pd.DataFrame) -> go.Figure:
             y=contingency[practice_status],
             text=[f"{val:.1f}%" for val in contingency[practice_status]],
             textposition='auto',
+            hovertemplate=f'<b>{practice_status}</b><br>' +
+                         'Has Goals: %{x}<br>' +
+                         'Percentage: %{y:.1f}%<extra></extra>'
         ))
     
     fig.update_layout(
@@ -201,7 +254,9 @@ def create_org_goals_practices_chart(df: pd.DataFrame) -> go.Figure:
         yaxis_title="Percentage",
         showlegend=True,
         legend_title="Implementation Status",
-        template="plotly_white"
+        template="plotly_white",
+        height=400,
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -228,6 +283,9 @@ def create_org_csr_practices_chart(df: pd.DataFrame) -> go.Figure:
             y=contingency[practice_status],
             text=[f"{val:.1f}%" for val in contingency[practice_status]],
             textposition='auto',
+            hovertemplate=f'<b>{practice_status}</b><br>' +
+                         'Has CSR Team: %{x}<br>' +
+                         'Percentage: %{y:.1f}%<extra></extra>'
         ))
     
     fig.update_layout(
@@ -237,7 +295,9 @@ def create_org_csr_practices_chart(df: pd.DataFrame) -> go.Figure:
         yaxis_title="Percentage",
         showlegend=True,
         legend_title="Implementation Status",
-        template="plotly_white"
+        template="plotly_white",
+        height=400,
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -264,6 +324,9 @@ def create_role_implementation_chart(df: pd.DataFrame) -> go.Figure:
             y=contingency[impl_status],
             text=[f"{val:.1f}%" for val in contingency[impl_status]],
             textposition='auto',
+            hovertemplate=f'<b>{impl_status}</b><br>' +
+                         'Role: %{x}<br>' +
+                         'Percentage: %{y:.1f}%<extra></extra>'
         ))
     
     fig.update_layout(
@@ -274,7 +337,9 @@ def create_role_implementation_chart(df: pd.DataFrame) -> go.Figure:
         showlegend=True,
         legend_title="Implementation Status",
         template="plotly_white",
-        xaxis={'tickangle': -45}
+        xaxis={'tickangle': -45},
+        height=500,
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -311,17 +376,18 @@ def create_role_drivers_chart(df: pd.DataFrame) -> go.Figure:
                     y=0.5,
                     showarrow=False
                 )
-            ]
+            ],
+            height=400
         )
         return fig
     
     # Create a mapping for shorter labels
     driver_labels = {
-        'Organizational policies ': 'Org Policies',
-        'Personal beliefs ': 'Personal Beliefs',
-        'Client requirements ': 'Client Requirements',
-        'User requirements': 'User Requirements',
-        'Legal requirements ': 'Legal Requirements'
+        'Organizational policies ': 'Organizational policies',
+        'Personal beliefs ': 'Personal beliefs',
+        'Client requirements ': 'Client requirements',
+        'User requirements': 'User requirements',
+        'Legal requirements ': 'Legal requirements'
     }
     
     # Calculate percentage of each driver by role
@@ -352,7 +418,8 @@ def create_role_drivers_chart(df: pd.DataFrame) -> go.Figure:
                     y=0.5,
                     showarrow=False
                 )
-            ]
+            ],
+            height=400
         )
         return fig
     
@@ -370,7 +437,10 @@ def create_role_drivers_chart(df: pd.DataFrame) -> go.Figure:
         texttemplate="%{text}",
         textfont={"size": 10},
         textcolor="white",
-        showscale=True
+        showscale=True,
+        hovertemplate='<b>%{y}</b><br>' +
+                     'Driver: %{x}<br>' +
+                     'Percentage: %{z:.1f}%<extra></extra>'
     ))
     
     fig.update_layout(
@@ -379,7 +449,8 @@ def create_role_drivers_chart(df: pd.DataFrame) -> go.Figure:
         yaxis_title="Role",
         template="plotly_white",
         height=600,
-        xaxis={'tickangle': -45}
+        xaxis={'tickangle': -45},
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -416,17 +487,18 @@ def create_role_barriers_chart(df: pd.DataFrame) -> go.Figure:
                     y=0.5,
                     showarrow=False
                 )
-            ]
+            ],
+            height=400
         )
         return fig
     
     # Create a mapping for shorter labels
     barrier_labels = {
-        'Lack of knowledge or awareness (e.g., not knowing enough about sustainability impact or best practices)': 'Knowledge Gap',
-        'Limited resources or budget (e.g., financial constraints, insufficient tools or technology)': 'Resource Constraints',
-        'Insufficient time or competing priorities (e.g., pressing deadlines, other projects taking precedence)': 'Time Constraints',
-        'Lack of organizational or leadership support (e.g., limited buy-in from management, inadequate policy frameworks)': 'Lack of Support',
-        'Complexity or uncertainty of sustainability solutions (e.g., difficulty measuring impact or navigating standards)': 'Solution Complexity'
+        'Lack of knowledge or awareness (e.g., not knowing enough about sustainability impact or best practices)': 'Lack of knowledge or awareness',
+        'Limited resources or budget (e.g., financial constraints, insufficient tools or technology)': 'Limited resources or budget',
+        'Insufficient time or competing priorities (e.g., pressing deadlines, other projects taking precedence)': 'Insufficient time or competing priorities',
+        'Lack of organizational or leadership support (e.g., limited buy-in from management, inadequate policy frameworks)': 'Lack of organizational or leadership support',
+        'Complexity or uncertainty of sustainability solutions (e.g., difficulty measuring impact or navigating standards)': 'Complexity or uncertainty of sustainability solutions'
     }
     
     # Calculate percentage of each barrier by role
@@ -457,7 +529,8 @@ def create_role_barriers_chart(df: pd.DataFrame) -> go.Figure:
                     y=0.5,
                     showarrow=False
                 )
-            ]
+            ],
+            height=400
         )
         return fig
     
@@ -470,12 +543,15 @@ def create_role_barriers_chart(df: pd.DataFrame) -> go.Figure:
         z=z_values,
         x=barriers,
         y=roles,
-        colorscale="Viridis",
+        colorscale="Reds",
         text=[[f"{val:.1f}%" for val in row] for row in z_values],
         texttemplate="%{text}",
         textfont={"size": 10},
         textcolor="white",
-        showscale=True
+        showscale=True,
+        hovertemplate='<b>%{y}</b><br>' +
+                     'Barrier: %{x}<br>' +
+                     'Percentage: %{z:.1f}%<extra></extra>'
     ))
     
     fig.update_layout(
@@ -484,7 +560,8 @@ def create_role_barriers_chart(df: pd.DataFrame) -> go.Figure:
         yaxis_title="Role",
         template="plotly_white",
         height=600,
-        xaxis={'tickangle': -45}
+        xaxis={'tickangle': -45},
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -504,11 +581,11 @@ def create_barriers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
     
     # Create a mapping for shorter labels
     barrier_labels = {
-        'Lack of knowledge or awareness (e.g., not knowing enough about sustainability impact or best practices)': 'Knowledge Gap',
-        'Limited resources or budget (e.g., financial constraints, insufficient tools or technology)': 'Resource Constraints',
-        'Insufficient time or competing priorities (e.g., pressing deadlines, other projects taking precedence)': 'Time Constraints',
-        'Lack of organizational or leadership support (e.g., limited buy-in from management, inadequate policy frameworks)': 'Lack of Support',
-        'Complexity or uncertainty of sustainability solutions (e.g., difficulty measuring impact or navigating standards)': 'Solution Complexity'
+        'Lack of knowledge or awareness (e.g., not knowing enough about sustainability impact or best practices)': 'Lack of knowledge or awareness',
+        'Limited resources or budget (e.g., financial constraints, insufficient tools or technology)': 'Limited resources or budget',
+        'Insufficient time or competing priorities (e.g., pressing deadlines, other projects taking precedence)': 'Insufficient time or competing priorities',
+        'Lack of organizational or leadership support (e.g., limited buy-in from management, inadequate policy frameworks)': 'Lack of organizational or leadership support',
+        'Complexity or uncertainty of sustainability solutions (e.g., difficulty measuring impact or navigating standards)': 'Complexity or uncertainty of sustainability solutions'
     }
     
     # Calculate percentage of each barrier by organization type
@@ -538,12 +615,15 @@ def create_barriers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
         z=z_values,
         x=barriers,
         y=org_types,
-        colorscale="Viridis",
+        colorscale="Reds",
         text=[[f"{val:.1f}%" for val in row] for row in z_values],
         texttemplate="%{text}",
         textfont={"size": 10},
         textcolor="white",
-        showscale=True
+        showscale=True,
+        hovertemplate='<b>%{y}</b><br>' +
+                     'Barrier: %{x}<br>' +
+                     'Percentage: %{z:.1f}%<extra></extra>'
     ))
     
     fig.update_layout(
@@ -551,8 +631,9 @@ def create_barriers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
         xaxis_title="Barrier",
         yaxis_title="Organization Type",
         template="plotly_white",
-        height=600,
-        xaxis={'tickangle': -45}
+        height=500,
+        xaxis={'tickangle': -45},
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -572,11 +653,11 @@ def create_drivers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
     
     # Create a mapping for shorter labels
     driver_labels = {
-        'Organizational policies ': 'Org Policies',
-        'Personal beliefs ': 'Personal Beliefs',
-        'Client requirements ': 'Client Requirements',
-        'User requirements': 'User Requirements',
-        'Legal requirements ': 'Legal Requirements'
+        'Organizational policies ': 'Organizational policies',
+        'Personal beliefs ': 'Personal beliefs',
+        'Client requirements ': 'Client requirements',
+        'User requirements': 'User requirements',
+        'Legal requirements ': 'Legal requirements'
     }
     
     # Calculate percentage of each driver by organization type
@@ -611,7 +692,10 @@ def create_drivers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
         texttemplate="%{text}",
         textfont={"size": 10},
         textcolor="white",
-        showscale=True
+        showscale=True,
+        hovertemplate='<b>%{y}</b><br>' +
+                     'Driver: %{x}<br>' +
+                     'Percentage: %{z:.1f}%<extra></extra>'
     ))
     
     fig.update_layout(
@@ -619,8 +703,9 @@ def create_drivers_by_org_type_chart(df: pd.DataFrame) -> go.Figure:
         xaxis_title="Driver",
         yaxis_title="Organization Type",
         template="plotly_white",
-        height=600,
-        xaxis={'tickangle': -45}
+        height=500,
+        xaxis={'tickangle': -45},
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -659,7 +744,10 @@ def create_barriers_drivers_correlation_chart(df: pd.DataFrame) -> go.Figure:
         text=[[f"{val:.2f}" for val in row] for row in correlation_matrix.values],
         texttemplate="%{text}",
         textfont={"size": 10, "color": "black"},
-        showscale=True
+        showscale=True,
+        hovertemplate='<b>Barrier:</b> %{y}<br>' +
+                     '<b>Driver:</b> %{x}<br>' +
+                     '<b>Correlation:</b> %{z:.2f}<extra></extra>'
     ))
     
     fig.update_layout(
@@ -668,7 +756,8 @@ def create_barriers_drivers_correlation_chart(df: pd.DataFrame) -> go.Figure:
         yaxis_title="Barriers",
         template="plotly_white",
         height=600,
-        xaxis={'tickangle': -45}
+        xaxis={'tickangle': -45},
+        font=dict(family="Inter, sans-serif")
     )
     
     return fig
@@ -686,22 +775,17 @@ def build_insights_page(df: pd.DataFrame) -> html.Div:
     awareness_col = awareness_cols[0]
     implementation_col = "incorporate_sustainability_in_tasks"
     
-    # Page title style
-    page_title_style = {
-        "color": PRIMARY_COLOR,
-        "border-bottom": f"2px solid {PRIMARY_COLOR}",
-        "padding-bottom": "0.5rem"
-    }
-    
-    # Section header style
-    section_header_style = {
-        "color": PRIMARY_COLOR,
-        "margin-top": "2rem",
-        "margin-bottom": "1.5rem",
-        "font-size": "1.5rem",
-        "border-bottom": f"2px solid {PRIMARY_COLOR}",
-        "padding-bottom": "0.5rem"
-    }
+    # Enhanced page header
+    page_header = html.Div([
+        html.Div([
+            html.H2([
+                html.I(className="bi bi-graph-up-arrow me-3"),
+                "Cross-Question Insights"
+            ], className="page-title mb-0"),
+            html.P("Deep analytical insights revealing patterns and relationships across survey responses", 
+                   className="page-subtitle mb-0")
+        ], className="page-header-content")
+    ], className="page-header mb-5")
 
     # Calculate key statistics for awareness impact
     def_aware_count = df[awareness_col].value_counts().get("Yes", 0)
@@ -712,21 +796,23 @@ def build_insights_page(df: pd.DataFrame) -> html.Div:
     total_impl_responses = df[implementation_col].notna().sum()
     impl_pct = round((impl_count / total_impl_responses * 100) if total_impl_responses > 0 else 0)
 
-    # Create statistics cards
-    stats_row = dbc.Row([
-        dbc.Col(build_stat_card(
+    # Create enhanced statistics cards for awareness section
+    awareness_stats_row = dbc.Row([
+        build_enhanced_stat_card(
             "Definition Awareness",
             f"{def_aware_pct}%",
             "bi-lightbulb-fill",
-            subtitle=f"{def_aware_count} out of {total_def_responses} respondents"
-        ), width=6),
-        dbc.Col(build_stat_card(
+            "linear-gradient(135deg, #831E82 0%, #A450A3 100%)",
+            f"{def_aware_count} out of {total_def_responses} respondents"
+        ),
+        build_enhanced_stat_card(
             "Implementation Rate",
             f"{impl_pct}%",
-            "bi-gear-fill",
-            subtitle=f"{impl_count} out of {total_impl_responses} organizations"
-        ), width=6),
-    ], className="mb-5 g-4")
+            "bi-gear-fill", 
+            "linear-gradient(135deg, #A450A3 0%, #C581C4 100%)",
+            f"{impl_count} out of {total_impl_responses} organizations"
+        )
+    ], className="mb-5")
 
     # Create the awareness impact charts
     awareness_impl_fig = create_awareness_implementation_chart(df)
@@ -734,64 +820,89 @@ def build_insights_page(df: pd.DataFrame) -> html.Div:
     discussion_impl_fig = create_discussion_implementation_chart(df)
 
     # Awareness and Implementation section
-    awareness_impact_section = html.Div([
-        html.H4("Awareness and Implementation", style=section_header_style),
-        html.P(
-            "Analyze the relationship between awareness of digital sustainability "
-            "and its practical implementation in organizations.",
-            className="mb-4",
-            style={"color": "#666"}
-        ),
-        stats_row,
-        dbc.Row([
-            build_chart_card(
-                "Impact of Definition Awareness on Implementation",
-                awareness_impl_fig,
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This chart examines the correlation between understanding of digital sustainability concepts and actual implementation. ",
-                    "We calculate the percentage of organizations implementing sustainable practices within each awareness group (Yes/No). ",
-                    "The calculation uses cross-tabulation (contingency tables) with row-wise normalization to show the proportion of implementation ",
-                    "status for each level of awareness. This helps identify if organizations with better understanding are more likely to implement practices."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Impact of Training on Implementation",
-                training_impl_fig,
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This visualization explores how training participation influences implementation rates. ",
-                    "Using cross-tabulation analysis, we compare the implementation rates between organizations where employees have/haven't participated in training. ",
-                    "The percentages are calculated by dividing the count of each implementation status by the total number of organizations in each training group. ",
-                    "This helps quantify the effectiveness of training programs in driving sustainable practices."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Impact of Discussion Frequency on Implementation",
-                discussion_impl_fig,
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This chart analyzes how the frequency of sustainability discussions correlates with implementation. ",
-                    "We use cross-tabulation to show the percentage of organizations implementing practices across different discussion frequency levels. ",
-                    "The analysis helps understand if more frequent discussions about sustainability translate to higher implementation rates, ",
-                    "suggesting the importance of organizational discourse in driving sustainable practices."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4")
-    ])
+    awareness_section = dbc.Container([
+        dbc.Card([
+            dbc.CardHeader([
+                html.H4([
+                    html.I(className="bi bi-lightbulb me-3"),
+                    "Awareness and Implementation"
+                ], className="mb-0 text-white")
+            ], className="enhanced-card-header"),
+            dbc.CardBody([
+                html.P(
+                    "Analyze the relationship between awareness of digital sustainability and its practical implementation in organizations.",
+                    className="mb-4 text-muted"
+                ),
+                awareness_stats_row,
+                
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-bar-chart me-2"),
+                            "Impact of Definition Awareness on Implementation"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=awareness_impl_fig, responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This chart examines the correlation between understanding of digital sustainability concepts and actual implementation. ",
+                                "We calculate the percentage of organizations implementing sustainable practices within each awareness group (Yes/No). ",
+                                "The calculation uses cross-tabulation (contingency tables) with row-wise normalization to show the proportion of implementation ",
+                                "status for each level of awareness. This helps identify if organizations with better understanding are more likely to implement practices."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card mb-4"),
+
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-mortarboard me-2"),
+                            "Impact of Training on Implementation"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=training_impl_fig, responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This visualization explores how training participation influences implementation rates. ",
+                                "Using cross-tabulation analysis, we compare the implementation rates between organizations where employees have/haven't participated in training. ",
+                                "The percentages are calculated by dividing the count of each implementation status by the total number of organizations in each training group. ",
+                                "This helps quantify the effectiveness of training programs in driving sustainable practices."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card mb-4"),
+
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-chat-dots me-2"),
+                            "Impact of Discussion Frequency on Implementation"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=discussion_impl_fig, responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This chart analyzes how the frequency of sustainability discussions correlates with implementation. ",
+                                "We use cross-tabulation to show the percentage of organizations implementing practices across different discussion frequency levels. ",
+                                "The analysis helps understand if more frequent discussions about sustainability translate to higher implementation rates, ",
+                                "suggesting the importance of organizational discourse in driving sustainable practices."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card")
+            ])
+        ], className="enhanced-chart-card mb-5")
+    ], fluid=True)
     
     # Create organizational factors charts
     org_type_fig = create_org_type_sustainability_chart(df)
@@ -806,81 +917,108 @@ def build_insights_page(df: pd.DataFrame) -> html.Div:
     goals_pct = round((has_goals_count / total_orgs * 100) if total_orgs > 0 else 0)
     csr_pct = round((has_csr_count / total_orgs * 100) if total_orgs > 0 else 0)
     
-    # Create statistics cards for organizational factors
+    # Create enhanced statistics cards for organizational factors
     org_stats_row = dbc.Row([
-        dbc.Col(build_stat_card(
+        build_enhanced_stat_card(
             "Have Sustainability Goals",
             f"{goals_pct}%",
             "bi-bullseye",
-            subtitle=f"{has_goals_count} out of {total_orgs} organizations"
-        ), width=6),
-        dbc.Col(build_stat_card(
+            "linear-gradient(135deg, #C581C4 0%, #E6B3E5 100%)",
+            f"{has_goals_count} out of {total_orgs} organizations"
+        ),
+        build_enhanced_stat_card(
             "Have CSR Team/Expert",
             f"{csr_pct}%",
             "bi-people-fill",
-            subtitle=f"{has_csr_count} out of {total_orgs} organizations"
-        ), width=6),
-    ], className="mb-5 g-4")
+            "linear-gradient(135deg, #E6B3E5 0%, #F0D0EF 100%)",
+            f"{has_csr_count} out of {total_orgs} organizations"
+        )
+    ], className="mb-5")
     
-    # Update organizational factors section
-    organizational_factors_section = html.Div([
-        html.H4("Organizational Factors", style=section_header_style),
-        html.P(
-            "Explore how organizational characteristics influence "
-            "digital sustainability practices and outcomes.",
-            className="mb-4",
-            style={"color": "#666"}
-        ),
-        org_stats_row,
-        dbc.Row([
-            build_chart_card(
-                "Sustainability Implementation by Organization Type",
-                org_type_fig,
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This visualization breaks down sustainability implementation rates across different organization types. ",
-                    "Using cross-tabulation with row-wise normalization, we calculate the percentage of organizations implementing sustainable practices within each organization type. ",
-                    "This analysis helps identify which sectors are leading in sustainability adoption and where there might be room for improvement. ",
-                    "The percentages are calculated by dividing the count of each implementation status by the total number of organizations of each type."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Impact of Having Sustainability Goals",
-                org_goals_fig,
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This chart examines the relationship between having formal sustainability goals and actual implementation. ",
-                    "We use contingency table analysis to compare implementation rates between organizations with and without specific sustainability goals. ",
-                    "The percentages show what proportion of organizations in each group (with/without goals) are implementing sustainable practices. ",
-                    "This helps quantify how formal goal-setting influences practical implementation."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Impact of Having CSR Team/Expert",
-                org_csr_fig,
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This visualization analyzes how having dedicated sustainability resources affects implementation. ",
-                    "Using cross-tabulation, we compare implementation rates between organizations with and without CSR teams/experts. ",
-                    "The percentages represent the proportion of organizations implementing practices within each group. ",
-                    "This helps understand the value of dedicated sustainability resources in driving implementation."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4")
-    ])
+    # Organizational factors section
+    org_factors_section = dbc.Container([
+        dbc.Card([
+            dbc.CardHeader([
+                html.H4([
+                    html.I(className="bi bi-building me-3"),
+                    "Organizational Factors"
+                ], className="mb-0 text-white")
+            ], className="enhanced-card-header"),
+            dbc.CardBody([
+                html.P(
+                    "Explore how organizational characteristics influence digital sustainability practices and outcomes.",
+                    className="mb-4 text-muted"
+                ),
+                org_stats_row,
+                
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-building-gear me-2"),
+                            "Sustainability Implementation by Organization Type"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=org_type_fig, responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This visualization breaks down sustainability implementation rates across different organization types. ",
+                                "Using cross-tabulation with row-wise normalization, we calculate the percentage of organizations implementing sustainable practices within each organization type. ",
+                                "This analysis helps identify which sectors are leading in sustainability adoption and where there might be room for improvement. ",
+                                "The percentages are calculated by dividing the count of each implementation status by the total number of organizations of each type."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card mb-4"),
+
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-target me-2"),
+                            "Impact of Having Sustainability Goals"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=org_goals_fig, responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This chart examines the relationship between having formal sustainability goals and actual implementation. ",
+                                "We use contingency table analysis to compare implementation rates between organizations with and without specific sustainability goals. ",
+                                "The percentages show what proportion of organizations in each group (with/without goals) are implementing sustainable practices. ",
+                                "This helps quantify how formal goal-setting influences practical implementation."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card mb-4"),
+
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-people-fill me-2"),
+                            "Impact of Having CSR Team/Expert"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=org_csr_fig, responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This visualization analyzes how having dedicated sustainability resources affects implementation. ",
+                                "Using cross-tabulation, we compare implementation rates between organizations with and without CSR teams/experts. ",
+                                "The percentages represent the proportion of organizations implementing practices within each group. ",
+                                "This helps understand the value of dedicated sustainability resources in driving implementation."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card")
+            ])
+        ], className="enhanced-chart-card mb-5")
+    ], fluid=True)
     
     # Create role-based analysis charts
     role_impl_fig = create_role_implementation_chart(df)
@@ -892,146 +1030,191 @@ def build_insights_page(df: pd.DataFrame) -> html.Div:
     implements_sustainability = df[implementation_col].value_counts().get("Yes", 0)
     implementation_rate = round((implements_sustainability / total_respondents * 100) if total_respondents > 0 else 0)
     
-    # Create statistics cards for role-based analysis
+    # Create enhanced statistics card for role-based analysis
     role_stats_row = dbc.Row([
-        dbc.Col(build_stat_card(
+        build_enhanced_stat_card(
             "Overall Implementation Rate",
             f"{implementation_rate}%",
             "bi-person-workspace",
-            subtitle=f"{implements_sustainability} out of {total_respondents} respondents"
-        ), width=12),
-    ], className="mb-5 g-4")
+            "linear-gradient(135deg, #831E82 0%, #A450A3 100%)",
+            f"{implements_sustainability} out of {total_respondents} respondents"
+        )
+    ], className="mb-5")
     
-    # Update role-based section
-    role_based_section = html.Div([
-        html.H4("Role-Based Analysis", style=section_header_style),
-        html.P(
-            "Understand how different roles perceive and implement "
-            "digital sustainability practices.",
-            className="mb-4",
-            style={"color": "#666"}
-        ),
-        role_stats_row,
-        dbc.Row([
-            build_chart_card(
-                "Implementation by Role",
-                role_impl_fig,
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This visualization shows how sustainability implementation varies across different professional roles. ",
-                    "Using cross-tabulation with row-wise normalization, we calculate the percentage of individuals in each role who incorporate sustainability practices. ",
-                    "This helps identify which roles are most actively engaged in sustainability implementation and where there might be opportunities for improvement. ",
-                    "The percentages represent the proportion of individuals implementing practices within each role category."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Drivers by Role",
-                role_drivers_fig,
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This heatmap visualizes what drives sustainability implementation across different roles. ",
-                    "For each role-driver combination, we calculate the percentage of respondents who selected that driver. ",
-                    "The color intensity represents the percentage, with darker colors indicating higher percentages. ",
-                    "This analysis helps understand what motivates different roles to implement sustainable practices and can inform role-specific strategies."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Barriers by Role",
-                role_barriers_fig,
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This heatmap shows the barriers to sustainability implementation faced by different roles. ",
-                    "For each role-barrier combination, we calculate the percentage of respondents who identified that barrier. ",
-                    "The color intensity indicates the percentage, with darker colors showing higher percentages. ",
-                    "This analysis helps identify role-specific challenges and can guide targeted interventions to overcome these barriers."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4")
-    ])
+    # Role-based section
+    role_section = dbc.Container([
+        dbc.Card([
+            dbc.CardHeader([
+                html.H4([
+                    html.I(className="bi bi-person-badge me-3"),
+                    "Role-Based Analysis"
+                ], className="mb-0 text-white")
+            ], className="enhanced-card-header"),
+            dbc.CardBody([
+                html.P(
+                    "Understand how different roles perceive and implement digital sustainability practices.",
+                    className="mb-4 text-muted"
+                ),
+                role_stats_row,
+                
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-person-workspace me-2"),
+                            "Implementation by Role"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=role_impl_fig, responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This visualization shows how sustainability implementation varies across different professional roles. ",
+                                "Using cross-tabulation with row-wise normalization, we calculate the percentage of individuals in each role who incorporate sustainability practices. ",
+                                "This helps identify which roles are most actively engaged in sustainability implementation and where there might be opportunities for improvement. ",
+                                "The percentages represent the proportion of individuals implementing practices within each role category."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card mb-4"),
+
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-arrow-up-circle me-2"),
+                            "Drivers by Role"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=role_drivers_fig, responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This heatmap visualizes what drives sustainability implementation across different roles. ",
+                                "For each role-driver combination, we calculate the percentage of respondents who selected that driver. ",
+                                "The color intensity represents the percentage, with darker colors indicating higher percentages. ",
+                                "This analysis helps understand what motivates different roles to implement sustainable practices and can inform role-specific strategies."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card mb-4"),
+
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-exclamation-triangle me-2"),
+                            "Barriers by Role"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=role_barriers_fig, responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This heatmap shows the barriers to sustainability implementation faced by different roles. ",
+                                "For each role-barrier combination, we calculate the percentage of respondents who identified that barrier. ",
+                                "The color intensity indicates the percentage, with darker colors showing higher percentages. ",
+                                "This analysis helps identify role-specific challenges and can guide targeted interventions to overcome these barriers."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card")
+            ])
+        ], className="enhanced-chart-card mb-5")
+    ], fluid=True)
     
-    # Update the barriers_drivers_section
-    barriers_drivers_section = html.Div([
-        html.H4("Barriers and Drivers Analysis", style=section_header_style),
-        html.P(
-            "Analyze the relationships between various barriers and drivers "
-            "across different organizational contexts.",
-            className="mb-4",
-            style={"color": "#666"}
-        ),
-        dbc.Row([
-            build_chart_card(
-                "Barriers by Organization Type",
-                create_barriers_by_org_type_chart(df),
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This heatmap visualizes how different barriers to sustainability implementation vary across organization types. ",
-                    "For each organization type-barrier combination, we calculate the percentage of respondents who identified that barrier. ",
-                    "The color intensity represents the percentage, with darker colors indicating higher percentages. ",
-                    "This analysis helps identify which barriers are most prevalent in different organizational contexts."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Drivers by Organization Type",
-                create_drivers_by_org_type_chart(df),
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This heatmap shows how different drivers of sustainability implementation vary across organization types. ",
-                    "For each organization type-driver combination, we calculate the percentage of respondents who selected that driver. ",
-                    "The color intensity represents the percentage, with darker colors showing higher percentages. ",
-                    "This analysis helps understand what motivates sustainability implementation in different organizational contexts."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4"),
-        dbc.Row([
-            build_chart_card(
-                "Correlation between Barriers and Drivers",
-                create_barriers_drivers_correlation_chart(df),
-                12
-            ),
-            html.Div([
-                html.H6("Analysis Methodology:", className="mt-3"),
-                html.P([
-                    "This correlation matrix explores the relationships between barriers and drivers of sustainability implementation. ",
-                    "We calculate the correlation coefficient between each barrier-driver pair based on whether respondents selected them. ",
-                    "Positive correlations (red) indicate that the barrier and driver tend to be selected together, ",
-                    "while negative correlations (blue) suggest they tend to be selected separately. ",
-                    "This analysis helps identify potential relationships between obstacles and motivations."
-                ], style={"color": "#666"})
-            ], className="px-4 pb-4")
-        ], className="mb-5 g-4")
-    ])
+    # Barriers and drivers section
+    barriers_drivers_section = dbc.Container([
+        dbc.Card([
+            dbc.CardHeader([
+                html.H4([
+                    html.I(className="bi bi-bar-chart-steps me-3"),
+                    "Barriers and Drivers Analysis"
+                ], className="mb-0 text-white")
+            ], className="enhanced-card-header"),
+            dbc.CardBody([
+                html.P(
+                    "Analyze the relationships between various barriers and drivers across different organizational contexts.",
+                    className="mb-4 text-muted"
+                ),
+                
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-shield-exclamation me-2"),
+                            "Barriers by Organization Type"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=create_barriers_by_org_type_chart(df), responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This heatmap visualizes how different barriers to sustainability implementation vary across organization types. ",
+                                "For each organization type-barrier combination, we calculate the percentage of respondents who identified that barrier. ",
+                                "The color intensity represents the percentage, with darker colors indicating higher percentages. ",
+                                "This analysis helps identify which barriers are most prevalent in different organizational contexts."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card mb-4"),
+
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-rocket me-2"),
+                            "Drivers by Organization Type"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=create_drivers_by_org_type_chart(df), responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This heatmap shows how different drivers of sustainability implementation vary across organization types. ",
+                                "For each organization type-driver combination, we calculate the percentage of respondents who selected that driver. ",
+                                "The color intensity represents the percentage, with darker colors showing higher percentages. ",
+                                "This analysis helps understand what motivates sustainability implementation in different organizational contexts."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card mb-4"),
+
+                dbc.Card([
+                    dbc.CardHeader([
+                        html.H5([
+                            html.I(className="bi bi-diagram-3 me-2"),
+                            "Correlation between Barriers and Drivers"
+                        ], className="mb-0")
+                    ]),
+                    dbc.CardBody([
+                        dcc.Graph(figure=create_barriers_drivers_correlation_chart(df), responsive=True),
+                        html.Hr(),
+                        html.Div([
+                            html.H6([html.I(className="bi bi-info-circle me-2"), "Analysis Methodology:"], className="text-primary"),
+                            html.P([
+                                "This correlation matrix explores the relationships between barriers and drivers of sustainability implementation. ",
+                                "We calculate the correlation coefficient between each barrier-driver pair based on whether respondents selected them. ",
+                                "Positive correlations (red) indicate that the barrier and driver tend to be selected together, ",
+                                "while negative correlations (blue) suggest they tend to be selected separately. ",
+                                "This analysis helps identify potential relationships between obstacles and motivations."
+                            ], className="text-muted small")
+                        ])
+                    ])
+                ], className="enhanced-chart-card")
+            ])
+        ], className="enhanced-chart-card")
+    ], fluid=True)
 
     return html.Div([
-        html.H3("Cross-Question Insights", className="mb-4 pt-3", style=page_title_style),
-        html.P(
-            "This section provides deeper insights by analyzing relationships "
-            "between different aspects of the survey responses.",
-            className="lead mb-5",
-            style={"color": "#666"}
-        ),
-        awareness_impact_section,
-        organizational_factors_section,
-        role_based_section,
+        page_header,
+        awareness_section,
+        org_factors_section,
+        role_section,
         barriers_drivers_section
-    ]) 
+    ], className="insights-page") 
