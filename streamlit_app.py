@@ -238,13 +238,6 @@ def main():
     if df is None:
         return
     
-    # Main header
-    st.markdown(f"""
-    <div class="main-header">
-        <h1>🌱 Digital Sustainability Insights Dashboard</h1>
-        <p>Survey Year: {selected_year} | Total Responses: {len(df)}</p>
-    </div>
-    """, unsafe_allow_html=True)
     
     # Route to appropriate page
     if selected_page == "Demographics (Questions 1-7)":

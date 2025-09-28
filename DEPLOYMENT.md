@@ -51,6 +51,8 @@ The app uses simple session-based authentication:
 - Ensure all dependencies are in `requirements.txt`
 - Verify file paths are correct
 - Check that data files are included in the repository
+- **Python version compatibility**: The app uses Python 3.11 (specified in `runtime.txt`)
+- **Package versions**: Updated to compatible versions for Streamlit Cloud
 
 ## Custom Domain (Optional)
 You can add a custom domain in the Streamlit Cloud settings after deployment.
