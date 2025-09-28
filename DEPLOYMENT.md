@@ -54,5 +54,11 @@ The app uses simple session-based authentication:
 - **Python version compatibility**: The app uses Python 3.11 (specified in `runtime.txt`)
 - **Package versions**: Updated to compatible versions for Streamlit Cloud
 
+### Common Errors:
+- **`ModuleNotFoundError: No module named 'plotly.express'`**: 
+  - Use compatible package versions (see current `requirements.txt`)
+  - Remove unused imports like `from plotly.subplots import make_subplots`
+  - Ensure Python 3.11 is specified in `runtime.txt`
+
 ## Custom Domain (Optional)
 You can add a custom domain in the Streamlit Cloud settings after deployment.
