@@ -1,169 +1,185 @@
 # IREB Digital Sustainability Survey Dashboard
 
-A modern, interactive dashboard built with Dash and Plotly to visualize and explore the results of the IREB Digital Sustainability Annual Survey.
+A modern, interactive dashboard for visualizing IREB Digital Sustainability Survey results, built with Streamlit and Plotly.
 
 ![Dashboard Screenshot](https://imgur.com/a/KZtvFuk)
 
-## Overview
+## 🌟 Features
 
-This project provides a web-based dashboard for analyzing responses to the IREB Digital Sustainability Survey. The dashboard presents survey results through intuitive visualizations organized into four main sections:
+- 🌱 **Interactive Visualizations**: Charts and graphs powered by Plotly
+- 🔐 **Authentication**: Simple login system (username: `ireb`, password: `irebireb`)
+- 📊 **Four Main Sections**: Demographics, Awareness, Organization, and Job Tasks
+- 🌍 **World Map**: Geographic distribution of responses
+- 📱 **Responsive Design**: Works on desktop and mobile devices
+- ⚡ **Fast Loading**: Cached data loading for better performance
+- 🎨 **IREB Branding**: Consistent color scheme and styling
 
-1. **Demographics** - Information about survey respondents including age groups, geographic distribution, professional roles, and more.
-2. **General Awareness** - Data on respondents' awareness of digital sustainability concepts and training participation.
-3. **Role in Organization** - Insights into how organizations approach sustainability including goals, teams, and reporting practices.
-4. **Job & Tasks** - Analysis of how sustainability is incorporated into individual roles and tasks, including drivers and barriers.
+## 📋 Prerequisites
 
-## Prerequisites
-
-Before setting up this project, ensure you have:
-
-- Python 3.8 or higher installed
+- Python 3.8 or higher
 - pip (Python package installer)
-- Git (to clone the repository)
 
-## Installation and Setup
-
-Follow these steps to set up and run the dashboard on your local machine:
+## 🚀 Quick Start
 
 ### 1. Clone the repository
-
 ```bash
-git clone https://github.com/your-username/IREB-digital-sustainability-annual-survey-results.git
-cd IREB-digital-sustainability-annual-survey-results
+git clone <repository-url>
+cd IREB-digital-sustainability-annual-survey-results-dashboard
 ```
 
-### 2. Create a virtual environment
-
-#### Using venv (Python's built-in virtual environment)
-
+### 2. Create and activate virtual environment
 ```bash
-# Create a virtual environment
+# Create virtual environment
 python -m venv venv
 
-# Activate the virtual environment
+# Activate virtual environment
 # On Windows:
 venv\Scripts\activate
 # On macOS/Linux:
 source venv/bin/activate
 ```
 
-#### Using conda (alternative)
-
+### 3. Install dependencies
 ```bash
-# Create a conda environment
-conda create -n sustainability-dashboard python=3.10
-# Activate the environment
-conda activate sustainability-dashboard
+pip install -r requirements_streamlit.txt
 ```
 
-### 3. Install required packages
-
+### 4. Run the application
 ```bash
-pip install -r requirements.txt
+python run_streamlit.py
 ```
 
-### 4. Run the dashboard
+The dashboard will be available at: `http://localhost:8501`
 
-```bash
-python app.py
+## 🔐 Authentication
+
+- **Username**: `ireb`
+- **Password**: `irebireb`
+
+## 📁 Project Structure
+
+```
+├── streamlit_app.py              # Main Streamlit application
+├── run_streamlit.py              # Script to run the app
+├── requirements_streamlit.txt    # Python dependencies
+├── .gitignore                    # Git ignore file
+├── src/
+│   ├── streamlit_utils.py        # Utility functions for Streamlit
+│   ├── config.py                 # Configuration settings
+│   └── utils/
+│       └── data_processing.py    # Data loading and processing
+├── data/                         # Survey data (CSV files)
+│   ├── 2025.csv
+│   └── 2026.csv
+├── assets/
+│   ├── IREB_RGB.jpg             # IREB logo
+│   └── custom.css               # Custom CSS styles
+└── rename_config.py             # Column name mappings
 ```
 
-After running this command, you should see output indicating that the Dash app is running. Open your web browser and navigate to `http://127.0.0.1:8050/` to view the dashboard.
+## 📊 Dashboard Sections
 
-## Project Structure
-
-- `app.py` - The main application file containing the dashboard layout and callback functions
-- `assets/` - Directory containing CSS and other static assets for styling
-- `data/` - Directory containing the survey data files
-- `analysis/` - Directory containing data analysis and preparation code
-- `requirements.txt` - List of Python package dependencies
-
-## Dashboard Sections
-
-### Demographics
-
-This section shows:
-- Key statistics about survey respondents
+### 🏠 Demographics (Questions 1-7)
+- Total responses and key metrics
 - Age group distribution
-- Years of experience distribution
-- Geographic distribution
-- Professional roles and organization types
-- Application domains
+- Professional experience histogram
+- Geographic distribution (continent pie chart)
+- World map with country responses
+- Role and organization type distributions
 
-### General Awareness
+### 💡 General Awareness of Sustainability (Questions 8-16)
+- Digital sustainability awareness levels
+- Training participation and satisfaction
+- Discussion frequency in professional environment
+- Reasons for training participation/non-participation
 
-This section presents:
-- Familiarity with digital sustainability concepts
-- Frequency of sustainability discussions in professional environments
-- Participation in sustainability training
-- Satisfaction with training opportunities
+### 🏢 The Role of Digital Sustainability in Your Organization (Questions 17-27)
+- Organization sustainability goals and practices
+- Multi-select sustainability dimensions
+- Training and resource availability
+- Customer requirements and reporting practices
 
-### Role in Organization
-
-This section displays:
-- Organization-level sustainability goals and commitments
-- Presence of sustainability experts or teams
-- Sustainability reporting practices
-- Training and resources offered
-- Customer requirements related to sustainability
-
-### Job & Tasks
-
-This section analyzes:
-- Individual incorporation of sustainability principles
-- Use of sustainability-related tools
-- Drivers and motivations for sustainability
-- Barriers to implementing sustainable practices
+### 👨‍💼 Sustainability in Your Job and Tasks (Questions 28-35)
+- Sustainability incorporation in tasks
+- Drivers and barriers to sustainability
 - Knowledge gaps and support needs
+- Tools and frameworks used
 
-## Making the Dashboard Accessible Online
+## 🛠️ Customization
 
-You can make the dashboard accessible over the internet using ngrok:
+### Adding New Years
+1. Add the year to `AVAILABLE_YEARS` in `src/config.py`
+2. Place the CSV file in the `data/` folder with the format `YYYY.csv`
 
-### 1. Install ngrok
+### Modifying Charts
+- Edit chart functions in `src/streamlit_utils.py`
+- Update page functions in `streamlit_app.py`
 
-Download from [ngrok.com](https://ngrok.com/download) or install using package managers:
+### Styling
+- Modify the CSS in the `st.markdown()` section of `streamlit_app.py`
+- Update color schemes in `src/config.py`
 
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **"Module not found" errors**
+   - Ensure all dependencies are installed: `pip install -r requirements_streamlit.txt`
+
+2. **Data loading errors**
+   - Check that CSV files exist in the `data/` folder
+   - Verify file naming convention (`YYYY.csv`)
+
+3. **Authentication not working**
+   - Username: `ireb`, Password: `irebireb`
+   - Check browser console for errors
+
+4. **Charts not displaying**
+   - Check that column names match between data and configuration
+   - Verify data types in CSV files
+
+### Performance Tips
+
+- The app uses `@st.cache_data` for data loading
+- Large datasets may take time to load initially
+- Consider reducing data size for development
+
+## 🚀 Deployment
+
+### Local Network Access
 ```bash
-# Using Homebrew on macOS
-brew install ngrok
-
-# Using Chocolatey on Windows
-choco install ngrok
+streamlit run streamlit_app.py --server.address 0.0.0.0 --server.port 8501
 ```
 
-### 2. Authenticate ngrok (first-time setup)
+### Cloud Deployment
+- **Streamlit Cloud**: Connect your GitHub repository
+- **Heroku**: Use the Streamlit buildpack
+- **Docker**: Create a Dockerfile with the requirements
 
-```bash
-ngrok authtoken YOUR_AUTH_TOKEN
-```
-
-### 3. Create a tunnel to your local dashboard
-
-With your dashboard running locally, open a new terminal and run:
-
-```bash
-ngrok http 8050
-```
-
-This will provide a public URL (like `https://a1b2c3d4.ngrok.io`) that you can share with others to access your dashboard.
-
-## Data Privacy
+## 📝 Data Privacy
 
 The dashboard uses anonymized survey data. No personally identifiable information is displayed.
 
-## Customization
+## 📄 License
 
-To customize the dashboard:
-- Edit `app.py` to modify the layout and visualizations
-- Modify `assets/custom.css` to change styling
-- Update the data files in the `data/` directory to use different survey responses
+This project is part of the IREB Digital Sustainability Survey initiative.
 
-## License
+## 🤝 Contributing
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-## Acknowledgments
+## 📞 Support
+
+For issues or questions:
+1. Check the troubleshooting section above
+2. Review the Streamlit documentation
+3. Check the project's issue tracker
+
+## 🙏 Acknowledgments
 
 - IREB for providing the digital sustainability survey data
-- Dash and Plotly teams for the visualization libraries 
+- Streamlit and Plotly teams for the visualization libraries
+- The open-source community for various supporting libraries

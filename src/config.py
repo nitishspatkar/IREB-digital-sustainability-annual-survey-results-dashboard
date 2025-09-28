@@ -65,24 +65,50 @@ DEMOGRAPHIC_COLS = [
 ]
 
 AWARENESS_COLS = [
-    "We consider Digital Sustainability an umbrella term for two aspects: Sustainable Software and Sustainable by Software. Have you heard of this or a similar definition of digital sustainability before?",
-    "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
-    "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment? [Other]",
-    "Have you participated in one or more training or educational programs on digital sustainability?",
-    "Are you satisfied with the number of trainings or educational programs you participated in?",
-    "How many times training(s) or educational program(s) on digital sustainability did you participate in?"
+    "We consider Digital Sustainability an umbrella term for two aspects: Sustainable Software and Sustainable by Software. Sustainable Software concerns the sustainability of digital solutions in terms of their impact on environmental, economic, technical, social, and individual dimensions, including carbon footprint (Green IT) and process resources. Sustainable by Software describes digital solutions designed to achieve positive sustainability impacts to help individuals and organizations reach sustainability goals, such as such as the United Nations Sustainable Development Goals (SDGs) more effectively. Have you heard of this or a similar definition of digital sustainability before?",
+    "frequency_sustainability_discussions",
+    "participated_sustainability_training",
+    "satisfied_num_trainings",
+    "num_sustainability_trainings",
+    "training_private_capacity"
+]
+
+# Training reasons (why haven't participated)
+AWARENESS_TRAINING_REASONS = [
+    "What are the reasons you haven't participated in a training or educational program on digital sustainability before? [I was not aware such programs existed]",
+    "What are the reasons you haven't participated in a training or educational program on digital sustainability before? [My organization does not offer such programs]",
+    "What are the reasons you haven't participated in a training or educational program on digital sustainability before? [I have not had the opportunity to attend]",
+    "What are the reasons you haven't participated in a training or educational program on digital sustainability before? [I don't see the need for such training]",
+    "What are the reasons you haven't participated in a training or educational program on digital sustainability before? [The cost is too high]"
+]
+
+# More training reasons (why haven't participated in more)
+AWARENESS_MORE_TRAINING_REASONS = [
+    "What are the reasons you haven't participated in more training or educational programs on digital sustainability? [ I was not aware such programs existed]",
+    "What are the reasons you haven't participated in more training or educational programs on digital sustainability? [My organization does not offer such programs]",
+    "What are the reasons you haven't participated in more training or educational programs on digital sustainability? [I have not had the opportunity to attend]",
+    "What are the reasons you haven't participated in more training or educational programs on digital sustainability? [I don't see the need for such training]",
+    "What are the reasons you haven't participated in more training or educational programs on digital sustainability? [The cost is too high]"
 ]
 
 ORGANIZATION_COLS = [
-    "Does your organization have specific digital sustainability goals or benchmarks for software development projects?",
-    "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?",
-    "Does your organization incorporate sustainable development practices?",
-    "Do different departments in your organization coordinate on sustainability for software development projects?",
-    "Does your organization report on sustainability practices?",
-    "Does your organization offer training or resources to employees on sustainable software development practices?",
-    "Can you tell us a little about the training or resources your organization offers?",
-    "How often is the sustainability of your digital solutions an explicit requirement of the customer or the users?",
-    "Why do you think that your customers and users have not asked explicitly to build sustainable digital solutions?"
+    "org_sustainability_goals",
+    "org_csr_expert_team", 
+    "org_incorporates_sustainability",
+    "org_coordination_on_sustainability",
+    "org_reports_sustainability",
+    "org_offers_sustainability_training",
+    "customer_requires_sustainability"
+]
+
+# Organization training reasons (why doesn't offer training)
+ORG_TRAINING_REASONS = [
+    "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Lack of awareness about the availability of such training]",
+    "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Lack of understanding about the need for such training]",
+    "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [No demand or interest from employees]",
+    "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Limited budget or resources for training programs]",
+    "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Sustainability is (perhaps) not a priority for the organization]",
+    "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Not sure]"
 ]
 
 ORG_MULTI_TRAINING = [
@@ -106,9 +132,17 @@ ORG_MULTI_DIMENSIONS = [
 ]
 
 JOB_TASK_COLS = [
-    "Do you incorporate digital sustainability considerations in your role-specific tasks?",
-    "Are there specific tools, software, or frameworks that help you incorporate sustainability into your tasks? (E.g., gathering and managing requirements, writing sustainability-focused tests, optimizing code for less energy consumption.)",
-    "Can you name the tools, software, and/or frameworks, and tell us how and for what you use them?"
+    "incorporate_sustainability_in_tasks",
+    "tools_for_sustainability"
+]
+
+# Sustainability dimensions considered in tasks
+JOB_TASK_DIMENSIONS = [
+    "Which sustainability dimensions do you consider in your role-specific tasks? [Environmental sustainability (e.g., resource efficiency of energy/water/…, carbon footprint)]",
+    "Which sustainability dimensions do you consider in your role-specific tasks? [Social sustainability (e.g., the role of community, shared values, working conditions, and well-being) ]",
+    "Which sustainability dimensions do you consider in your role-specific tasks? [Individual sustainability (e.g., health, competence, access to services)]",
+    "Which sustainability dimensions do you consider in your role-specific tasks? [Economic sustainability (e.g., cost efficiency, economic viability)]",
+    "Which sustainability dimensions do you consider in your role-specific tasks? [Technical sustainability (e.g., maintainability, scalability)]"
 ]
 
 JOB_TASK_MULTI_DRIVES = [
@@ -139,7 +173,7 @@ JOB_TASK_MULTI_KNOWLEDGE = [
     "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? [Individual sustainability (e.g., health, competence, access to services)]",
     "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? [Economic sustainability (e.g., cost efficiency, economic viability)]",
     "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? [Technical sustainability (e.g., maintainability, scalability)]",
-    "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? [Other]"
+    "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? [I have sufficient knowledge and tools to effectively address all five sustainability dimensions]"
 ]
 
 JOB_TASK_MULTI_SUPPORT = [
@@ -158,4 +192,24 @@ JOB_TASK_MULTI_SUPPORT = [
 NUMERIC_COLS = [
     "How many years of professional experience do you have in IT/software engineering?",
     "How many times training(s) or educational program(s) on digital sustainability did you participate in?"
+]
+
+# Free text response columns (short names)
+FREE_TEXT_COLS = [
+    'Which of the following best describes your current role in the organization? [Other]',
+    'In which application domain do you currently primarily work? [Other]',
+    'How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment? [Other]',
+    'training_description',
+    'What are the reasons you haven\'t participated in a training or educational program on digital sustainability before? [Other]',
+    'What are the reasons you haven\'t participated in more training or educational programs on digital sustainability? [Other]',
+    'Which dimensions of sustainability are actively considered in your organizations software development projects? [Other]',
+    'org_training_resources_description',
+    'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Other]',
+    'why_customers_not_asking',
+    'tools_description',
+    'What drives you to incorporate digital sustainability in your role-related tasks? [Other]',
+    'What hinders you from incorporating sustainability in your role-specific tasks? [Other]',
+    'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? [Other]',
+    'What additional support or resources would help you integrate digital sustainability into your work? [Other]',
+    'num_sustainability_trainings'
 ] 
