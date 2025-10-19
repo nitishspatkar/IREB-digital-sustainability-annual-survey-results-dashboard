@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --color-lavender-50: #ece2ec;
+  --color-lavender-100: #ffffff;
+
+  --color-plum-200: #dba6db;
+  --color-plum-400: #a63ca4;
+  --color-plum-500: #831f82;
+  --color-plum-600: #6b166f;
+
+  --color-ink-900: #2f0f2f;
+  --color-ink-700: #562456;
+  --color-ink-500: #7a3a7a;
+
+  --shadow-card: 0 18px 38px -18px rgba(131, 31, 130, 0.35);
+  --radius-card: 1.25rem;
+}
+
+@layer base {
+  body {
+    @apply min-h-screen bg-lavender-50 text-ink-900 antialiased;
+    background-image: radial-gradient(
+        at 20% 20%,
+        rgba(131, 31, 130, 0.08) 0px,
+        transparent 70%
+      ),
+      radial-gradient(at 80% 0%, rgba(131, 31, 130, 0.06) 0px, transparent 75%);
+  }
+
+  ::selection {
+    background: rgba(131, 31, 130, 0.25);
+    color: #2f0f2f;
+  }
+}
