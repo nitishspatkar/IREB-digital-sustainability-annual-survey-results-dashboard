@@ -54,7 +54,7 @@ const Demographic = () => {
         <DemographicProfessionalExperience />
         <DemographicOrganizationalRole />
         <DemographicOrganizationType />
-        <DemographicApplicationDomain />
+        <DemographicApplicationDomain className="lg:col-span-2" />
       </div>
     </div>
   );
