@@ -5,116 +5,117 @@ import type { Data, Layout } from "plotly.js";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 
-/**
- * Bar chart: What drives you to incorporate digital sustainability in your role-related tasks?
- *
- * Data columns used (boolean or text):
- * - driveOrganizationalPolicies
- * - drivePersonalBeliefs
- * - driveClientRequirements
- * - driveUserRequirements
- * - driveLegalRequirements
- * - driveOther (counted if non-empty and not "n/a")
- */
 const DriversToIncorporateSustainability = () => {
-  const barColor = useThemeColor("--color-plum-400");
-  const titleColor = useThemeColor("--color-ink-900");
-  const tickColor = useThemeColor("--color-ink-700");
+    const barColor = useThemeColor("--color-plum-400");
+    const titleColor = useThemeColor("--color-ink-900");
+    const tickColor = useThemeColor("--color-ink-700");
 
-  const surveyResponses = useSurveyData();
+    const surveyResponses = useSurveyData();
 
-  const counts = useMemo(() => {
-    const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
+    const counts = useMemo(() => {
+        const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
 
-    let orgPolicies = 0;
-    let personalBeliefs = 0;
-    let clientReqs = 0;
-    let userReqs = 0;
-    let legalReqs = 0;
-    let other = 0;
+        let orgPolicies = 0;
+        let personalBeliefs = 0;
+        let clientReqs = 0;
+        let userReqs = 0;
+        let legalReqs = 0;
+        let other = 0;
 
-    surveyResponses.forEach((response) => {
-      const raw = response.raw;
+        // --- Precondition: Q28 = Yes ---
+        const filteredResponses = surveyResponses.filter(
+            (r) => normalize(r.raw.personIncorporatesSustainability) === "yes"
+        );
 
-      if (normalize(raw.driveOrganizationalPolicies) === "yes")
-        orgPolicies += 1;
-      if (normalize(raw.drivePersonalBeliefs) === "yes") personalBeliefs += 1;
-      if (normalize(raw.driveClientRequirements) === "yes") clientReqs += 1;
-      if (normalize(raw.driveUserRequirements) === "yes") userReqs += 1;
-      if (normalize(raw.driveLegalRequirements) === "yes") legalReqs += 1;
+        filteredResponses.forEach((response) => {
+            const raw = response.raw;
 
-      const otherVal = normalize(raw.driveOther);
-      if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
-    });
+            if (normalize(raw.driveOrganizationalPolicies) === "yes")
+                orgPolicies += 1;
+            if (normalize(raw.drivePersonalBeliefs) === "yes") personalBeliefs += 1;
+            if (normalize(raw.driveClientRequirements) === "yes") clientReqs += 1;
+            if (normalize(raw.driveUserRequirements) === "yes") userReqs += 1;
+            if (normalize(raw.driveLegalRequirements) === "yes") legalReqs += 1;
 
-    return {
-      labels: [
-        "Organizational policies",
-        "Personal beliefs",
-        "Client requirements",
-        "User requirements",
-        "Legal requirements",
-        "Other",
-      ],
-      values: [
-        orgPolicies,
-        personalBeliefs,
-        clientReqs,
-        userReqs,
-        legalReqs,
-        other,
-      ],
-    } as const;
-  }, [surveyResponses]);
+            const otherVal = normalize(raw.driveOther);
+            if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
+        });
 
-  const data = useMemo<Data[]>(
-    () => [
-      {
-        x: [...counts.labels],
-        y: [...counts.values],
-        type: "bar",
-        marker: { color: barColor },
-        hoverinfo: "none",
-      },
-    ],
-    [counts, barColor]
-  );
+        const items = [
+            { label: "Organizational policies", value: orgPolicies },
+            { label: "Personal beliefs", value: personalBeliefs },
+            { label: "Client requirements", value: clientReqs },
+            { label: "User requirements", value: userReqs },
+            { label: "Legal requirements", value: legalReqs },
+            { label: "Other", value: other },
+        ];
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 30, r: 0, b: 100, l: 48 },
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
-      title: {
-        text: "Drivers to incorporate digital sustainability in role-related tasks",
-        font: { family: "Inter, sans-serif", size: 18, color: titleColor },
-      },
-      xaxis: {
-        tickangle: -20,
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-      yaxis: {
-        title: {
-          text: "Number of Respondents",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
-        },
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-    }),
-    [titleColor, tickColor]
-  );
+        // Sort ascending by value
+        items.sort((a, b) => a.value - b.value);
 
-  return (
-    <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <Plot
-        data={data}
-        layout={layout}
-        config={{ displayModeBar: false, responsive: true }}
-        useResizeHandler
-        style={{ width: "100%", height: "100%" }}
-      />
-    </div>
-  );
+        return {
+            labels: items.map((item) => item.label),
+            values: items.map((item) => item.value),
+        } as const;
+    }, [surveyResponses]);
+
+    const data = useMemo<Data[]>(
+        () => [
+            {
+                type: "bar",
+                orientation: "h",
+                x: counts.values,
+                y: counts.labels,
+                marker: { color: barColor },
+                // --- ADDED TEXT LABELS ---
+                text: counts.values.map((v) => v.toString()),
+                textposition: "outside",
+                textfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
+                cliponaxis: false,
+                hoverinfo: "none",
+            },
+        ],
+        [counts, barColor, tickColor] // Added tickColor
+    );
+
+    const layout = useMemo<Partial<Layout>>(
+        () => ({
+            margin: { t: 50, r: 40, b: 60, l: 180 }, // Adjusted margins
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            title: {
+                text: "Drivers for incorporating sustainability (Incorporators Only)",
+                font: { family: "Inter, sans-serif", size: 18, color: titleColor },
+            },
+            xaxis: {
+                title: {
+                    text: "Number of Respondents",
+                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                },
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+            yaxis: {
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+        }),
+        [titleColor, tickColor]
+    );
+
+    return (
+        <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <Plot
+                data={data}
+                layout={layout}
+                config={{ displayModeBar: false, responsive: true }}
+                useResizeHandler
+                style={{ width: "100%", height: "100%" }}
+            />
+        </div>
+    );
 };
 
 export default DriversToIncorporateSustainability;
