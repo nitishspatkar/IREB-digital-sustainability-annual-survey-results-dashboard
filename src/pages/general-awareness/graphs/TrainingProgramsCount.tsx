@@ -97,7 +97,6 @@ const TrainingProgramsCount = () => {
                 y: stats.map((s) => s.count),
                 type: "bar",
                 marker: { color: barColor },
-                // --- CHANGES START HERE ---
                 text: stats.map((s) => s.count.toString()),
                 textposition: "outside",
                 textfont: {
@@ -106,15 +105,14 @@ const TrainingProgramsCount = () => {
                     color: tickColor,
                 },
                 cliponaxis: false,
-                // --- CHANGES END HERE ---
                 hoverinfo: "none",
             },
         ];
-    }, [stats, barColor, tickColor]); // Added tickColor
+    }, [stats, barColor, tickColor]);
 
     const layout = useMemo<Partial<Layout>>(
         () => ({
-            margin: { t: 50, r: 0, b: 80, l: 48 }, // Changed t: 30 to t: 50
+            margin: { t: 50, r: 0, b: 60, l: 48 }, // Changed b: 80 to b: 60
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
             title: {
@@ -126,7 +124,7 @@ const TrainingProgramsCount = () => {
                     text: "Number of trainings",
                     font: { family: "Inter, sans-serif", size: 12, color: tickColor },
                 },
-                tickangle: -30,
+                // --- REMOVED tickangle: -30 ---
                 tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
             },
             yaxis: {
@@ -154,7 +152,7 @@ const TrainingProgramsCount = () => {
                     layout={layout}
                     config={{ displayModeBar: false, responsive: true }}
                     useResizeHandler
-                    style={{ width: "10m%", height: "100%" }}
+                    style={{ width: "100%", height: "100%" }}
                 />
             )}
         </div>

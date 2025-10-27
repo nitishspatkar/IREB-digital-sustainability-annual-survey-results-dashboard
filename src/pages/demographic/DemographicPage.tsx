@@ -47,14 +47,14 @@ const Demographic = () => {
         </p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6">
         <DemographicCountryTable respondentStats={respondentStats} />
         <DemographicChoropleth respondentStats={respondentStats} />
         <DemographicAgeGroup />
         <DemographicProfessionalExperience />
         <DemographicOrganizationalRole />
         <DemographicOrganizationType />
-        <DemographicApplicationDomain className="lg:col-span-2" />
+        <DemographicApplicationDomain />
       </div>
     </div>
   );

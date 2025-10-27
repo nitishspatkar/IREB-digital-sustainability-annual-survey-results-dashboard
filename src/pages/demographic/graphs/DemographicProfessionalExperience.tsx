@@ -6,11 +6,11 @@ import type { Data, Layout } from "plotly.js";
 
 export function DemographicProfessionalExperience() {
     const surveyResponses = useSurveyData();
-    const plum400 = useThemeColor("--color-plum-400");
-    const ink900 = useThemeColor("--color-ink-900");
+    const chartBarColor = useThemeColor("--color-plum-400");
+    const titleColor = useThemeColor("--color-ink-900");
+    const tickColor = useThemeColor("--color-ink-700");
 
     const experienceStats = useMemo(() => {
-        // ... Logik bleibt unverändert
         const counts = new Map<string, number>();
         surveyResponses.forEach((response) => {
             const experience = response.raw.professionalExperienceYears ?? "";
@@ -36,50 +36,77 @@ export function DemographicProfessionalExperience() {
 
     const data: Data[] = useMemo(
         () => [
-            // ... Daten bleiben unverändert
             {
                 x: experienceStats.map((item) => item.experience),
                 y: experienceStats.map((item) => item.count),
                 type: "bar",
                 marker: {
-                    color: plum400,
+                    color: chartBarColor,
                 },
+                text: experienceStats.map((item) => item.count.toString()),
+                textposition: "outside",
+                textfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
+                cliponaxis: false,
+                hoverinfo: "none",
             },
         ],
-        [experienceStats, plum400]
+        [experienceStats, chartBarColor, tickColor]
     );
 
     const layout: Partial<Layout> = useMemo(
         () => ({
-            // ... Layout bleibt unverändert
+            margin: { t: 50, r: 40, b: 60, l: 60 },
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
             title: {
                 text: "How many years of professional experience do you have?",
+                font: {
+                    family: "Inter, sans-serif",
+                    size: 18,
+                    color: titleColor,
+                },
             },
             xaxis: {
                 automargin: true,
                 title: {
                     text: "Years of Experience",
+                    font: {
+                        family: "Inter, sans-serif",
+                        size: 12,
+                        color: tickColor,
+                    },
                 },
-                tickangle: -45,
+                // --- THIS IS THE FIX: tickangle is GONE ---
+                tickfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
             },
             yaxis: {
                 title: {
                     text: "Number of Respondents",
+                    font: {
+                        family: "Inter, sans-serif",
+                        size: 12,
+                        color: tickColor,
+                    },
+                },
+                tickfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
                 },
             },
-            paper_bgcolor: "rgba(0,0,0,0)",
-            plot_bgcolor: "rgba(0,0,0,0)",
-            font: {
-                color: ink900,
-            },
-            margin: { t: 40, r: 40, b: 80, l: 60 },
         }),
-        [ink900]
+        [titleColor, tickColor]
     );
 
     return (
-        // --- ÄNDERUNG HIER ---
-        // Die Klassen wurden an die der anderen Komponenten angeglichen.
         <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <Plot
                 data={data}
