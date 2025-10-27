@@ -5,51 +5,59 @@ import type { Data, Layout } from "plotly.js";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 
-const OrganizationOffersTraining = () => {
+type FrequencyStat = {
+    label: string;
+    count: number;
+};
+
+// Define the logical order of answers
+const frequencyOrder = [
+    "For every project or solution",
+    "For most projects or solutions",
+    "For some projects or solutions",
+    "Rarely, but it has happened",
+    "Never",
+];
+
+const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
+
+const CustomerRequirementFrequency = () => {
     const barColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
 
     const responses = useSurveyData();
 
-    const counts = useMemo(() => {
-        const norm = (v: string) => (v ?? "").trim().toLowerCase();
-
-        let yes = 0;
-        let no = 0;
-        let notSure = 0;
-        let unknown = 0;
+    const stats = useMemo<FrequencyStat[]>(() => {
+        const counts = new Map<string, number>();
+        frequencyOrder.forEach((label) => counts.set(label, 0));
 
         responses.forEach((r) => {
-            const v = norm(r.raw.organizationOffersTraining as unknown as string);
-            if (v === "yes") yes += 1;
-            else if (v === "no") no += 1;
-            else if (v === "not sure") notSure += 1;
-            else if (v === "") {
-                return;
-            } else if (v !== "n/a") {
-                unknown += 1;
+            // Key for Q26
+            const raw = normalize(r.raw.customerRequirementFrequency ?? "");
+            if (counts.has(raw)) {
+                counts.set(raw, (counts.get(raw) ?? 0) + 1);
             }
         });
 
-        const labels: string[] = ["Yes", "No", "Not sure"];
-        const values: number[] = [yes, no, notSure];
-        if (unknown > 0) {
-            labels.push("Unknown");
-            values.push(unknown);
-        }
-        return { labels, values } as const;
+        // Create array and sort it based on the predefined logical order
+        return Array.from(counts.entries())
+            .map(([label, count]) => ({ label, count }))
+            .sort(
+                (a, b) =>
+                    frequencyOrder.indexOf(a.label) - frequencyOrder.indexOf(b.label)
+            );
     }, [responses]);
 
     const data = useMemo<Data[]>(
         () => [
             {
-                x: counts.labels,
-                y: counts.values,
                 type: "bar",
+                orientation: "h",
+                x: stats.map((s) => s.count),
+                y: stats.map((s) => s.label),
                 marker: { color: barColor },
-                // --- ADDED TEXT LABELS ---
-                text: counts.values.map((v) => v.toString()),
+                text: stats.map((s) => s.count.toString()),
                 textposition: "outside",
                 textfont: {
                     family: "Inter, sans-serif",
@@ -60,34 +68,33 @@ const OrganizationOffersTraining = () => {
                 hoverinfo: "none",
             },
         ],
-        [counts, barColor, tickColor] // Added tickColor
+        [stats, barColor, tickColor]
     );
 
     const layout = useMemo<Partial<Layout>>(
         () => ({
-            margin: { t: 50, r: 0, b: 60, l: 48 }, // Adjusted margins
+            margin: { t: 50, r: 40, b: 60, l: 250 }, // Wide left margin for labels
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
             title: {
-                text: "Does your organization offer sustainability training/resources?",
+                text: "Sustainability as an Explicit Customer Requirement",
                 font: { family: "Inter, sans-serif", size: 18, color: titleColor },
             },
             xaxis: {
-                // --- REMOVED tickangle ---
+                title: {
+                    text: "Number of Respondents",
+                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                },
                 tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
             },
             yaxis: {
-                title: {
-                    text: "Number of respondents",
-                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
-                },
                 tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
             },
         }),
         [titleColor, tickColor]
     );
 
-    const total = counts.values.reduce((a, b) => a + b, 0);
+    const total = stats.reduce((a, b) => a + b.count, 0);
 
     return (
         <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -108,4 +115,4 @@ const OrganizationOffersTraining = () => {
     );
 };
 
-export default OrganizationOffersTraining;
+export default CustomerRequirementFrequency;

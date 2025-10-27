@@ -217,6 +217,11 @@ export const columnDefinitions = [
       "Which dimensions of sustainability are actively considered in your organization's software development projects?  [Other]",
   },
   {
+    key: "considerNotSure",
+    header:
+      "Which dimensions of sustainability are actively considered in your organization's software development projects?  [Not sure]",
+  },
+  {
     key: "organizationReportsOnSustainability",
     header: "Does your organization report on sustainability practices?  ",
   },

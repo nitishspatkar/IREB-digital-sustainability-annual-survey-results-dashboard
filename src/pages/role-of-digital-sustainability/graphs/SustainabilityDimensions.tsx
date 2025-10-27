@@ -6,96 +6,118 @@ import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 
 const SustainabilityDimensions = () => {
-  const barColor = useThemeColor("--color-plum-400");
-  const titleColor = useThemeColor("--color-ink-900");
-  const tickColor = useThemeColor("--color-ink-700");
+    const barColor = useThemeColor("--color-plum-400");
+    const titleColor = useThemeColor("--color-ink-900");
+    const tickColor = useThemeColor("--color-ink-700");
 
-  const surveyResponses = useSurveyData();
+    const surveyResponses = useSurveyData();
 
-  const counts = useMemo(() => {
-    const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
+    const counts = useMemo(() => {
+        const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
 
-    let environmental = 0;
-    let social = 0;
-    let individual = 0;
-    let economic = 0;
-    let technical = 0;
-    let other = 0;
+        let environmental = 0;
+        let social = 0;
+        let individual = 0;
+        let economic = 0;
+        let technical = 0;
+        let other = 0;
+        // --- ADDED "NOT SURE" (from screenshot Q21g) ---
+        let notSure = 0;
 
-    surveyResponses.forEach((response) => {
-      const raw = response.raw;
+        surveyResponses.forEach((response) => {
+            const raw = response.raw;
 
-      if (normalize(raw.considerEnvironmental) === "yes") environmental += 1;
-      if (normalize(raw.considerSocial) === "yes") social += 1;
-      if (normalize(raw.considerIndividual) === "yes") individual += 1;
-      if (normalize(raw.considerEconomic) === "yes") economic += 1;
-      if (normalize(raw.considerTechnical) === "yes") technical += 1;
+            if (normalize(raw.considerEnvironmental) === "yes") environmental += 1;
+            if (normalize(raw.considerSocial) === "yes") social += 1;
+            if (normalize(raw.considerIndividual) === "yes") individual += 1;
+            if (normalize(raw.considerEconomic) === "yes") economic += 1;
+            if (normalize(raw.considerTechnical) === "yes") technical += 1;
 
-      const otherVal = normalize(raw.considerOther);
-      if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
-    });
+            // Assuming Q21g "Not sure" key is `considerNotSure`
+            // You may need to verify this key
+            if (normalize(raw.considerNotSure) === "yes") notSure += 1;
 
-    return {
-      labels: [
-        "Environmental",
-        "Social",
-        "Individual",
-        "Economic",
-        "Technical",
-        "Other",
-      ],
-      values: [environmental, social, individual, economic, technical, other],
-    } as const;
-  }, [surveyResponses]);
+            const otherVal = normalize(raw.considerOther);
+            if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
+        });
 
-  const data = useMemo<Data[]>(
-    () => [
-      {
-        x: [...counts.labels],
-        y: [...counts.values],
-        type: "bar",
-        marker: { color: barColor },
-        hoverinfo: "none",
-      },
-    ],
-    [counts, barColor]
-  );
+        const items = [
+            { label: "Environmental", value: environmental },
+            { label: "Social", value: social },
+            { label: "Individual", value: individual },
+            { label: "Economic", value: economic },
+            { label: "Technical", value: technical },
+            { label: "Not sure", value: notSure },
+            { label: "Other", value: other },
+        ];
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 30, r: 0, b: 80, l: 40 },
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
-      title: {
-        text: "Sustainability Dimensions in Software Development Projects",
-        font: { family: "Inter, sans-serif", size: 18, color: titleColor },
-      },
-      xaxis: {
-        tickangle: -20,
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-      yaxis: {
-        title: {
-          text: "Number of Respondents",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
-        },
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-    }),
-    [titleColor, tickColor]
-  );
+        // Sort ascending by value
+        items.sort((a, b) => a.value - b.value);
 
-  return (
-    <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <Plot
-        data={data}
-        layout={layout}
-        config={{ displayModeBar: false, responsive: true }}
-        useResizeHandler
-        style={{ width: "100%", height: "100%" }}
-      />
-    </div>
-  );
+        return {
+            labels: items.map(item => item.label),
+            values: items.map(item => item.value),
+        } as const;
+    }, [surveyResponses]);
+
+    const data = useMemo<Data[]>(
+        () => [
+            {
+                // --- CONVERTED TO HORIZONTAL BAR ---
+                type: "bar",
+                orientation: "h",
+                x: counts.values,
+                y: counts.labels,
+                marker: { color: barColor },
+                // --- ADDED TEXT LABELS ---
+                text: counts.values.map(v => v.toString()),
+                textposition: "outside",
+                textfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
+                cliponaxis: false,
+                hoverinfo: "none",
+            },
+        ],
+        [counts, barColor, tickColor] // Added tickColor
+    );
+
+    const layout = useMemo<Partial<Layout>>(
+        () => ({
+            margin: { t: 50, r: 40, b: 40, l: 120 }, // Adjusted margins
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            title: {
+                text: "Sustainability Dimensions in Software Development Projects",
+                font: { family: "Inter, sans-serif", size: 18, color: titleColor },
+            },
+            xaxis: { // Now the value axis
+                title: {
+                    text: "Number of Respondents",
+                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                },
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+            yaxis: { // Now the category axis
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+        }),
+        [titleColor, tickColor]
+    );
+
+    return (
+        <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <Plot
+                data={data}
+                layout={layout}
+                config={{ displayModeBar: false, responsive: true }}
+                useResizeHandler
+                style={{ width: "100%", height: "100%" }}
+            />
+        </div>
+    );
 };
 
 export default SustainabilityDimensions;

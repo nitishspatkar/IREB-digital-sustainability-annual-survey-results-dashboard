@@ -5,51 +5,50 @@ import type { Data, Layout } from "plotly.js";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 
-const OrganizationOffersTraining = () => {
+const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
+
+const OrganizationIncorporatesPractices = () => {
     const barColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
 
     const responses = useSurveyData();
 
-    const counts = useMemo(() => {
-        const norm = (v: string) => (v ?? "").trim().toLowerCase();
-
-        let yes = 0;
-        let no = 0;
-        let notSure = 0;
-        let unknown = 0;
+    const stats = useMemo(() => {
+        const counts = new Map<string, number>();
+        counts.set("Yes", 0);
+        counts.set("No", 0);
+        counts.set("Not sure", 0);
 
         responses.forEach((r) => {
-            const v = norm(r.raw.organizationOffersTraining as unknown as string);
-            if (v === "yes") yes += 1;
-            else if (v === "no") no += 1;
-            else if (v === "not sure") notSure += 1;
-            else if (v === "") {
-                return;
-            } else if (v !== "n/a") {
-                unknown += 1;
+            // Key for Q19 from SurveyColumnDefinition.ts
+            const raw = normalize(r.raw.organizationIncorporatesSustainablePractices ?? "");
+            const lower = raw.toLowerCase();
+
+            if (lower === "yes") {
+                counts.set("Yes", (counts.get("Yes") ?? 0) + 1);
+            } else if (lower === "no") {
+                counts.set("No", (counts.get("No") ?? 0) + 1);
+            } else if (lower === "not sure") {
+                counts.set("Not sure", (counts.get("Not sure") ?? 0) + 1);
             }
         });
 
-        const labels: string[] = ["Yes", "No", "Not sure"];
-        const values: number[] = [yes, no, notSure];
-        if (unknown > 0) {
-            labels.push("Unknown");
-            values.push(unknown);
-        }
-        return { labels, values } as const;
+        const labels = ["Yes", "No", "Not sure"];
+        return {
+            labels,
+            values: labels.map(label => counts.get(label) ?? 0),
+        };
     }, [responses]);
 
     const data = useMemo<Data[]>(
         () => [
             {
-                x: counts.labels,
-                y: counts.values,
+                x: stats.labels,
+                y: stats.values,
                 type: "bar",
                 marker: { color: barColor },
-                // --- ADDED TEXT LABELS ---
-                text: counts.values.map((v) => v.toString()),
+                text: stats.values.map((v) => v.toString()),
                 textposition: "outside",
                 textfont: {
                     family: "Inter, sans-serif",
@@ -60,25 +59,24 @@ const OrganizationOffersTraining = () => {
                 hoverinfo: "none",
             },
         ],
-        [counts, barColor, tickColor] // Added tickColor
+        [stats, barColor, tickColor]
     );
 
     const layout = useMemo<Partial<Layout>>(
         () => ({
-            margin: { t: 50, r: 0, b: 60, l: 48 }, // Adjusted margins
+            margin: { t: 50, r: 20, b: 60, l: 48 },
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
             title: {
-                text: "Does your organization offer sustainability training/resources?",
+                text: "Does your organization incorporate sustainable practices?",
                 font: { family: "Inter, sans-serif", size: 18, color: titleColor },
             },
             xaxis: {
-                // --- REMOVED tickangle ---
                 tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
             },
             yaxis: {
                 title: {
-                    text: "Number of respondents",
+                    text: "Number of Respondents",
                     font: { family: "Inter, sans-serif", size: 12, color: tickColor },
                 },
                 tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
@@ -87,7 +85,7 @@ const OrganizationOffersTraining = () => {
         [titleColor, tickColor]
     );
 
-    const total = counts.values.reduce((a, b) => a + b, 0);
+    const total = stats.values.reduce((a, b) => a + b, 0);
 
     return (
         <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -108,4 +106,4 @@ const OrganizationOffersTraining = () => {
     );
 };
 
-export default OrganizationOffersTraining;
+export default OrganizationIncorporatesPractices;
