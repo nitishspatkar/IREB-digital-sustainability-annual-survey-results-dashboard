@@ -5,55 +5,43 @@ import type { Data, Layout } from "plotly.js";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 
-type SatisfactionStat = {
+type ParticipationStat = {
     label: string;
     count: number;
 };
 
 const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
 
-const TrainingSatisfaction = () => {
+const TrainingParticipation = () => {
     const barColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
 
     const responses = useSurveyData();
 
-    const stats = useMemo<SatisfactionStat[]>(() => {
+    const stats = useMemo<ParticipationStat[]>(() => {
         const counts = new Map<string, number>();
+        counts.set("Yes", 0);
+        counts.set("No", 0);
 
-        const participants = responses.filter(
-            (r) =>
-                normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
-        );
-
-        participants.forEach((r) => {
-            const raw = normalize(r.raw.trainingSatisfaction ?? "");
-            if (!raw || raw.toLowerCase() === "n/a") return;
-
-            let key = raw;
+        responses.forEach((r) => {
+            // Data key for Q10
+            const raw = normalize(r.raw.participatedInTraining ?? "");
             const lower = raw.toLowerCase();
-            if (lower === "yes" || lower === "satisfied") key = "Yes";
-            else if (lower === "no" || lower === "not satisfied") key = "No";
-            else if (lower.includes("not sure") || lower === "unsure")
-                key = "Not sure";
 
-            counts.set(key, (counts.get(key) ?? 0) + 1);
+            if (lower === "yes") {
+                counts.set("Yes", (counts.get("Yes") ?? 0) + 1);
+            } else if (lower === "no") {
+                counts.set("No", (counts.get("No") ?? 0) + 1);
+            }
+            // Other values (empty, "n/a", etc.) are ignored
         });
 
-        const order = ["Yes", "No", "Not sure"];
-        const items = Array.from(counts.entries()).map(([label, count]) => ({
-            label,
-            count,
-        }));
-
-        order.forEach((label) => {
-            if (!counts.has(label)) items.push({ label, count: 0 });
-        });
-
-        return items.sort(
-            (a, b) => order.indexOf(a.label) - order.indexOf(b.label)
-        );
+        // Return in a fixed order for the bar chart
+        return [
+            { label: "Yes", count: counts.get("Yes") ?? 0 },
+            { label: "No", count: counts.get("No") ?? 0 },
+        ];
     }, [responses]);
 
     const chartData = useMemo<Data[]>(() => {
@@ -62,8 +50,10 @@ const TrainingSatisfaction = () => {
                 x: stats.map((s) => s.label),
                 y: stats.map((s) => s.count),
                 type: "bar",
-                marker: { color: barColor },
-                // --- CHANGES START HERE ---
+                marker: {
+                    color: barColor,
+                },
+                // Add text labels on top of bars
                 text: stats.map((s) => s.count.toString()),
                 textposition: "outside",
                 textfont: {
@@ -72,30 +62,45 @@ const TrainingSatisfaction = () => {
                     color: tickColor,
                 },
                 cliponaxis: false,
-                // --- CHANGES END HERE ---
                 hoverinfo: "none",
             },
         ];
-    }, [stats, barColor, tickColor]); // Added tickColor
+    }, [stats, barColor, tickColor]);
 
     const layout = useMemo<Partial<Layout>>(
         () => ({
-            margin: { t: 50, r: 0, b: 60, l: 40 }, // Changed t: 30 to t: 50
+            margin: { t: 60, r: 20, b: 60, l: 48 }, // Increased top margin for labels
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
             title: {
-                text: "Satisfaction with Number of Trainings (Participants Only)",
-                font: { family: "Inter, sans-serif", size: 18, color: titleColor },
+                text: "Participation in Digital Sustainability Training",
+                font: {
+                    family: "Inter, sans-serif",
+                    size: 18,
+                    color: titleColor,
+                },
             },
             xaxis: {
-                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                tickfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
             },
             yaxis: {
                 title: {
                     text: "Number of Respondents",
-                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                    font: {
+                        family: "Inter, sans-serif",
+                        size: 12,
+                        color: tickColor,
+                    },
                 },
-                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                tickfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
             },
         }),
         [titleColor, tickColor]
@@ -122,4 +127,4 @@ const TrainingSatisfaction = () => {
     );
 };
 
-export default TrainingSatisfaction;
+export default TrainingParticipation;
