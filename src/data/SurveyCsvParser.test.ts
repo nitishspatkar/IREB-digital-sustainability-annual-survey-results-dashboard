@@ -116,6 +116,7 @@ describe("SurveyCsvParser", () => {
       supportNeedTools: "Yes",
       supportNeedNone: "No",
       supportNeedOther: "",
+      considerNotSure: ""
     };
 
     expect(record).toEqual(expectedRecord);
