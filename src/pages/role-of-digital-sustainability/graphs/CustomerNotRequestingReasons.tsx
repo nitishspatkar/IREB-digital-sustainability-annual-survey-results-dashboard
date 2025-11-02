@@ -12,7 +12,7 @@ const CustomerNotRequestingReasons = () => {
     const responses = useSurveyData();
 
     const reasons = useMemo<string[]>(() => {
-        // --- Precondition: Q26 = "Rarely..." or "Never" ---
+        // Precondition: Q26 = "Rarely..." or "Never"
         const rarely = "rarely, but it has happened";
         const never = "never";
 
