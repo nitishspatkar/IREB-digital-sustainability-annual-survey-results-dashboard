@@ -29,17 +29,17 @@ function categorizeCount(
     const plusMatch = value.match(/(\d+)\s*\+/);
     if (plusMatch) {
         const n = Number(plusMatch[1]);
-        return { label: `${n}+`, sortKey: n + 0.001 };
+        return { label: value, sortKey: n + 0.001 };
     }
     const moreThanMatch = lower.match(/more than\s*(\d+)/);
     if (moreThanMatch) {
         const n = Number(moreThanMatch[1]);
-        return { label: `${n + 1}+`, sortKey: n + 1 + 0.001 };
+        return { label: value, sortKey: n + 1 + 0.001 };
     }
     const greaterThanMatch = value.match(/>\s*(\d+)/);
     if (greaterThanMatch) {
         const n = Number(greaterThanMatch[1]);
-        return { label: `${n + 1}+`, sortKey: n + 1 + 0.001 };
+        return { label: value, sortKey: n + 1 + 0.001 };
     }
 
     const rangeMatch = value.match(/(\d+)\s*[-–]\s*(\d+)/);
@@ -48,7 +48,7 @@ function categorizeCount(
         const b = Number(rangeMatch[2]);
         const lo = Math.min(a, b);
         const hi = Math.max(a, b);
-        return { label: `${lo}-${hi}`, sortKey: lo + (hi - lo) / 100 };
+        return { label: value, sortKey: lo + (hi - lo) / 100 };
     }
 
     const firstNum = value.match(/(\d+)/);
@@ -120,6 +120,7 @@ const TrainingProgramsCount = () => {
                 font: { family: "Inter, sans-serif", size: 18, color: titleColor },
             },
             xaxis: {
+                type: "category",
                 title: {
                     text: "Number of trainings",
                     font: { family: "Inter, sans-serif", size: 12, color: tickColor },

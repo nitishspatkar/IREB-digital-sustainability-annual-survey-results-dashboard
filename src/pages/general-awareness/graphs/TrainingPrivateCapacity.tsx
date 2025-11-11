@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 
@@ -21,10 +22,9 @@ const capacityOptions = [
         searchTerms: ["no"],
     },
     {
-        label: "Both (Organization & Private)",
+        label: "My organization paid it on some occasions, and i paid it myself on others.",
         searchTerms: [
             "my organization paid it on some occasions, and i paid it myself on others.",
-            "my organization paid it", // Shorter fallback
         ],
     },
 ];
@@ -32,6 +32,8 @@ const capacityOptions = [
 const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
 
 const TrainingPrivateCapacity = () => {
+    const trainingPrivateCapacityQuestion =
+        columnDefinitions.find((c) => c.key === "trainingPrivateCapacity")?.header
     const barColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
@@ -98,10 +100,6 @@ const TrainingPrivateCapacity = () => {
             margin: { t: 60, r: 40, b: 60, l: 200 }, // Left margin for labels
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
-            title: {
-                text: "Training Funding Source (Participants Only)",
-                font: { family: "Inter, sans-serif", size: 18, color: titleColor },
-            },
             xaxis: {
                 title: {
                     text: "Number of Respondents",
@@ -111,6 +109,7 @@ const TrainingPrivateCapacity = () => {
             },
             yaxis: {
                 tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                automargin: true,
             },
         }),
         [titleColor, tickColor]
@@ -119,12 +118,20 @@ const TrainingPrivateCapacity = () => {
     const total = stats.reduce((a, b) => a + b.count, 0);
 
     return (
-        <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h3
+                className="text-lg"
+                style={{ color: titleColor }}
+            >
+                {trainingPrivateCapacityQuestion}
+            </h3>
+
             {total === 0 ? (
                 <div className="flex h-full items-center justify-center text-ink-700">
                     No data available
                 </div>
             ) : (
+                <div className="mt-4 h-[520px]">
                 <Plot
                     data={chartData}
                     layout={layout}
@@ -132,6 +139,7 @@ const TrainingPrivateCapacity = () => {
                     useResizeHandler
                     style={{ width: "100%", height: "100%" }}
                 />
+                </div>
             )}
         </div>
     );

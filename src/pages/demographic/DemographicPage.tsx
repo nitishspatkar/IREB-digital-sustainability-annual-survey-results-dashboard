@@ -41,9 +41,8 @@ const Demographic = () => {
         <h1 className="text-3xl font-semibold tracking-tight text-plum-500">
           Demographic
         </h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-600">
-          Snapshot of where respondents are located. Based on {totalRespondents}
-          responses across {totalCountries} countries from the {year} survey.
+        <p className="mt-2 text-sm text-slate-600">
+          Snapshot of where respondents are located. Based on {totalRespondents} responses across {totalCountries} countries from the {year} survey.
         </p>
       </header>
 

@@ -90,8 +90,7 @@ const DiscussionFrequency = () => {
 
     const layout = useMemo<Partial<Layout>>(
         () => ({
-            // --- ADJUSTED LAYOUT FOR HORIZONTAL ---
-            margin: { t: 50, r: 40, b: 60, l: 100 }, // Added left/right margin
+            margin: { t: 50, r: 40, b: 60, l: 240 }, // mehr Platz links
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
             title: {
@@ -102,7 +101,7 @@ const DiscussionFrequency = () => {
                     color: titleColor,
                 },
             },
-            xaxis: { // Now the bottom axis (value)
+            xaxis: {
                 title: {
                     text: "Number of Respondents",
                     font: {
@@ -117,17 +116,18 @@ const DiscussionFrequency = () => {
                     color: tickColor,
                 },
             },
-            yaxis: { // Now the left axis (category)
+            yaxis: {
                 tickfont: {
                     family: "Inter, sans-serif",
                     size: 12,
                     color: tickColor,
                 },
+                automargin: true, // wichtig
             },
-            // --- END ADJUSTMENTS ---
         }),
         [titleColor, tickColor]
     );
+
 
     return (
         <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">

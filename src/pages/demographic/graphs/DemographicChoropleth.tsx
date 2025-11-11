@@ -28,7 +28,14 @@ const DemographicChoropleth = ({
           (item) => `${item.country}: ${item.count} respondents`
         ),
         hovertemplate: "%{text}<extra></extra>",
-        colorscale: "YlGnBu",
+        colorscale: [
+            [0.0, "#0c2c84"],
+            [0.2, "#225ea8"],
+            [0.4, "#1d91c0"],
+            [0.6, "#41b6c4"],
+            [0.8, "#7fcdbb"],
+            [1.0, "#c7e9b4"],
+        ],
         marker: {
           line: {
             width: 0.5,
