@@ -4,6 +4,7 @@ import type { Data, Layout } from "plotly.js";
 
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
 
 interface Props {
     className?: string;
@@ -13,10 +14,15 @@ const normalizeApplicationDomain = (value: string) =>
     value.replace(/\s+/g, " ").trim();
 
 const DemographicApplicationDomain = ({ className }: Props) => {
+    const questionHeader =
+        columnDefinitions.find((c) => c.key === "primaryApplicationDomain")?.header
+    const questionHeaderOther =
+        columnDefinitions.find((c) => c.key === "primaryApplicationDomainOther")?.header
     const chartBarColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
     const surveyResponses = useSurveyData();
+    const borderColor = useThemeColor("--color-ink-200");
 
     const applicationDomainStats = useMemo(() => {
         const counts = new Map<string, number>();
@@ -25,14 +31,8 @@ const DemographicApplicationDomain = ({ className }: Props) => {
             const primaryDomain = normalizeApplicationDomain(
                 response.raw.primaryApplicationDomain ?? ""
             );
-            const otherDomain = normalizeApplicationDomain(
-                response.raw.primaryApplicationDomainOther ?? ""
-            );
 
-            const domain =
-                primaryDomain.toLowerCase() === "other" && otherDomain.length > 0
-                    ? otherDomain
-                    : primaryDomain;
+            const domain = primaryDomain;
 
             if (domain.length > 0 && domain.toLowerCase() !== "n/a") {
                 counts.set(domain, (counts.get(domain) ?? 0) + 1);
@@ -43,6 +43,12 @@ const DemographicApplicationDomain = ({ className }: Props) => {
             .map(([domain, count]) => ({ domain, count }))
             .sort((a, b) => b.count - a.count);
 
+    }, [surveyResponses]);
+
+    const otherApplicationDomainTexts = useMemo(() => {
+        return surveyResponses
+            .map((response) => normalizeApplicationDomain(response.raw.primaryApplicationDomainOther ?? ""))
+            .filter((value) => value.length > 0);
     }, [surveyResponses]);
 
     const chartData = useMemo<Data[]>(() => {
@@ -74,14 +80,6 @@ const DemographicApplicationDomain = ({ className }: Props) => {
             margin: { t: 40, r: 40, b: 40, l: 250 },
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
-            title: {
-                text: "Application Domain of Respondents",
-                font: {
-                    family: "Inter, sans-serif",
-                    size: 18,
-                    color: titleColor,
-                },
-            },
             xaxis: {
                 tickangle: 0,
                 tickfont: {
@@ -99,6 +97,7 @@ const DemographicApplicationDomain = ({ className }: Props) => {
                     color: tickColor,
                 },
                 showline: false,
+                automargin: true,
             },
             showlegend: false,
         }),
@@ -106,9 +105,15 @@ const DemographicApplicationDomain = ({ className }: Props) => {
     );
 
     return (
-        <div
-            className={`h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm ${className ?? ''}`}
-        >
+        <>
+        <div className={`w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm ${className ?? ''}`}>
+            <h3
+                className="text-lg text-center"
+                style={{ color: titleColor }}
+            >
+                {questionHeader}
+            </h3>
+            <div className="mt-4 h-[520px]">
             <Plot
                 data={chartData}
                 layout={layout}
@@ -116,7 +121,36 @@ const DemographicApplicationDomain = ({ className }: Props) => {
                 useResizeHandler
                 style={{ width: "100%", height: "100%" }}
             />
+            </div>
         </div>
+
+        {otherApplicationDomainTexts.length > 0 && (
+            <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h3
+                    className="text-lg text-center"
+                    style={{ color: titleColor }}
+                >
+                    {questionHeaderOther}
+                </h3>
+                <div className="mt-4 h-[520px]">
+                    <ul
+                        className="h-[calc(100%-40px)] overflow-y-auto"
+                        style={{ color: tickColor }}
+                    >
+                        {otherApplicationDomainTexts.map((text, index) => (
+                            <li
+                                key={index}
+                                className="border-b px-2 py-3 text-sm"
+                                style={{ borderColor: borderColor }}
+                            >
+                                {text}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        )}
+    </>
     );
 };
 

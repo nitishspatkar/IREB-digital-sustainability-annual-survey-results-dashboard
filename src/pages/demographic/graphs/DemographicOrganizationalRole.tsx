@@ -4,6 +4,7 @@ import type { Data, Layout } from "plotly.js";
 
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
 
 interface RoleStat {
     role: string;
@@ -13,6 +14,10 @@ interface RoleStat {
 const normalizeRole = (value: string) => value.replace(/\s+/g, " ").trim();
 
 const DemographicOrganizationalRole = () => {
+    const questionHeader =
+        columnDefinitions.find((c) => c.key === "role")?.header
+    const questionHeaderOther =
+        columnDefinitions.find((c) => c.key === "roleOther")?.header
     const chartBarColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
@@ -65,14 +70,6 @@ const DemographicOrganizationalRole = () => {
             margin: { t: 50, r: 40, b: 40, l: 200 },
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
-            title: {
-                text: "Current Role in Organization",
-                font: {
-                    family: "Inter, sans-serif",
-                    size: 18,
-                    color: titleColor,
-                },
-            },
             xaxis: {
                 tickfont: {
                     family: "Inter, sans-serif",
@@ -102,7 +99,14 @@ const DemographicOrganizationalRole = () => {
 
     return (
         <>
-            <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h3
+                    className="text-lg text-center"
+                    style={{ color: titleColor }}
+                >
+                    {questionHeader}
+                </h3>
+                <div className="mt-4 h-[520px]">
                 <Plot
                     data={chartData}
                     layout={layout}
@@ -110,16 +114,18 @@ const DemographicOrganizationalRole = () => {
                     useResizeHandler
                     style={{ width: "100%", height: "100%" }}
                 />
+                </div>
             </div>
 
             {otherRoleTexts.length > 0 && (
-                <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                     <h3
-                        className="mb-4 text-lg font-semibold"
+                        className="text-lg text-center"
                         style={{ color: titleColor }}
                     >
-                        Current Role in Organization («Other» responses)
+                        {questionHeaderOther}
                     </h3>
+                    <div className="mt-4 h-[520px]">
                     <ul
                         className="h-[calc(100%-40px)] overflow-y-auto"
                         style={{ color: tickColor }}
@@ -134,6 +140,7 @@ const DemographicOrganizationalRole = () => {
                             </li>
                         ))}
                     </ul>
+                    </div>
                 </div>
             )}
         </>

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
 import { useSurveyData } from "../../../data/SurveyContext";
 import type { AgeGroupStat } from "../demographicTypes";
 import useThemeColor from "../../../hooks/useThemeColor";
@@ -9,6 +10,8 @@ import useThemeColor from "../../../hooks/useThemeColor";
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, " ").trim();
 
 const DemographicAgeGroup = () => {
+    const questionHeader =
+        columnDefinitions.find((c) => c.key === "ageGroup")?.header
     const chartBarColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
@@ -69,14 +72,6 @@ const DemographicAgeGroup = () => {
             margin: { t: 50, r: 0, b: 60, l: 40 }, // Adjusted top/bottom margins
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
-            title: {
-                text: "Respondents by Age Group",
-                font: {
-                    family: "Inter, sans-serif",
-                    size: 18,
-                    color: titleColor,
-                },
-            },
             xaxis: {
                 // --- REMOVED tickangle: -45 ---
                 tickfont: {
@@ -106,7 +101,14 @@ const DemographicAgeGroup = () => {
     );
 
     return (
-        <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h3
+                className="text-lg text-center"
+                style={{ color: titleColor }}
+            >
+                {questionHeader}
+            </h3>
+            <div className="mt-4 h-[520px]">
             <Plot
                 data={chartData}
                 layout={layout}
@@ -114,6 +116,7 @@ const DemographicAgeGroup = () => {
                 useResizeHandler
                 style={{ width: "100%", height: "100%" }}
             />
+            </div>
         </div>
     );
 };

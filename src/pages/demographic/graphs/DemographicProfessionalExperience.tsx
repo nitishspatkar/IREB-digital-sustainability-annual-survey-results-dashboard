@@ -1,10 +1,13 @@
 import { useMemo } from "react";
 import Plot from "react-plotly.js";
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 import type { Data, Layout } from "plotly.js";
 
 export function DemographicProfessionalExperience() {
+    const questionHeader =
+        columnDefinitions.find((c) => c.key === "professionalExperienceYears")?.header
     const surveyResponses = useSurveyData();
     const chartBarColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
@@ -62,14 +65,6 @@ export function DemographicProfessionalExperience() {
             margin: { t: 50, r: 40, b: 60, l: 60 },
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
-            title: {
-                text: "How many years of professional experience do you have?",
-                font: {
-                    family: "Inter, sans-serif",
-                    size: 18,
-                    color: titleColor,
-                },
-            },
             xaxis: {
                 automargin: true,
                 title: {
@@ -107,7 +102,14 @@ export function DemographicProfessionalExperience() {
     );
 
     return (
-        <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h3
+                className="text-lg text-center"
+                style={{ color: titleColor }}
+            >
+                {questionHeader}
+            </h3>
+            <div className="mt-4 h-[520px]">
             <Plot
                 data={data}
                 layout={layout}
@@ -115,6 +117,7 @@ export function DemographicProfessionalExperience() {
                 useResizeHandler
                 config={{ displayModeBar: false, responsive: true }}
             />
+            </div>
         </div>
     );
 }
