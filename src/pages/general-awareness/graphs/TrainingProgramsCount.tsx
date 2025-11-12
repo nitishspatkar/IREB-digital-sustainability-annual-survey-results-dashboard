@@ -4,6 +4,7 @@ import type { Data, Layout } from "plotly.js";
 
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
+import {columnDefinitions} from "../../../data/SurveyColumnDefinitions.ts";
 
 type CountStat = {
     label: string;
@@ -61,6 +62,8 @@ function categorizeCount(
 }
 
 const TrainingProgramsCount = () => {
+    const questionHeader =
+        columnDefinitions.find((c) => c.key === "trainingCount")?.header
     const barColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
@@ -115,10 +118,6 @@ const TrainingProgramsCount = () => {
             margin: { t: 50, r: 0, b: 60, l: 48 }, // Changed b: 80 to b: 60
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
-            title: {
-                text: "How many trainings did you attend? (Participants Only)",
-                font: { family: "Inter, sans-serif", size: 18, color: titleColor },
-            },
             xaxis: {
                 type: "category",
                 title: {
@@ -142,12 +141,19 @@ const TrainingProgramsCount = () => {
     const total = stats.reduce((a, b) => a + b.count, 0);
 
     return (
-        <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h3
+                className="text-lg text-center"
+                style={{ color: titleColor }}
+            >
+                {questionHeader}
+            </h3>
             {total === 0 ? (
-                <div className="flex h-full items-center justify-center text-ink-700">
+                <div className="mt-4 h-[520px]">
                     No data available
                 </div>
             ) : (
+                <div className="mt-4 h-[520px]">
                 <Plot
                     data={chartData}
                     layout={layout}
@@ -155,6 +161,7 @@ const TrainingProgramsCount = () => {
                     useResizeHandler
                     style={{ width: "100%", height: "100%" }}
                 />
+                </div>
             )}
         </div>
     );

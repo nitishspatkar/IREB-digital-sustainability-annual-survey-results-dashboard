@@ -4,6 +4,7 @@ import type { Data, Layout } from "plotly.js";
 
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
+import {columnDefinitions} from "../../../data/SurveyColumnDefinitions.ts";
 
 type ReasonStat = {
     label: string;
@@ -42,9 +43,13 @@ const reasonsList: Omit<ReasonStat, "count">[] = [
 const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
 
 const TrainingReasonsNo = () => {
+    const questionHeader = "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?";
+    const questionHeaderOther =
+        columnDefinitions.find((c) => c.key === "trainingOtherReason")?.header
     const barColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
+    const borderColor = useThemeColor("--color-ink-200");
 
     const responses = useSurveyData();
 
@@ -90,6 +95,17 @@ const TrainingReasonsNo = () => {
             .sort((a, b) => a.count - b.count);
     }, [responses]);
 
+    const otherTrainingReasonsTexts = useMemo(() => {
+        return responses
+            .filter(
+                (r) =>
+                    normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "no"
+            )
+            .map((r) => normalize(r.raw.trainingOtherReason ?? ""))
+            .filter((value) => value.length > 0);
+    }, [responses]);
+
+
     const chartData = useMemo<Data[]>(() => {
         return [
             {
@@ -116,10 +132,6 @@ const TrainingReasonsNo = () => {
             margin: { t: 60, r: 40, b: 60, l: 300 },
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
-            title: {
-                text: "Reasons for Not Participating (Non-Participants Only)",
-                font: { family: "Inter, sans-serif", size: 18, color: titleColor },
-            },
             xaxis: {
                 title: {
                     text: "Number of Respondents",
@@ -137,12 +149,20 @@ const TrainingReasonsNo = () => {
     const total = stats.reduce((a, b) => a + b.count, 0);
 
     return (
-        <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <>
+        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h3
+                className="text-lg text-center"
+                style={{ color: titleColor }}
+            >
+                {questionHeader}
+            </h3>
             {total === 0 ? (
-                <div className="flex h-full items-center justify-center text-ink-700">
+                <div className="mt-4 h-[520px]">
                     No data available
                 </div>
             ) : (
+                <div className="mt-4 h-[520px]">
                 <Plot
                     data={chartData}
                     layout={layout}
@@ -150,8 +170,37 @@ const TrainingReasonsNo = () => {
                     useResizeHandler
                     style={{ width: "100%", height: "100%" }}
                 />
+                </div>
             )}
         </div>
+
+        {otherTrainingReasonsTexts.length > 0 && (
+            <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h3
+                    className="text-lg text-center"
+                    style={{ color: titleColor }}
+                >
+                    {questionHeaderOther}
+                </h3>
+                <div className="mt-4 h-[520px]">
+                    <ul
+                        className="h-[calc(100%-40px)] overflow-y-auto"
+                        style={{ color: tickColor }}
+                    >
+                        {otherTrainingReasonsTexts.map((text, index) => (
+                            <li
+                                key={index}
+                                className="border-b px-2 py-3 text-sm"
+                                style={{ borderColor: borderColor }}
+                            >
+                                {text}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        )}
+    </>
     );
 };
 

@@ -32,7 +32,7 @@ const capacityOptions = [
 const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
 
 const TrainingPrivateCapacity = () => {
-    const trainingPrivateCapacityQuestion =
+    const questionHeader =
         columnDefinitions.find((c) => c.key === "trainingPrivateCapacity")?.header
     const barColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
@@ -123,11 +123,11 @@ const TrainingPrivateCapacity = () => {
                 className="text-lg"
                 style={{ color: titleColor }}
             >
-                {trainingPrivateCapacityQuestion}
+                {questionHeader}
             </h3>
 
             {total === 0 ? (
-                <div className="flex h-full items-center justify-center text-ink-700">
+                <div className="mt-4 h-[520px]">
                     No data available
                 </div>
             ) : (

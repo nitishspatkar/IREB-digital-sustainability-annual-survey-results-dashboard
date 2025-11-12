@@ -4,6 +4,7 @@ import type { Data, Layout } from "plotly.js";
 
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
 
 type DiscussionFrequencyStat = {
     frequency: string;
@@ -13,9 +14,14 @@ type DiscussionFrequencyStat = {
 const normalizeFrequency = (value: string) => value.replace(/\s+/g, " ").trim();
 
 const DiscussionFrequency = () => {
+    const questionHeader =
+        columnDefinitions.find((c) => c.key === "participatedInTraining")?.header
+    const questionHeaderOther =
+        columnDefinitions.find((c) => c.key === "discussionFrequencyOther")?.header
     const chartBarColor = useThemeColor("--color-plum-400");
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
+    const borderColor = useThemeColor("--color-ink-200");
     const surveyResponses = useSurveyData();
 
     const frequencyStats = useMemo<DiscussionFrequencyStat[]>(() => {
@@ -27,8 +33,7 @@ const DiscussionFrequency = () => {
             );
             if (
                 frequency.length > 0 &&
-                frequency.toLowerCase() !== "n/a" &&
-                !frequency.toLowerCase().includes("other")
+                frequency.toLowerCase() !== "n/a"
             ) {
                 counts.set(frequency, (counts.get(frequency) ?? 0) + 1);
             }
@@ -36,46 +41,29 @@ const DiscussionFrequency = () => {
 
         return Array.from(counts.entries())
             .map(([frequency, count]) => ({ frequency, count }))
-            .sort((a, b) => b.count - a.count);
+            .sort((a, b) => a.count - b.count);
+    }, [surveyResponses]);
+
+    const otherFrequencyTexts = useMemo(() => {
+        return surveyResponses
+            .map((response) => normalizeFrequency(response.raw.discussionFrequencyOther ?? ""))
+            .filter((value) => value.length > 0);
     }, [surveyResponses]);
 
     const chartData = useMemo<Data[]>(() => {
-        const frequencyOrder = [
-            "Daily",
-            "Weekly",
-            "Monthly",
-            "Quarterly",
-            "Rarely",
-            "Never",
-        ];
-
-        const sortedStats = [...frequencyStats].sort((a, b) => {
-            const aIndex = frequencyOrder.indexOf(a.frequency);
-            const bIndex = frequencyOrder.indexOf(b.frequency);
-
-            // --- CHANGE TO SORT FOR HORIZONTAL BAR (TOP TO BOTTOM) ---
-            if (aIndex !== -1 && bIndex !== -1) {
-                return aIndex - bIndex; // Original sort is fine, y-axis plots bottom-up
-            }
-            // --- END CHANGE ---
-
-            if (aIndex !== -1) return -1;
-            if (bIndex !== -1) return 1;
-            return a.frequency.localeCompare(b.frequency);
-        });
 
         return [
             {
                 // --- CHANGES FOR HORIZONTAL BAR ---
                 type: "bar",
                 orientation: "h",
-                x: sortedStats.map((item) => item.count),
-                y: sortedStats.map((item) => item.frequency),
+                x: frequencyStats.map((item) => item.count),
+                y: frequencyStats.map((item) => item.frequency),
                 // --- END CHANGES ---
                 marker: {
                     color: chartBarColor,
                 },
-                text: sortedStats.map((item) => item.count.toString()),
+                text: frequencyStats.map((item) => item.count.toString()),
                 textposition: "outside",
                 textfont: {
                     family: "Inter, sans-serif",
@@ -93,14 +81,6 @@ const DiscussionFrequency = () => {
             margin: { t: 50, r: 40, b: 60, l: 240 }, // mehr Platz links
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
-            title: {
-                text: "Discussion Frequency in Professional Environment",
-                font: {
-                    family: "Inter, sans-serif",
-                    size: 18,
-                    color: titleColor,
-                },
-            },
             xaxis: {
                 title: {
                     text: "Number of Respondents",
@@ -130,7 +110,15 @@ const DiscussionFrequency = () => {
 
 
     return (
-        <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <>
+        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h3
+                className="text-lg text-center"
+                style={{ color: titleColor }}
+            >
+                {questionHeader}
+            </h3>
+            <div className="mt-4 h-[520px]">
             <Plot
                 data={chartData}
                 layout={layout}
@@ -138,7 +126,36 @@ const DiscussionFrequency = () => {
                 useResizeHandler
                 style={{ width: "100%", height: "100%" }}
             />
+            </div>
         </div>
+
+        {otherFrequencyTexts.length > 0 && (
+            <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <h3
+                    className="text-lg text-center"
+                    style={{ color: titleColor }}
+                >
+                    {questionHeaderOther}
+                </h3>
+                <div className="mt-4 h-[520px]">
+                    <ul
+                        className="h-[calc(100%-40px)] overflow-y-auto"
+                        style={{ color: tickColor }}
+                    >
+                        {otherFrequencyTexts.map((text, index) => (
+                            <li
+                                key={index}
+                                className="border-b px-2 py-3 text-sm"
+                                style={{ borderColor: borderColor }}
+                            >
+                                {text}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        )}
+        </>
     );
 };
 
