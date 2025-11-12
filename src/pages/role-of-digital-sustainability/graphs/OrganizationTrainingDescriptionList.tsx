@@ -1,10 +1,13 @@
 import { useMemo } from "react";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
+import {columnDefinitions} from "../../../data/SurveyColumnDefinitions.ts";
 
 const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
 
 const OrganizationTrainingDescriptionList = () => {
+    const questionHeader =
+        columnDefinitions.find((c) => c.key === "organizationTrainingDescription")?.header
     const titleColor = useThemeColor("--color-ink-900");
     const tickColor = useThemeColor("--color-ink-700");
     const borderColor = useThemeColor("--color-ink-200");
@@ -28,12 +31,12 @@ const OrganizationTrainingDescriptionList = () => {
     }, [responses]);
 
     return (
-        <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <h3
-                className="mb-4 text-lg font-semibold"
+                className="mb-4 text-lg text-center"
                 style={{ color: titleColor }}
             >
-                Org. Training Descriptions ({descriptions.length} responses)
+                {questionHeader} ({descriptions.length} responses)
             </h3>
             {descriptions.length === 0 ? (
                 <div
@@ -43,6 +46,7 @@ const OrganizationTrainingDescriptionList = () => {
                     No descriptions provided.
                 </div>
             ) : (
+                <div className="mt-4 h-[520px]">
                 <ul
                     className="h-[calc(100%-40px)] overflow-y-auto"
                     style={{ color: tickColor }}
@@ -57,6 +61,7 @@ const OrganizationTrainingDescriptionList = () => {
                         </li>
                     ))}
                 </ul>
+                </div>
             )}
         </div>
     );
