@@ -10,7 +10,6 @@ const TrainingDescriptionList = () => {
   const questionHeader = columnDefinitions.find(
     (c) => c.key === "trainingDescription"
   )?.header;
-  const titleColor = useThemeColor("--color-ink-900");
   const tickColor = useThemeColor("--color-ink-700");
   const borderColor = useThemeColor("--color-ink-200");
 
