@@ -24,7 +24,7 @@ function Sidebar({
       <button
         type="button"
         onClick={() => setIsSidebarOpen(true)}
-        className="fixed left-4 top-4 z-40 block rounded-md bg-lavender-100 p-2 text-plum-600 shadow-md ring-1 ring-plum-200/40 md:hidden"
+        className="fixed left-4 top-4 z-40 block rounded-md bg-ireb-superlight-berry p-2 text-ireb-berry shadow-md ring-1 ring-ireb-light-berry/40 md:hidden"
         aria-label="Menü öffnen"
       >
         <svg
@@ -59,7 +59,7 @@ function Sidebar({
         }}
         className={`
         fixed top-0 left-0 z-50 flex h-screen w-100 shrink-0 flex-col gap-6 overflow-y-auto 
-        rounded-r-3xl border-r border-plum-200/60 bg-lavender-100 px-8 py-8 shadow-card
+        rounded-r-3xl border-r border-ireb-light-berry/60 bg-white px-8 py-8 shadow-card
         transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         md:sticky md:translate-x-0
@@ -69,7 +69,7 @@ function Sidebar({
         <button
           type="button"
           onClick={() => setIsSidebarOpen(false)}
-          className="absolute right-4 top-4 z-50 block rounded-md p-2 text-plum-600 md:hidden"
+          className="absolute right-4 top-4 z-50 block rounded-md p-2 text-ireb-berry md:hidden"
           aria-label="Menü schließen"
         >
           <svg
@@ -94,13 +94,13 @@ function Sidebar({
           className="mb-4 mt-8 md:mt-0"
         />{" "}
         {/* Oben etwas Platz für den X-Button auf mobil */}
-        <div className="text-4xl md:text-4xl font-semibold tracking-tight text-plum-600">
+        <div className="text-4xl md:text-4xl font-semibold tracking-tight text-ireb-berry">
           Sustainability Survey
         </div>
         <div className="mt-4">
           <label
             htmlFor="year-select"
-            className="block text-sm font-medium text-ink-700"
+            className="block text-sm font-medium text-ireb-grey-01"
           >
             Select Year
           </label>
@@ -108,7 +108,7 @@ function Sidebar({
             id="year-select"
             value={activeYear}
             onChange={(e) => setActiveYear(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+            className="mt-1 block w-full rounded-md border-ireb-grey-04 py-2 pl-3 pr-10 text-base focus:border-ireb-berry focus:outline-none focus:ring-ireb-berry sm:text-sm"
           >
             {availableYears.map((year) => (
               <option key={year} value={year}>
@@ -118,7 +118,7 @@ function Sidebar({
           </select>
         </div>
         <nav className="mt-6">
-          <ul className="flex flex-col gap-2 text-sm font-medium text-ink-700">
+          <ul className="flex flex-col gap-2 text-sm font-medium text-ireb-grey-01">
             {navigationSections.map((section) => {
               const isActive = section.id === activeSectionId;
 
@@ -130,10 +130,10 @@ function Sidebar({
                       setActiveSectionId(section.id);
                       setIsSidebarOpen(false); // Menü bei Klick schließen (mobil)
                     }}
-                    className={`flex w-full items-center justify-between rounded-none border px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum-400/50 ${
+                    className={`flex w-full items-center justify-between rounded-none border px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 ${
                       isActive
-                        ? "bg-plum-600 text-white border-plum-600 shadow-card"
-                        : "bg-plum-200 text-plum-600 border-plum-600 hover:bg-plum-400 hover:text-plum-700"
+                        ? "bg-ireb-berry text-white border-ireb-berry shadow-card"
+                        : "bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
                     }`}
                   >
                     <span className="pr-2 leading-snug">{section.label}</span>
@@ -144,7 +144,7 @@ function Sidebar({
           </ul>
         </nav>
         {/* Footer contact block at the bottom */}
-        <div className="mt-auto pt-4 text-sm md:text-lg leading-tight text-ink-500 font-bold">
+        <div className="mt-auto pt-4 text-sm md:text-lg leading-tight text-ireb-berry font-bold">
           <div>IREB GmbH</div>
           <div>Mahlbergstrasse 25</div>
           <div>76189 Karlsruhe (Germany)</div>
