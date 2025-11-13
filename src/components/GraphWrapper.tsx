@@ -19,18 +19,18 @@ const GraphWrapper = ({
     <div className="space-y-4">
       {/* Stats boxes */}
       <div className="flex gap-4">
-        <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 shadow-sm">
-          <span className="text-sm text-slate-600">
+        <div className="border border-slate-200 bg-ireb-light-berry px-6 py-3 shadow-sm">
+          <span className="text-base text-ireb-berry">
             Number of responses:{" "}
-            <span className="font-semibold text-slate-900">
+            <span className="font-semibold text-ireb-berry">
               {numberOfResponses}
             </span>
           </span>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-white px-4 py-2 shadow-sm">
-          <span className="text-sm text-slate-600">
+        <div className="border border-slate-200 bg-ireb-light-berry px-6 py-3 shadow-sm">
+          <span className="text-base text-ireb-berry">
             Response rate:{" "}
-            <span className="font-semibold text-slate-900">
+            <span className="font-semibold text-ireb-berry">
               {responseRate}%
             </span>
           </span>
