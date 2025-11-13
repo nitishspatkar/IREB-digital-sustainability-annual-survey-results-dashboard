@@ -15,7 +15,7 @@ const GeneralAwareness = () => {
                 General Awareness of Sustainability
             </h1>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-18">
                 <DefinitionAwareness />
                 <DiscussionFrequency />
                 <TrainingParticipation />

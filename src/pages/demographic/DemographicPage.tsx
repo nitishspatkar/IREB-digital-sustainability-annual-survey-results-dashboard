@@ -47,10 +47,9 @@ const Demographic = () => {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 gap-6">
-        <DemographicCountryTable respondentStats={respondentStats}/>
-        <DemographicChoropleth respondentStats={respondentStats}
-/>
+      <div className="grid grid-cols-1 gap-18">
+        <DemographicCountryTable respondentStats={respondentStats} />
+        <DemographicChoropleth respondentStats={respondentStats} />
         <DemographicAgeGroup />
         <DemographicProfessionalExperience />
         <DemographicOrganizationalRole />

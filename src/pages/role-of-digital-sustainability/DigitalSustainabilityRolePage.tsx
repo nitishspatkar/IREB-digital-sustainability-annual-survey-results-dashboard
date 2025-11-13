@@ -11,27 +11,27 @@ import CustomerRequirementFrequency from "./graphs/CustomerRequirementFrequency"
 import CustomerNotRequestingReasons from "./graphs/CustomerNotRequestingReasons"; // <-- 1. Add this import
 
 const DigitalSustainabilityRole = () => {
-    return (
-        <div className="space-y-8">
-            <h1 className="text-3xl font-semibold tracking-tight text-plum-500">
-                The Role of Digital Sustainability in Your Organization
-            </h1>
+  return (
+    <div className="space-y-8">
+      <h1 className="text-3xl font-semibold tracking-tight text-plum-500">
+        The Role of Digital Sustainability in Your Organization
+      </h1>
 
-            <div className="grid grid-cols-1 gap-6">
-                <OrganizationHasGoals />
-                <OrganizationHasSustainabilityTeam />
-                <OrganizationIncorporatesPractices />
-                <OrganizationDepartmentCoordination />
-                <OrganizationReportsOnSustainability />
-                <SustainabilityDimensions />
-                <CustomerRequirementFrequency />
-                <CustomerNotRequestingReasons />
-                <OrganizationOffersTraining />
-                <OrganizationTrainingDescriptionList />
-                <NoTrainingReasons />
-            </div>
-        </div>
-    );
+      <div className="grid grid-cols-1 gap-18">
+        <OrganizationHasGoals />
+        <OrganizationHasSustainabilityTeam />
+        <OrganizationIncorporatesPractices />
+        <OrganizationDepartmentCoordination />
+        <OrganizationReportsOnSustainability />
+        <SustainabilityDimensions />
+        <CustomerRequirementFrequency />
+        <CustomerNotRequestingReasons />
+        <OrganizationOffersTraining />
+        <OrganizationTrainingDescriptionList />
+        <NoTrainingReasons />
+      </div>
+    </div>
+  );
 };
 
 export default DigitalSustainabilityRole;
