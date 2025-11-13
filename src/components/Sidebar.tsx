@@ -118,7 +118,7 @@ function Sidebar({
           </select>
         </div>
         <nav className="mt-6">
-          <ul className="flex flex-col gap-2 text-sm font-medium text-ireb-grey-01">
+          <ul className="flex flex-col gap-4 text-sm font-medium">
             {navigationSections.map((section) => {
               const isActive = section.id === activeSectionId;
 
@@ -130,7 +130,7 @@ function Sidebar({
                       setActiveSectionId(section.id);
                       setIsSidebarOpen(false); // Menü bei Klick schließen (mobil)
                     }}
-                    className={`flex w-full items-center justify-between rounded-none border px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 ${
+                    className={`flex w-full items-center justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 ${
                       isActive
                         ? "bg-ireb-berry text-white border-ireb-berry shadow-card"
                         : "bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
