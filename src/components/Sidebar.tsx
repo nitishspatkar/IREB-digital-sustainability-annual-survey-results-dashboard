@@ -53,8 +53,12 @@ function Sidebar({
       )}
 
       <aside
+        style={{
+          fontFamily:
+            '"GT Pressura Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+        }}
         className={`
-        fixed top-0 left-0 z-50 flex h-screen w-72 shrink-0 flex-col gap-6 overflow-y-auto 
+        fixed top-0 left-0 z-50 flex h-screen w-100 shrink-0 flex-col gap-6 overflow-y-auto 
         rounded-r-3xl border-r border-plum-200/60 bg-lavender-100 px-8 py-8 shadow-card
         transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
@@ -146,6 +150,14 @@ function Sidebar({
             })}
           </ul>
         </nav>
+        {/* Footer contact block at the bottom */}
+        <div className="mt-auto pt-4 text-xs leading-relaxed text-ink-700">
+          <div>IREB GmbH</div>
+          <div>Mahlbergstrasse 25</div>
+          <div>76189 Karlsruhe (Germany)</div>
+          <div>+49 (0) 721 98 23 45 90</div>
+          <div>info@ireb.org</div>
+        </div>
       </aside>
     </>
   );
