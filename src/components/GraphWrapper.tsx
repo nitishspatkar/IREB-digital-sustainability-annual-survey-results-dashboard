@@ -38,7 +38,7 @@ const GraphWrapper = ({
       </div>
 
       {/* Main content box */}
-      <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div className="border border-slate-200 bg-white shadow-sm overflow-hidden">
         <div className="grid grid-cols-4">
           {/* Left side - Text content (1/4) */}
           <div className="col-span-1 space-y-3 bg-ireb-berry p-6">
