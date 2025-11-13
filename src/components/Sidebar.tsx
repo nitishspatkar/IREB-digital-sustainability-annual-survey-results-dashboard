@@ -108,7 +108,7 @@ function Sidebar({
             id="year-select"
             value={activeYear}
             onChange={(e) => setActiveYear(e.target.value)}
-            className="mt-1 block w-full rounded-md border-ireb-grey-04 py-2 pl-3 pr-10 text-base focus:border-ireb-berry focus:outline-none focus:ring-ireb-berry sm:text-sm"
+            className="mt-1 block w-full rounded-md border-ireb-light-berry bg-ireb-superlight-berry py-2 pl-3 pr-10 text-base focus:border-ireb-berry focus:outline-none focus:ring-ireb-berry sm:text-sm"
           >
             {availableYears.map((year) => (
               <option key={year} value={year}>
