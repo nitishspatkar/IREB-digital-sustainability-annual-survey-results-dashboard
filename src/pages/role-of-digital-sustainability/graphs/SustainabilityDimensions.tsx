@@ -4,168 +4,177 @@ import type { Data, Layout } from "plotly.js";
 
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
-import {columnDefinitions} from "../../../data/SurveyColumnDefinitions.ts";
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions.ts";
+import GraphWrapper from "../../../components/GraphWrapper";
 
 const SustainabilityDimensions = () => {
-    const questionHeader = "Which dimensions of sustainability are actively considered in your organization's software development projects?";
-    const questionHeaderOther =
-        columnDefinitions.find((c) => c.key === "considerOther")?.header
-    const barColor = useThemeColor("--color-plum-400");
-    const titleColor = useThemeColor("--color-ink-900");
-    const tickColor = useThemeColor("--color-ink-700");
-    const borderColor = useThemeColor("--color-ink-200");
+  const questionHeader =
+    "Which dimensions of sustainability are actively considered in your organization's software development projects?";
+  const questionHeaderOther = columnDefinitions.find(
+    (c) => c.key === "considerOther"
+  )?.header;
+  const barColor = useThemeColor("--color-plum-400");
+  const tickColor = useThemeColor("--color-ink-700");
+  const borderColor = useThemeColor("--color-ink-200");
 
-    const surveyResponses = useSurveyData();
+  const surveyResponses = useSurveyData();
 
-    const counts = useMemo(() => {
-        const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
+  const counts = useMemo(() => {
+    const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
 
-        let environmental = 0;
-        let social = 0;
-        let individual = 0;
-        let economic = 0;
-        let technical = 0;
-        let other = 0;
-        // --- ADDED "NOT SURE" (from screenshot Q21g) ---
-        let notSure = 0;
+    let environmental = 0;
+    let social = 0;
+    let individual = 0;
+    let economic = 0;
+    let technical = 0;
+    let other = 0;
+    // --- ADDED "NOT SURE" (from screenshot Q21g) ---
+    let notSure = 0;
 
-        surveyResponses.forEach((response) => {
-            const raw = response.raw;
+    surveyResponses.forEach((response) => {
+      const raw = response.raw;
 
-            if (normalize(raw.considerEnvironmental) === "yes") environmental += 1;
-            if (normalize(raw.considerSocial) === "yes") social += 1;
-            if (normalize(raw.considerIndividual) === "yes") individual += 1;
-            if (normalize(raw.considerEconomic) === "yes") economic += 1;
-            if (normalize(raw.considerTechnical) === "yes") technical += 1;
+      if (normalize(raw.considerEnvironmental) === "yes") environmental += 1;
+      if (normalize(raw.considerSocial) === "yes") social += 1;
+      if (normalize(raw.considerIndividual) === "yes") individual += 1;
+      if (normalize(raw.considerEconomic) === "yes") economic += 1;
+      if (normalize(raw.considerTechnical) === "yes") technical += 1;
 
-            // Assuming Q21g "Not sure" key is `considerNotSure`
-            // You may need to verify this key
-            if (normalize(raw.considerNotSure) === "yes") notSure += 1;
+      // Assuming Q21g "Not sure" key is `considerNotSure`
+      // You may need to verify this key
+      if (normalize(raw.considerNotSure) === "yes") notSure += 1;
 
-            const otherVal = normalize(raw.considerOther);
-            if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
-        });
+      const otherVal = normalize(raw.considerOther);
+      if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
+    });
 
-        const items = [
-            { label: "Environmental", value: environmental },
-            { label: "Social", value: social },
-            { label: "Individual", value: individual },
-            { label: "Economic", value: economic },
-            { label: "Technical", value: technical },
-            { label: "Not sure", value: notSure },
-            { label: "Other", value: other },
-        ];
+    const items = [
+      { label: "Environmental", value: environmental },
+      { label: "Social", value: social },
+      { label: "Individual", value: individual },
+      { label: "Economic", value: economic },
+      { label: "Technical", value: technical },
+      { label: "Not sure", value: notSure },
+      { label: "Other", value: other },
+    ];
 
-        // Sort ascending by value
-        items.sort((a, b) => a.value - b.value);
+    // Sort ascending by value
+    items.sort((a, b) => a.value - b.value);
 
-        return {
-            labels: items.map(item => item.label),
-            values: items.map(item => item.value),
-        } as const;
-    }, [surveyResponses]);
+    return {
+      labels: items.map((item) => item.label),
+      values: items.map((item) => item.value),
+    } as const;
+  }, [surveyResponses]);
 
-    const otherNotConsiderTexts = useMemo(() => {
-        return surveyResponses
-            .map((r) => (r.raw.considerOther ?? "").trim())
-            .filter((value) => {
-                if (!value) return false;
-                const lower = value.toLowerCase();
-                return lower.length > 0 && lower !== "n/a";
-            });
-    }, [surveyResponses]);
+  const otherNotConsiderTexts = useMemo(() => {
+    return surveyResponses
+      .map((r) => (r.raw.considerOther ?? "").trim())
+      .filter((value) => {
+        if (!value) return false;
+        const lower = value.toLowerCase();
+        return lower.length > 0 && lower !== "n/a";
+      });
+  }, [surveyResponses]);
 
+  const data = useMemo<Data[]>(
+    () => [
+      {
+        // --- CONVERTED TO HORIZONTAL BAR ---
+        type: "bar",
+        orientation: "h",
+        x: counts.values,
+        y: counts.labels,
+        marker: { color: barColor },
+        // --- ADDED TEXT LABELS ---
+        text: counts.values.map((v) => v.toString()),
+        textposition: "outside",
+        textfont: {
+          family: "Inter, sans-serif",
+          size: 12,
+          color: tickColor,
+        },
+        cliponaxis: false,
+        hoverinfo: "none",
+      },
+    ],
+    [counts, barColor, tickColor] // Added tickColor
+  );
 
-    const data = useMemo<Data[]>(
-        () => [
-            {
-                // --- CONVERTED TO HORIZONTAL BAR ---
-                type: "bar",
-                orientation: "h",
-                x: counts.values,
-                y: counts.labels,
-                marker: { color: barColor },
-                // --- ADDED TEXT LABELS ---
-                text: counts.values.map(v => v.toString()),
-                textposition: "outside",
-                textfont: {
-                    family: "Inter, sans-serif",
-                    size: 12,
-                    color: tickColor,
-                },
-                cliponaxis: false,
-                hoverinfo: "none",
-            },
-        ],
-        [counts, barColor, tickColor] // Added tickColor
-    );
+  const layout = useMemo<Partial<Layout>>(
+    () => ({
+      margin: { t: 50, r: 40, b: 40, l: 120 }, // Adjusted margins
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "rgba(0,0,0,0)",
+      xaxis: {
+        // Now the value axis
+        title: {
+          text: "Number of Respondents",
+          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+        },
+        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+      },
+      yaxis: {
+        // Now the category axis
+        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+      },
+    }),
+    [tickColor]
+  );
 
-    const layout = useMemo<Partial<Layout>>(
-        () => ({
-            margin: { t: 50, r: 40, b: 40, l: 120 }, // Adjusted margins
-            paper_bgcolor: "rgba(0,0,0,0)",
-            plot_bgcolor: "rgba(0,0,0,0)",
-            xaxis: { // Now the value axis
-                title: {
-                    text: "Number of Respondents",
-                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
-                },
-                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-            },
-            yaxis: { // Now the category axis
-                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-            },
-        }),
-        [titleColor, tickColor]
-    );
+  const total = counts.values.reduce((a, b) => a + b, 0);
+  const responseRate =
+    surveyResponses.length > 0
+      ? Math.round((total / surveyResponses.length) * 100)
+      : 0;
 
-    return (
-        <>
-        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h3
-                className="text-lg text-center"
-                style={{ color: titleColor }}
-            >
-                {questionHeader}
-            </h3>
-            <div className="mt-4 h-[520px]">
-            <Plot
-                data={data}
-                layout={layout}
-                config={{ displayModeBar: false, responsive: true }}
-                useResizeHandler
-                style={{ width: "100%", height: "100%" }}
-            />
-            </div>
+  const question = questionHeader;
+  const description =
+    "Shows which dimensions of sustainability are actively considered in software development projects.";
+
+  return (
+    <>
+      <GraphWrapper
+        question={question}
+        description={description}
+        numberOfResponses={total}
+        responseRate={responseRate}
+      >
+        <div className="h-[520px]">
+          <Plot
+            data={data}
+            layout={layout}
+            config={{ displayModeBar: false, responsive: true }}
+            useResizeHandler
+            style={{ width: "100%", height: "100%" }}
+          />
         </div>
-        {otherNotConsiderTexts.length > 0 && (
-            <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <h3
-                    className="text-lg text-center"
-                    style={{ color: titleColor }}
+      </GraphWrapper>
+      {otherNotConsiderTexts.length > 0 && (
+        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <h3 className="text-lg text-center" style={{ color: tickColor }}>
+            {questionHeaderOther}
+          </h3>
+          <div className="mt-4 h-[520px]">
+            <ul
+              className="h-[calc(100%-40px)] overflow-y-auto"
+              style={{ color: tickColor }}
+            >
+              {otherNotConsiderTexts.map((text, index) => (
+                <li
+                  key={index}
+                  className="border-b px-2 py-3 text-sm"
+                  style={{ borderColor: borderColor }}
                 >
-                    {questionHeaderOther}
-                </h3>
-                <div className="mt-4 h-[520px]">
-                    <ul
-                        className="h-[calc(100%-40px)] overflow-y-auto"
-                        style={{ color: tickColor }}
-                    >
-                        {otherNotConsiderTexts.map((text, index) => (
-                            <li
-                                key={index}
-                                className="border-b px-2 py-3 text-sm"
-                                style={{ borderColor: borderColor }}
-                            >
-                                {text}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-        )}
+                  {text}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </>
-    );
+  );
 };
 
 export default SustainabilityDimensions;
