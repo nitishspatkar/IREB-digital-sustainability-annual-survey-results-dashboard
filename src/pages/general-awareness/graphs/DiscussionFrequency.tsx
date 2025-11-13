@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
+import GraphWrapper from "../../../components/GraphWrapper";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
@@ -109,25 +110,34 @@ const DiscussionFrequency = () => {
     );
 
 
+    const numberOfResponses = frequencyStats.reduce((sum, stat) => sum + stat.count, 0);
+    const totalResponses = surveyResponses.length;
+    const responseRate =
+        totalResponses > 0
+            ? Math.round((numberOfResponses / totalResponses) * 100)
+            : 0;
+
+    const question = questionHeader ?? "How often do you discuss digital sustainability in your professional environment?";
+    const description = "Shows the frequency of digital sustainability discussions among respondents.";
+
     return (
         <>
-        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h3
-                className="text-lg text-center"
-                style={{ color: titleColor }}
-            >
-                {questionHeader}
-            </h3>
-            <div className="mt-4 h-[520px]">
-            <Plot
-                data={chartData}
-                layout={layout}
-                config={{ displayModeBar: false, responsive: true }}
-                useResizeHandler
-                style={{ width: "100%", height: "100%" }}
-            />
+        <GraphWrapper
+            question={question}
+            description={description}
+            numberOfResponses={numberOfResponses}
+            responseRate={responseRate}
+        >
+            <div className="h-[520px]">
+                <Plot
+                    data={chartData}
+                    layout={layout}
+                    style={{ width: "100%", height: "100%" }}
+                    useResizeHandler
+                    config={{ displayModeBar: false, responsive: true }}
+                />
             </div>
-        </div>
+        </GraphWrapper>
 
         {otherFrequencyTexts.length > 0 && (
             <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
