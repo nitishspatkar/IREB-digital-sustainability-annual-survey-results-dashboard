@@ -53,11 +53,11 @@ const GraphWrapper = ({
 
       {/* Action buttons */}
       <div className="flex gap-4">
-        <button className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50">
-          Button 1
+        <button className="cursor-pointer border border-ireb-berry bg-ireb-berry px-4 py-2 text-base font-medium text-white shadow-sm transition-colors hover:brightness-75">
+          results
         </button>
-        <button className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50">
-          Button 2
+        <button className="cursor-pointer border border-ireb-berry bg-ireb-superlight-berry px-4 py-2 text-base font-medium text-ireb-berry shadow-sm transition-colors hover:brightness-75">
+          explore
         </button>
       </div>
     </div>
