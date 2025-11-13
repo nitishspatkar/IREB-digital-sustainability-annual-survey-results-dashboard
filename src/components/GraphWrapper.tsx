@@ -38,18 +38,16 @@ const GraphWrapper = ({
       </div>
 
       {/* Main content box */}
-      <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="grid grid-cols-3 gap-6">
-          {/* Left side - Text content (1/3) */}
-          <div className="col-span-1 space-y-3">
-            <h2 className="text-lg font-semibold text-plum-500">{question}</h2>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              {description}
-            </p>
+      <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="grid grid-cols-4">
+          {/* Left side - Text content (1/4) */}
+          <div className="col-span-1 space-y-3 bg-ireb-berry p-6">
+            <h2 className="text-3xl font-semibold text-white">{question}</h2>
+            <p className="text-sm text-white leading-relaxed">{description}</p>
           </div>
 
-          {/* Right side - Graph (2/3) */}
-          <div className="col-span-2">{children}</div>
+          {/* Right side - Graph (3/4) */}
+          <div className="col-span-3 p-6">{children}</div>
         </div>
       </div>
 
