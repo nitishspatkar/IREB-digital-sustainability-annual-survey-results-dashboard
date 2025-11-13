@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { useSurveyData } from "../../data/SurveyContext";
+import GraphWrapper from "../../components/GraphWrapper";
 import DemographicAgeGroup from "./graphs/DemographicAgeGroup";
 import DemographicApplicationDomain from "./graphs/DemographicApplicationDomain";
 import DemographicChoropleth from "./graphs/DemographicChoropleth";
@@ -42,14 +43,22 @@ const Demographic = () => {
           Demographic
         </h1>
         <p className="mt-2 text-sm text-slate-600">
-          Snapshot of where respondents are located. Based on {totalRespondents} responses across {totalCountries} countries from the {year} survey.
+          Snapshot of where respondents are located. Based on {totalRespondents}{" "}
+          responses across {totalCountries} countries from the {year} survey.
         </p>
       </header>
 
       <div className="grid grid-cols-1 gap-6">
         <DemographicCountryTable respondentStats={respondentStats} />
         <DemographicChoropleth respondentStats={respondentStats} />
-        <DemographicAgeGroup />
+        <GraphWrapper
+          question="What is your age group?"
+          description="This chart shows the distribution of survey respondents across different age groups. The data helps us understand the demographic composition of the survey participants and identify which age groups are most represented in the responses."
+          numberOfResponses={150}
+          responseRate={85}
+        >
+          <DemographicAgeGroup />
+        </GraphWrapper>
         <DemographicProfessionalExperience />
         <DemographicOrganizationalRole />
         <DemographicOrganizationType />
