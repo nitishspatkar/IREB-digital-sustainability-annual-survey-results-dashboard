@@ -94,7 +94,7 @@ function Sidebar({
           className="mb-4 mt-8 md:mt-0"
         />{" "}
         {/* Oben etwas Platz für den X-Button auf mobil */}
-        <div className="text-lg font-semibold tracking-tight text-plum-600">
+        <div className="text-4xl md:text-4xl font-semibold tracking-tight text-plum-600">
           Sustainability Survey
         </div>
         <div className="mt-4">
@@ -151,7 +151,7 @@ function Sidebar({
           </ul>
         </nav>
         {/* Footer contact block at the bottom */}
-        <div className="mt-auto pt-4 text-xs leading-relaxed text-ink-700">
+        <div className="mt-auto pt-4 text-sm md:text-lg leading-tight text-ink-500 font-bold">
           <div>IREB GmbH</div>
           <div>Mahlbergstrasse 25</div>
           <div>76189 Karlsruhe (Germany)</div>
