@@ -130,20 +130,13 @@ function Sidebar({
                       setActiveSectionId(section.id);
                       setIsSidebarOpen(false); // Menü bei Klick schließen (mobil)
                     }}
-                    className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum-400/50 ${
+                    className={`flex w-full items-center justify-between rounded-none border px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-plum-400/50 ${
                       isActive
-                        ? "bg-plum-500 text-white shadow-card"
-                        : "text-ink-700 hover:bg-plum-200/30 hover:text-plum-600"
+                        ? "bg-plum-600 text-white border-plum-600 shadow-card"
+                        : "bg-plum-200 text-plum-600 border-plum-600 hover:bg-plum-400 hover:text-plum-700"
                     }`}
                   >
                     <span className="pr-2 leading-snug">{section.label}</span>
-                    <span
-                      className={`text-xs ${
-                        isActive ? "text-white" : "text-plum-400"
-                      }`}
-                    >
-                      ›
-                    </span>
                   </button>
                 </li>
               );
