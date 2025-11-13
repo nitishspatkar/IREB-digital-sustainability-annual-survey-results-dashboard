@@ -2,8 +2,11 @@ import { useMemo } from "react";
 import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
-import type { RespondentStat } from "../demographicTypes";
+import GraphWrapper from "../../../components/GraphWrapper";
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
+import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
+import type { RespondentStat } from "../demographicTypes";
 
 type DemographicChoroplethProps = {
   respondentStats: RespondentStat[];
@@ -12,11 +15,11 @@ type DemographicChoroplethProps = {
 const DemographicChoropleth = ({
   respondentStats,
 }: DemographicChoroplethProps) => {
-  const titleColor = useThemeColor("--color-ink-900");
   const landColor = useThemeColor("--color-lavender-50");
   const coastlineColor = useThemeColor("--color-ink-900");
   const lakeColor = useThemeColor("--color-lavender-100");
   const markerLineColor = useThemeColor("--color-lavender-100");
+  const surveyResponses = useSurveyData();
   const choroplethData = useMemo<Data[]>(
     () => [
       {
@@ -29,12 +32,12 @@ const DemographicChoropleth = ({
         ),
         hovertemplate: "%{text}<extra></extra>",
         colorscale: [
-            [0.0, "#0c2c84"],
-            [0.2, "#225ea8"],
-            [0.4, "#1d91c0"],
-            [0.6, "#41b6c4"],
-            [0.8, "#7fcdbb"],
-            [1.0, "#c7e9b4"],
+          [0.0, "#0c2c84"],
+          [0.2, "#225ea8"],
+          [0.4, "#1d91c0"],
+          [0.6, "#41b6c4"],
+          [0.8, "#7fcdbb"],
+          [1.0, "#c7e9b4"],
         ],
         marker: {
           line: {
@@ -68,28 +71,43 @@ const DemographicChoropleth = ({
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
       margin: { t: 40, r: 0, l: 0, b: 0 },
-      title: {
-        text: "Respondents by Country",
-        font: {
-          family: "Inter, sans-serif",
-          size: 20,
-          color: titleColor,
-        },
-      },
     }),
-    [titleColor, landColor, coastlineColor, lakeColor]
+    [landColor, coastlineColor, lakeColor]
   );
 
+  const numberOfResponses = respondentStats.reduce(
+    (sum, stat) => sum + stat.count,
+    0
+  );
+  const totalResponses = surveyResponses.length;
+  const responseRate =
+    totalResponses > 0
+      ? Math.round((numberOfResponses / totalResponses) * 100)
+      : 0;
+
+  const question =
+    columnDefinitions.find((c) => c.key === "countryOfResidence")?.header ??
+    "What is your current country of residence?";
+  const description =
+    "Visualizes the geographic distribution of respondents using a world map.";
+
   return (
-    <div className="h-[520px] w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <Plot
-        data={choroplethData}
-        layout={layout}
-        config={{ displayModeBar: false, responsive: true }}
-        useResizeHandler
-        style={{ width: "100%", height: "100%" }}
-      />
-    </div>
+    <GraphWrapper
+      question={question}
+      description={description}
+      numberOfResponses={numberOfResponses}
+      responseRate={responseRate}
+    >
+      <div className="h-[520px]">
+        <Plot
+          data={choroplethData}
+          layout={layout}
+          config={{ displayModeBar: false, responsive: true }}
+          useResizeHandler
+          style={{ width: "100%", height: "100%" }}
+        />
+      </div>
+    </GraphWrapper>
   );
 };
 

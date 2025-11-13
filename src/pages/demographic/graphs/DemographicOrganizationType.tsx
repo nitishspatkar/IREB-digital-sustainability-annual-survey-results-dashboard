@@ -2,120 +2,135 @@ import { useMemo } from "react";
 import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
+import GraphWrapper from "../../../components/GraphWrapper";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
 
 interface OrganizationTypeStat {
-    organizationType: string;
-    count: number;
+  organizationType: string;
+  count: number;
 }
 
 const normalizeOrganizationType = (value: string) =>
-    value.replace(/\s+/g, " ").trim();
+  value.replace(/\s+/g, " ").trim();
 
 const DemographicOrganizationType = () => {
-    const questionHeader =
-        columnDefinitions.find((c) => c.key === "organizationType")?.header
-    const chartBarColor = useThemeColor("--color-plum-400");
-    const titleColor = useThemeColor("--color-ink-900");
-    const tickColor = useThemeColor("--color-ink-700");
-    const surveyResponses = useSurveyData();
+  const questionHeader = columnDefinitions.find(
+    (c) => c.key === "organizationType"
+  )?.header;
+  const chartBarColor = useThemeColor("--color-plum-400");
+  const tickColor = useThemeColor("--color-ink-700");
+  const surveyResponses = useSurveyData();
 
-    const organizationTypeStats = useMemo<OrganizationTypeStat[]>(() => {
-        const counts = new Map<string, number>();
+  const organizationTypeStats = useMemo<OrganizationTypeStat[]>(() => {
+    const counts = new Map<string, number>();
 
-        surveyResponses.forEach((response) => {
-            const orgType = normalizeOrganizationType(
-                response.raw.organizationType ?? ""
-            );
-            if (orgType.length > 0 && orgType.toLowerCase() !== "n/a") {
-                counts.set(orgType, (counts.get(orgType) ?? 0) + 1);
-            }
-        });
+    surveyResponses.forEach((response) => {
+      const orgType = normalizeOrganizationType(
+        response.raw.organizationType ?? ""
+      );
+      if (orgType.length > 0 && orgType.toLowerCase() !== "n/a") {
+        counts.set(orgType, (counts.get(orgType) ?? 0) + 1);
+      }
+    });
 
-        // Sort ascending by count so highest bar is at the top
-        return Array.from(counts.entries())
-            .map(([organizationType, count]) => ({ organizationType, count }))
-            .sort((a, b) => a.count - b.count);
-    }, [surveyResponses]);
+    // Sort ascending by count so highest bar is at the top
+    return Array.from(counts.entries())
+      .map(([organizationType, count]) => ({ organizationType, count }))
+      .sort((a, b) => a.count - b.count);
+  }, [surveyResponses]);
 
-    const chartData = useMemo<Data[]>(() => {
-        return [
-            {
-                x: organizationTypeStats.map((item) => item.count),
-                y: organizationTypeStats.map((item) => item.organizationType),
-                type: "bar",
-                orientation: "h",
-                marker: {
-                    color: chartBarColor,
-                },
-                // --- ADDED TEXT LABELS ---
-                text: organizationTypeStats.map((item) => item.count.toString()),
-                textposition: "outside",
-                textfont: {
-                    family: "Inter, sans-serif",
-                    size: 12,
-                    color: tickColor,
-                },
-                cliponaxis: false,
-                // --- END OF CHANGES ---
-                hoverinfo: "none",
-            },
-        ];
-    }, [organizationTypeStats, chartBarColor, tickColor]); // Added tickColor
+  const numberOfResponses = organizationTypeStats.reduce(
+    (sum, stat) => sum + stat.count,
+    0
+  );
+  const totalResponses = surveyResponses.length;
+  const responseRate =
+    totalResponses > 0
+      ? Math.round((numberOfResponses / totalResponses) * 100)
+      : 0;
 
-    const layout = useMemo<Partial<Layout>>(
-        () => ({
-            margin: { t: 50, r: 40, b: 40, l: 200 }, // Adjusted top/right margins
-            paper_bgcolor: "rgba(0,0,0,0)",
-            plot_bgcolor: "rgba(0,0,0,0)",
-            xaxis: {
-                tickfont: {
-                    family: "Inter, sans-serif",
-                    size: 12,
-                    color: tickColor,
-                },
-                title: {
-                    text: "Number of Respondents",
-                    font: {
-                        family: "Inter, sans-serif",
-                        size: 12,
-                        color: tickColor,
-                    },
-                },
-            },
-            yaxis: {
-                tickfont: {
-                    family: "Inter, sans-serif",
-                    size: 11,
-                    color: tickColor,
-                },
-                automargin: true,
-            },
-        }),
-        [titleColor, tickColor]
-    );
+  const chartData = useMemo<Data[]>(
+    () => [
+      {
+        x: organizationTypeStats.map((item) => item.count),
+        y: organizationTypeStats.map((item) => item.organizationType),
+        type: "bar",
+        orientation: "h",
+        marker: {
+          color: chartBarColor,
+        },
+        text: organizationTypeStats.map((item) => item.count.toString()),
+        textposition: "outside",
+        textfont: {
+          family: "Inter, sans-serif",
+          size: 12,
+          color: tickColor,
+        },
+        cliponaxis: false,
+        hoverinfo: "none",
+      },
+    ],
+    [organizationTypeStats, chartBarColor, tickColor]
+  );
 
-    return (
-        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-            <h3
-                className="text-lg text-center"
-                style={{ color: titleColor }}
-            >
-                {questionHeader}
-            </h3>
-            <div className="mt-4 h-[520px]">
-            <Plot
-                data={chartData}
-                layout={layout}
-                config={{ displayModeBar: false, responsive: true }}
-                useResizeHandler
-                style={{ width: "100%", height: "100%" }}
-            />
-            </div>
-        </div>
-    );
+  const layout = useMemo<Partial<Layout>>(
+    () => ({
+      margin: { t: 50, r: 40, b: 40, l: 200 }, // Adjusted top/right margins
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "rgba(0,0,0,0)",
+      xaxis: {
+        tickfont: {
+          family: "Inter, sans-serif",
+          size: 12,
+          color: tickColor,
+        },
+        title: {
+          text: "Number of Respondents",
+          font: {
+            family: "Inter, sans-serif",
+            size: 12,
+            color: tickColor,
+          },
+        },
+      },
+      yaxis: {
+        tickfont: {
+          family: "Inter, sans-serif",
+          size: 11,
+          color: tickColor,
+        },
+        automargin: true,
+      },
+    }),
+    [tickColor]
+  );
+
+  const question =
+    questionHeader ??
+    "Which of the following organizational types best describes your organization?";
+  const description =
+    "Visualizes how respondents classify their organizations across the provided types.";
+
+  return (
+    <GraphWrapper
+      question={question}
+      description={description}
+      numberOfResponses={numberOfResponses}
+      responseRate={responseRate}
+    >
+      <div className="h-[520px]">
+        <Plot
+          data={chartData}
+          layout={layout}
+          config={{ displayModeBar: false, responsive: true }}
+          useResizeHandler
+          style={{ width: "100%", height: "100%" }}
+        />
+      </div>
+    </GraphWrapper>
+  );
 };
 
 export default DemographicOrganizationType;
