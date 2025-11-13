@@ -59,7 +59,7 @@ function Sidebar({
         }}
         className={`
         fixed top-0 left-0 z-50 flex h-screen w-100 shrink-0 flex-col gap-6 overflow-y-auto 
-        rounded-r-3xl border-r border-ireb-light-berry/60 bg-white px-8 py-8 shadow-card
+        border-r border-ireb-light-berry/60 bg-white px-8 py-8 shadow-card
         transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         md:sticky md:translate-x-0
