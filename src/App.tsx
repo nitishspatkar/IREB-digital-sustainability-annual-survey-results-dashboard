@@ -34,10 +34,10 @@ function App() {
         activeYear={activeYear}
         setActiveYear={setActiveYear}
       />
-      <main className="flex flex-1 flex-col px-4 pb-12 pt-20 md:p-12">
+      <main className="flex flex-1 flex-col px-4 pb-12 pt-20 md:p-12 bg-ireb-superlight-berry">
         {" "}
         {/* Padding oben für mobil angepasst */}
-        <div className="w-full rounded-[var(--radius-card)] border border-plum-200/60 bg-lavender-100 px-10 py-12 shadow-card ring-1 ring-plum-200/40 backdrop-blur-sm">
+        <div className="w-full px-10 py-12">
           <SurveyProvider value={surveyData}>
             <ActiveSectionComponent />
           </SurveyProvider>
