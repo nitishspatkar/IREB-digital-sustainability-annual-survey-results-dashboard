@@ -1,17 +1,40 @@
 @import "tailwindcss";
 
 @theme {
-  --color-lavender-50: #ece2ec;
-  --color-lavender-100: #ffffff;
+  /* IREB color palette */
+  --color-ireb-berry: #831f82;
+  --color-ireb-light-berry: #c6a1cf;
+  --color-ireb-superlight-berry: #ece2ec;
 
-  --color-plum-200: #dba6db;
-  --color-plum-400: #a63ca4;
-  --color-plum-500: #831f82;
-  --color-plum-600: #6b166f;
+  --color-ireb-spring: #00bf6f;
+  --color-ireb-light-spring: #a2e4b8;
+  --color-ireb-superlight-spring: #eff8f3;
 
-  --color-ink-900: #2f0f2f;
-  --color-ink-700: #562456;
-  --color-ink-500: #7a3a7a;
+  --color-ireb-sky: #307fe2;
+  --color-ireb-light-sky: #92c1e9;
+  --color-ireb-superlight-sky: #e5f0f9;
+
+  --color-ireb-mandarin: #ff711c;
+  --color-ireb-light-mandarin: #faceb2;
+  --color-ireb-superlight-mandarin: #ffefe5;
+
+  --color-ireb-grey-01: #3c3c3b;
+  --color-ireb-grey-02: #878787;
+  --color-ireb-grey-03: #bdbcbc;
+  --color-ireb-grey-04: #e3e3e3;
+
+  /* DEPRECATED: legacy palette (do not remove yet) */
+  --color-lavender-50: #ece2ec; /* DEPRECATED */
+  --color-lavender-100: #ffffff; /* DEPRECATED */
+
+  --color-plum-200: #dba6db; /* DEPRECATED */
+  --color-plum-400: #a63ca4; /* DEPRECATED */
+  --color-plum-500: #831f82; /* DEPRECATED */
+  --color-plum-600: #6b166f; /* DEPRECATED */
+
+  --color-ink-900: #2f0f2f; /* DEPRECATED */
+  --color-ink-700: #562456; /* DEPRECATED */
+  --color-ink-500: #7a3a7a; /* DEPRECATED */
 
   --shadow-card: 0 18px 38px -18px rgba(131, 31, 130, 0.35);
   --radius-card: 1.25rem;
@@ -19,7 +42,7 @@
 
 @layer base {
   body {
-    @apply min-h-screen bg-lavender-50 text-ink-900 antialiased;
+    @apply min-h-screen bg-ireb-superlight-berry text-ireb-grey-01 antialiased;
     background-image: radial-gradient(
         at 20% 20%,
         rgba(131, 31, 130, 0.08) 0px,
