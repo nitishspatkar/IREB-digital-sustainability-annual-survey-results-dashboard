@@ -39,7 +39,7 @@ const GraphWrapper = ({
 
       {/* Main content box */}
       <div className="border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-1 xl:grid-cols-4">
           {/* Left side - Text content (1/4) */}
           <div className="col-span-1 space-y-3 bg-ireb-berry p-6">
             <h2 className="text-3xl font-semibold text-white">{question}</h2>
@@ -47,7 +47,7 @@ const GraphWrapper = ({
           </div>
 
           {/* Right side - Graph (3/4) */}
-          <div className="col-span-3 p-6">{children}</div>
+          <div className="col-span-1 xl:col-span-3 p-6">{children}</div>
         </div>
       </div>
 
