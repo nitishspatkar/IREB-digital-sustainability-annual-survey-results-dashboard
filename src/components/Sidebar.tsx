@@ -118,7 +118,7 @@ function Sidebar({
           </select>
         </div>
         <nav className="mt-6">
-          <ul className="flex flex-col gap-4 text-sm font-medium">
+          <ul className="flex flex-col gap-4 text-base font-semibold">
             {navigationSections.map((section) => {
               const isActive = section.id === activeSectionId;
 
@@ -144,7 +144,7 @@ function Sidebar({
           </ul>
         </nav>
         {/* Footer contact block at the bottom */}
-        <div className="mt-auto pt-4 text-sm md:text-lg leading-tight text-ireb-berry font-bold">
+        <div className="mt-auto pt-4 text-sm md:text-lg leading-tight text-ireb-berry font-semibold">
           <div>IREB GmbH</div>
           <div>Mahlbergstrasse 25</div>
           <div>76189 Karlsruhe (Germany)</div>
