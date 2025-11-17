@@ -25,6 +25,7 @@ const OrganizationDepartmentCoordination = () => {
     counts.set("Not sure", 0);
 
     // --- Precondition: Q17 = Yes ---
+    /*
     const filteredResponses = responses.filter(
       (r) =>
         normalize(
@@ -32,7 +33,9 @@ const OrganizationDepartmentCoordination = () => {
         ).toLowerCase() === "yes"
     );
 
-    filteredResponses.forEach((r) => {
+     */
+
+      responses.forEach((r) => {
       // Key for Q20
       const raw = normalize(r.raw.organizationDepartmentCoordination ?? "");
       const lower = raw.toLowerCase();
