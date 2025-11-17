@@ -31,22 +31,47 @@ const SustainabilityDimensions = () => {
     // --- ADDED "NOT SURE" (from screenshot Q21g) ---
     let notSure = 0;
 
-    surveyResponses.forEach((response) => {
-      const raw = response.raw;
+    let respondentsWithAnyAnswer = 0;
 
-      if (normalize(raw.considerEnvironmental) === "yes") environmental += 1;
-      if (normalize(raw.considerSocial) === "yes") social += 1;
-      if (normalize(raw.considerIndividual) === "yes") individual += 1;
-      if (normalize(raw.considerEconomic) === "yes") economic += 1;
-      if (normalize(raw.considerTechnical) === "yes") technical += 1;
+      surveyResponses.forEach((response) => {
+          const raw = response.raw;
+          let hasAny = false;
 
-      // Assuming Q21g "Not sure" key is `considerNotSure`
-      // You may need to verify this key
-      if (normalize(raw.considerNotSure) === "yes") notSure += 1;
+          if (normalize(raw.considerEnvironmental) === "yes") {
+              environmental += 1;
+              hasAny = true;
+          }
+          if (normalize(raw.considerSocial) === "yes") {
+              social += 1;
+              hasAny = true;
+          }
+          if (normalize(raw.considerIndividual) === "yes") {
+              individual += 1;
+              hasAny = true;
+          }
+          if (normalize(raw.considerEconomic) === "yes") {
+              economic += 1;
+              hasAny = true;
+          }
+          if (normalize(raw.considerTechnical) === "yes") {
+              technical += 1;
+              hasAny = true;
+          }
+          if (normalize(raw.considerNotSure) === "yes") {
+              notSure += 1;
+              hasAny = true;
+          }
 
-      const otherVal = normalize(raw.considerOther);
-      if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
-    });
+          const otherVal = normalize(raw.considerOther);
+          if (otherVal.length > 0 && otherVal !== "n/a") {
+              other += 1;
+              hasAny = true;
+          }
+
+          if (hasAny) {
+              respondentsWithAnyAnswer += 1;
+          }
+      });
 
     const items = [
       { label: "Environmental", value: environmental },
@@ -64,6 +89,7 @@ const SustainabilityDimensions = () => {
     return {
       labels: items.map((item) => item.label),
       values: items.map((item) => item.value),
+      respondentsWithAnyAnswer,
     } as const;
   }, [surveyResponses]);
 
@@ -122,11 +148,15 @@ const SustainabilityDimensions = () => {
     [tickColor]
   );
 
-  const total = counts.values.reduce((a, b) => a + b, 0);
-  const responseRate =
-    surveyResponses.length > 0
-      ? Math.round((total / surveyResponses.length) * 100)
-      : 0;
+    const numberOfRespondents = counts.respondentsWithAnyAnswer;
+
+    const responseRate =
+        surveyResponses.length > 0
+            ? (numberOfRespondents / surveyResponses.length) * 100
+            : 0;
+
+    console.log(numberOfRespondents);
+    console.log(surveyResponses.length);
 
   const question = questionHeader;
   const description =
@@ -137,7 +167,7 @@ const SustainabilityDimensions = () => {
       <GraphWrapper
         question={question}
         description={description}
-        numberOfResponses={total}
+        numberOfResponses={numberOfRespondents}
         responseRate={responseRate}
       >
         <div className="h-[520px]">
