@@ -4,7 +4,7 @@ import GeneralAwareness from "../pages/general-awareness/GeneralAwarenessPage";
 import SustainabilityTasks from "../pages/sustainability-in-job-and-tasks/SustainabilityTasksPage";
 
 export const navigationSections = [
-  { id: "demographic", label: "Demographic", component: Demographic },
+  { id: "demographic", label: "Demographics", component: Demographic },
   {
     id: "general-awareness",
     label: "General Awareness of Sustainability",

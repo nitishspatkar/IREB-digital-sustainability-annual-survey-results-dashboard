@@ -54,7 +54,7 @@ const DemographicOrganizationalRole = () => {
   const totalResponses = surveyResponses.length;
   const responseRate =
     totalResponses > 0
-      ? Math.round((numberOfResponses / totalResponses) * 100)
+      ? (numberOfResponses / totalResponses) * 100
       : 0;
 
   const chartData = useMemo<Data[]>(
@@ -117,11 +117,6 @@ const DemographicOrganizationalRole = () => {
   const description =
     "Shows how respondents distribute across the provided organizational role options.";
 
-  const otherResponses = otherRoleTexts.length;
-  const otherResponseRate =
-    totalResponses > 0
-      ? Math.round((otherResponses / totalResponses) * 100)
-      : 0;
   const otherQuestion =
     questionHeaderOther ??
     "Which of the following best describes your current role in the organization? [Other]";
@@ -151,8 +146,6 @@ const DemographicOrganizationalRole = () => {
         <GraphWrapper
           question={otherQuestion}
           description={otherDescription}
-          numberOfResponses={otherResponses}
-          responseRate={otherResponseRate}
         >
           <div className="h-[520px] overflow-y-auto">
             <ul style={{ color: tickColor }}>

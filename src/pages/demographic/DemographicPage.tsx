@@ -39,7 +39,7 @@ const Demographic = () => {
     <div className="space-y-6">
       <header>
         <h1 className="text-3xl font-semibold tracking-tight text-plum-500">
-          Demographic
+          Demographics
         </h1>
         <p className="mt-2 text-sm text-slate-600">
           Snapshot of where respondents are located. Based on {totalRespondents}{" "}

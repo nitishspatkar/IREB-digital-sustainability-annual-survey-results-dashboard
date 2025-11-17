@@ -63,7 +63,7 @@ const DemographicApplicationDomain = ({ className }: Props) => {
   const totalResponses = surveyResponses.length;
   const responseRate =
     totalResponses > 0
-      ? Math.round((numberOfResponses / totalResponses) * 100)
+      ? (numberOfResponses / totalResponses) * 100
       : 0;
 
   const chartData = useMemo<Data[]>(
@@ -127,11 +127,6 @@ const DemographicApplicationDomain = ({ className }: Props) => {
     "In which application domain do you currently primarily work? [Other]";
   const otherDescription =
     "Lists the free-text application domains supplied under the Other option.";
-  const otherResponses = otherApplicationDomainTexts.length;
-  const otherResponseRate =
-    totalResponses > 0
-      ? Math.round((otherResponses / totalResponses) * 100)
-      : 0;
 
   const chartContent = (
     <GraphWrapper
@@ -164,8 +159,6 @@ const DemographicApplicationDomain = ({ className }: Props) => {
         <GraphWrapper
           question={otherQuestion}
           description={otherDescription}
-          numberOfResponses={otherResponses}
-          responseRate={otherResponseRate}
         >
           <div className="h-[520px] overflow-y-auto">
             <ul style={{ color: tickColor }}>

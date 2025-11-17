@@ -42,7 +42,7 @@ const DemographicAgeGroup = () => {
   );
   const responseRate =
     surveyResponses.length > 0
-      ? Math.round((numberOfResponses / surveyResponses.length) * 100)
+      ? (numberOfResponses / surveyResponses.length) * 100
       : 0;
 
   const chartData = useMemo<Data[]>(() => {

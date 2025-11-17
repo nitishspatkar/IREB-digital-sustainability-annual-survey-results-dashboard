@@ -50,7 +50,7 @@ export function DemographicProfessionalExperience() {
   const totalResponses = surveyResponses.length;
   const responseRate =
     totalResponses > 0
-      ? Math.round((numberOfResponses / totalResponses) * 100)
+      ? (numberOfResponses / totalResponses) * 100
       : 0;
 
   const data: Data[] = useMemo(

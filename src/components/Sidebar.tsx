@@ -94,7 +94,7 @@ function Sidebar({
           className="mb-4 mt-8 md:mt-0"
         />{" "}
         {/* Oben etwas Platz für den X-Button auf mobil */}
-        <div className="text-4xl md:text-4xl font-semibold tracking-tight text-ireb-berry">
+        <div className="text-4xl md:text-4xl tracking-tight text-ireb-berry">
           Sustainability Survey
         </div>
         <div className="mt-4">
