@@ -37,7 +37,7 @@ function App() {
       <main className="flex flex-1 flex-col px-4 pb-12 pt-20 md:p-12 bg-ireb-superlight-berry">
         {" "}
         {/* Padding oben für mobil angepasst */}
-        <div className="w-full px-10 py-12">
+        <div className="w-full py-12">
           <SurveyProvider value={surveyData}>
             <ActiveSectionComponent />
           </SurveyProvider>
