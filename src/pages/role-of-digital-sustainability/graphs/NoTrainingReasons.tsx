@@ -150,10 +150,9 @@ const NoTrainingReasons = () => {
         </div>
       </GraphWrapper>
       {orgNoTrainingOtherTexts.length > 0 && (
-        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <h3 className="text-lg text-center" style={{ color: tickColor }}>
-            {questionHeaderOther}
-          </h3>
+          <GraphWrapper
+              question={questionHeaderOther ?? ""}
+          >
           <div className="mt-4 h-[520px]">
             <ul
               className="h-[calc(100%-40px)] overflow-y-auto"
@@ -170,7 +169,7 @@ const NoTrainingReasons = () => {
               ))}
             </ul>
           </div>
-        </div>
+        </GraphWrapper>
       )}
     </>
   );
