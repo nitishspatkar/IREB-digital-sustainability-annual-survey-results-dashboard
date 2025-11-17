@@ -114,7 +114,7 @@ const DiscussionFrequency = () => {
     const totalResponses = surveyResponses.length;
     const responseRate =
         totalResponses > 0
-            ? Math.round((numberOfResponses / totalResponses) * 100)
+            ? (numberOfResponses / totalResponses) * 100
             : 0;
 
     const question = questionHeader ?? "How often do you discuss digital sustainability in your professional environment?";
@@ -140,30 +140,26 @@ const DiscussionFrequency = () => {
         </GraphWrapper>
 
         {otherFrequencyTexts.length > 0 && (
-            <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <h3
-                    className="text-lg text-center"
-                    style={{ color: titleColor }}
+            <GraphWrapper
+                question={questionHeaderOther ?? ""}
+            >
+            <div className="mt-4 h-[520px]">
+                <ul
+                    className="h-[calc(100%-40px)] overflow-y-auto"
+                    style={{ color: tickColor }}
                 >
-                    {questionHeaderOther}
-                </h3>
-                <div className="mt-4 h-[520px]">
-                    <ul
-                        className="h-[calc(100%-40px)] overflow-y-auto"
-                        style={{ color: tickColor }}
-                    >
-                        {otherFrequencyTexts.map((text, index) => (
-                            <li
-                                key={index}
-                                className="border-b px-2 py-3 text-sm"
-                                style={{ borderColor: borderColor }}
-                            >
-                                {text}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                    {otherFrequencyTexts.map((text, index) => (
+                        <li
+                            key={index}
+                            className="border-b px-2 py-3 text-sm"
+                            style={{ borderColor: borderColor }}
+                        >
+                            {text}
+                        </li>
+                    ))}
+                </ul>
             </div>
+            </GraphWrapper>
         )}
         </>
     );

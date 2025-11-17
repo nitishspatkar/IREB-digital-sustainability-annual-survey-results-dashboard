@@ -37,7 +37,7 @@ const TrainingDescriptionList = () => {
   const totalResponses = responses.length;
   const responseRate =
     totalResponses > 0
-      ? Math.round((participants.length / totalResponses) * 100)
+      ? (participants.length / totalResponses) * 100
       : 0;
 
   const question =

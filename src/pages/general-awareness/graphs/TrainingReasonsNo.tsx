@@ -155,7 +155,7 @@ const TrainingReasonsNo = () => {
   const totalResponses = responses.length;
   const responseRate =
     totalResponses > 0
-      ? Math.round((numberOfResponses / totalResponses) * 100)
+      ? (numberOfResponses / totalResponses) * 100
       : 0;
 
   const question = questionHeader;
@@ -182,10 +182,9 @@ const TrainingReasonsNo = () => {
       </GraphWrapper>
 
       {otherTrainingReasonsTexts.length > 0 && (
-        <div className="w-full rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <h3 className="text-lg text-center" style={{ color: titleColor }}>
-            {questionHeaderOther}
-          </h3>
+        <GraphWrapper
+            question={questionHeaderOther ?? ""}
+        >
           <div className="mt-4 h-[520px]">
             <ul
               className="h-[calc(100%-40px)] overflow-y-auto"
@@ -202,7 +201,7 @@ const TrainingReasonsNo = () => {
               ))}
             </ul>
           </div>
-        </div>
+        </GraphWrapper>
       )}
     </>
   );
