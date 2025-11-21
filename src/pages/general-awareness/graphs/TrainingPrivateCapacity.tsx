@@ -118,10 +118,9 @@ const TrainingPrivateCapacity = () => {
     [titleColor, tickColor]
   );
 
-  const participants = responses.filter(
-    (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
-  );
-  const numberOfResponses = participants.length;
+  const numberOfResponses = useMemo(() => {
+      return stats.reduce((sum, item) => sum + item.count, 0);
+  }, [stats]);
   const totalResponses = responses.length;
   const responseRate =
     totalResponses > 0

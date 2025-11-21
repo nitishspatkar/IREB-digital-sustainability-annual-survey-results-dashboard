@@ -158,6 +158,17 @@ const TrainingReasonsNo = () => {
       ? (numberOfResponses / totalResponses) * 100
       : 0;
 
+
+  const numberOfResponsesOther = otherTrainingReasonsTexts.length;
+  const numberOfResponsesOtherAll = useMemo(() => {
+        const otherStat = stats.find((s) => s.key === "trainingOtherReason");
+        return otherStat ? otherStat.count : 0;
+  }, [stats]);
+  const otherResponseRate =
+        numberOfResponsesOtherAll > 0
+            ? (numberOfResponsesOther / numberOfResponsesOtherAll) * 100
+            : 0;
+
   const question = questionHeader;
   const description =
     "Reasons why respondents haven't participated in digital sustainability training.";
@@ -184,6 +195,8 @@ const TrainingReasonsNo = () => {
       {otherTrainingReasonsTexts.length > 0 && (
         <GraphWrapper
             question={questionHeaderOther ?? ""}
+            numberOfResponses={numberOfResponsesOtherAll}
+            responseRate={otherResponseRate}
         >
           <div className="mt-4 h-[520px]">
             <ul

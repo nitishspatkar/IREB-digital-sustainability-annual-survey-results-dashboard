@@ -117,6 +117,20 @@ const DiscussionFrequency = () => {
             ? (numberOfResponses / totalResponses) * 100
             : 0;
 
+
+    const numberOfResponsesOther = otherFrequencyTexts.length;
+    const numberOfResponsesOtherAll = useMemo(() => {
+        const otherStat = frequencyStats.find((s) =>
+            s.frequency.toLowerCase().includes("other")
+        );
+        return otherStat ? otherStat.count : 0;
+    }, [frequencyStats]);
+
+    const otherResponseRate =
+        numberOfResponsesOtherAll > 0
+            ? (numberOfResponsesOther / numberOfResponsesOtherAll) * 100
+            : 0;
+
     const question = questionHeader ?? "How often do you discuss digital sustainability in your professional environment?";
     const description = "Shows the frequency of digital sustainability discussions among respondents.";
 
@@ -142,6 +156,8 @@ const DiscussionFrequency = () => {
         {otherFrequencyTexts.length > 0 && (
             <GraphWrapper
                 question={questionHeaderOther ?? ""}
+                numberOfResponses={numberOfResponsesOtherAll}
+                responseRate={otherResponseRate}
             >
             <div className="mt-4 h-[520px]">
                 <ul

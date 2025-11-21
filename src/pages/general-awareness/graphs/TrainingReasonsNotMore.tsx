@@ -139,8 +139,26 @@ const TrainingReasonsNotMore = () => {
     [titleColor, tickColor]
   );
 
-  const numberOfResponses = responses.length;
-  const responseRate = 100;
+  const participants = responses.filter(
+        (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
+    );
+  const numberOfResponses = participants.length;
+  const totalResponses = responses.length;
+  const responseRate =
+        totalResponses > 0
+            ? (numberOfResponses / totalResponses) * 100
+            : 0;
+
+
+  const numberOfResponsesOther = otherTrainingReasonsTexts.length;
+  const numberOfResponsesOtherAll = useMemo(() => {
+    const otherStat = stats.find((s) => s.key === "notMoreTrainingOther");
+    return otherStat ? otherStat.count : 0;
+  }, [stats]);
+  const otherResponseRate =
+        numberOfResponsesOtherAll > 0
+            ? (numberOfResponsesOther / numberOfResponsesOtherAll) * 100
+            : 0;
 
   const question = questionHeader;
   const description =
@@ -167,6 +185,8 @@ const TrainingReasonsNotMore = () => {
       {otherTrainingReasonsTexts.length > 0 && (
         <GraphWrapper
             question={questionHeaderOther ?? ""}
+            numberOfResponses={numberOfResponsesOtherAll}
+            responseRate={otherResponseRate}
         >
           <div className="mt-4 h-[520px]">
             <ul
