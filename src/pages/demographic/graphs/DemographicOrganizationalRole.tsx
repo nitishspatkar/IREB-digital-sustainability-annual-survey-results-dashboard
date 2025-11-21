@@ -57,6 +57,20 @@ const DemographicOrganizationalRole = () => {
       ? (numberOfResponses / totalResponses) * 100
       : 0;
 
+
+  const numberOfResponsesOther = otherRoleTexts.length;
+
+  const numberOfResponsesOtherAll = useMemo(() => {
+    const otherStat = roleStats.find(s => s.role.toLowerCase().includes("other"));
+    return otherStat ? otherStat.count : 0;
+  }, [roleStats]);
+
+  const otherResponseRate =
+    totalResponses > 0
+        ? (numberOfResponsesOther / numberOfResponsesOtherAll) * 100
+        : 0;
+
+
   const chartData = useMemo<Data[]>(
     () => [
       {
@@ -146,6 +160,8 @@ const DemographicOrganizationalRole = () => {
         <GraphWrapper
           question={otherQuestion}
           description={otherDescription}
+          numberOfResponses={numberOfResponsesOther}
+          responseRate={otherResponseRate}
         >
           <div className="h-[520px] overflow-y-auto">
             <ul style={{ color: tickColor }}>
