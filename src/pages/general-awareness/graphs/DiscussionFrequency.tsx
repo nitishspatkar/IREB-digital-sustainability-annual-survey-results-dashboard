@@ -16,7 +16,7 @@ const normalizeFrequency = (value: string) => value.replace(/\s+/g, " ").trim();
 
 const DiscussionFrequency = () => {
     const questionHeader =
-        columnDefinitions.find((c) => c.key === "participatedInTraining")?.header
+        columnDefinitions.find((c) => c.key === "discussionFrequency")?.header
     const questionHeaderOther =
         columnDefinitions.find((c) => c.key === "discussionFrequencyOther")?.header
     const chartBarColor = useThemeColor("--color-plum-400");

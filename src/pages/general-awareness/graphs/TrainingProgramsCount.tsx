@@ -151,7 +151,7 @@ const TrainingProgramsCount = () => {
       : 0;
 
   const question =
-    questionHeader ?? "How many training programs have you attended?";
+    questionHeader?.replace("times", "") ?? "How many training programs have you attended?";
   const description =
     "Distribution of the number of training programs attended by respondents.";
 
