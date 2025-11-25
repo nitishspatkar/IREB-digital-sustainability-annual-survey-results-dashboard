@@ -31,20 +31,52 @@ const AdditionalSupportResources = () => {
     let tools = 0;
     let none = 0;
     let other = 0;
+    let numberOfRespondents = 0;
 
     responses.forEach((r) => {
       const raw = r.raw;
-      if (norm(raw.supportNeedTheoretical) === "yes") theoretical += 1;
-      if (norm(raw.supportNeedTutorials) === "yes") tutorials += 1;
-      if (norm(raw.supportNeedCurricula) === "yes") curricula += 1;
-      if (norm(raw.supportNeedPractical) === "yes") practical += 1;
-      if (norm(raw.supportNeedCaseStudies) === "yes") caseStudies += 1;
-      if (norm(raw.supportNeedStructures) === "yes") structures += 1;
-      if (norm(raw.supportNeedTools) === "yes") tools += 1;
-      if (norm(raw.supportNeedNone) === "yes") none += 1;
+      let hasAnswer = false;
+
+      if (norm(raw.supportNeedTheoretical) === "yes") {
+        theoretical += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.supportNeedTutorials) === "yes") {
+        tutorials += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.supportNeedCurricula) === "yes") {
+        curricula += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.supportNeedPractical) === "yes") {
+        practical += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.supportNeedCaseStudies) === "yes") {
+        caseStudies += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.supportNeedStructures) === "yes") {
+        structures += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.supportNeedTools) === "yes") {
+        tools += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.supportNeedNone) === "yes") {
+        none += 1;
+        hasAnswer = true;
+      }
 
       const otherVal = norm(raw.supportNeedOther);
-      if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
+      if (otherVal.length > 0 && otherVal !== "n/a") {
+        other += 1;
+        hasAnswer = true;
+      }
+
+      if (hasAnswer) numberOfRespondents += 1;
     });
 
     const items = [
@@ -65,6 +97,8 @@ const AdditionalSupportResources = () => {
     return {
       labels: items.map((item) => item.label),
       values: items.map((item) => item.value),
+      numberOfRespondents,
+      totalEligible: responses.length,
     } as const;
   }, [responses]);
 
@@ -120,11 +154,10 @@ const AdditionalSupportResources = () => {
     [tickColor]
   );
 
-  const numberOfResponses = counts.values.reduce((a, b) => a + b, 0);
-  const totalResponses = responses.length;
+  const numberOfResponses = counts.numberOfRespondents;
   const responseRate =
-    totalResponses > 0
-      ? Math.round((numberOfResponses / totalResponses) * 100)
+    counts.totalEligible > 0
+      ? Math.round((numberOfResponses / counts.totalEligible) * 100)
       : 0;
 
   const question = questionHeader;

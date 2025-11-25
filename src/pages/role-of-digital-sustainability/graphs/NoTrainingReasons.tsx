@@ -29,22 +29,50 @@ const NoTrainingReasons = () => {
     let notPriority = 0;
     let notSure = 0;
     let other = 0;
+    let numberOfRespondents = 0;
 
-    surveyResponses.forEach((response) => {
+    // Filter: organizationOffersTraining != "yes" and not empty
+    const filteredResponses = surveyResponses.filter((r) => {
+      const offer = normalize(r.raw.organizationOffersTraining);
+      return offer !== "yes" && offer !== "";
+    });
+
+    filteredResponses.forEach((response) => {
       const raw = response.raw;
+      let hasAnswer = false;
 
-      if (normalize(raw.orgNoTrainingLackAwareness) === "yes")
+      if (normalize(raw.orgNoTrainingLackAwareness) === "yes") {
         lackAwareness += 1;
-      if (normalize(raw.orgNoTrainingLackUnderstanding) === "yes")
+        hasAnswer = true;
+      }
+      if (normalize(raw.orgNoTrainingLackUnderstanding) === "yes") {
         lackUnderstanding += 1;
-      if (normalize(raw.orgNoTrainingNoDemand) === "yes") noDemand += 1;
-      if (normalize(raw.orgNoTrainingLimitedBudget) === "yes")
+        hasAnswer = true;
+      }
+      if (normalize(raw.orgNoTrainingNoDemand) === "yes") {
+        noDemand += 1;
+        hasAnswer = true;
+      }
+      if (normalize(raw.orgNoTrainingLimitedBudget) === "yes") {
         limitedBudget += 1;
-      if (normalize(raw.orgNoTrainingNotPriority) === "yes") notPriority += 1;
-      if (normalize(raw.orgNoTrainingNotSure) === "yes") notSure += 1;
+        hasAnswer = true;
+      }
+      if (normalize(raw.orgNoTrainingNotPriority) === "yes") {
+        notPriority += 1;
+        hasAnswer = true;
+      }
+      if (normalize(raw.orgNoTrainingNotSure) === "yes") {
+        notSure += 1;
+        hasAnswer = true;
+      }
 
       const otherVal = normalize(raw.orgNoTrainingOther);
-      if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
+      if (otherVal.length > 0 && otherVal !== "n/a") {
+        other += 1;
+        hasAnswer = true;
+      }
+
+      if (hasAnswer) numberOfRespondents += 1;
     });
 
     const items = [
@@ -63,6 +91,8 @@ const NoTrainingReasons = () => {
     return {
       labels: items.map((item) => item.label),
       values: items.map((item) => item.value),
+      numberOfRespondents,
+      totalEligible: filteredResponses.length,
     } as const;
   }, [surveyResponses]);
 
@@ -121,10 +151,10 @@ const NoTrainingReasons = () => {
     [tickColor]
   );
 
-  const total = counts.values.reduce((a, b) => a + b, 0);
+  const total = counts.numberOfRespondents;
   const responseRate =
-    surveyResponses.length > 0
-      ? Math.round((total / surveyResponses.length) * 100)
+    counts.totalEligible > 0
+      ? Math.round((total / counts.totalEligible) * 100)
       : 0;
 
   const question = questionHeader;

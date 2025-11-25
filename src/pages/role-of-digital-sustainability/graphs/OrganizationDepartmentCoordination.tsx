@@ -25,7 +25,6 @@ const OrganizationDepartmentCoordination = () => {
     counts.set("Not sure", 0);
 
     // --- Precondition: Q17 = Yes ---
-    /*
     const filteredResponses = responses.filter(
       (r) =>
         normalize(
@@ -33,9 +32,7 @@ const OrganizationDepartmentCoordination = () => {
         ).toLowerCase() === "yes"
     );
 
-     */
-
-      responses.forEach((r) => {
+    filteredResponses.forEach((r) => {
       // Key for Q20
       const raw = normalize(r.raw.organizationDepartmentCoordination ?? "");
       const lower = raw.toLowerCase();
@@ -53,6 +50,7 @@ const OrganizationDepartmentCoordination = () => {
     return {
       labels,
       values: labels.map((label) => counts.get(label) ?? 0),
+      totalEligible: filteredResponses.length,
     };
   }, [responses]);
 
@@ -97,14 +95,10 @@ const OrganizationDepartmentCoordination = () => {
   );
 
   const total = stats.values.reduce((a, b) => a + b, 0);
-  const filteredTotal = responses.filter(
-    (r) =>
-      normalize(
-        r.raw.organizationHasDigitalSustainabilityGoals ?? ""
-      ).toLowerCase() === "yes"
-  ).length;
   const responseRate =
-    filteredTotal > 0 ? Math.round((total / filteredTotal) * 100) : 0;
+    stats.totalEligible > 0
+      ? Math.round((total / stats.totalEligible) * 100)
+      : 0;
 
   const question =
     questionHeader ??

@@ -32,6 +32,7 @@ const HindrancesToIncorporateSustainability = () => {
     let culturalBarriers = 0;
     let stakeholderResistance = 0;
     let other = 0;
+    let numberOfRespondents = 0;
 
     // --- Precondition: Q28 = No ---
     const filteredResponses = responses.filter(
@@ -40,21 +41,52 @@ const HindrancesToIncorporateSustainability = () => {
 
     filteredResponses.forEach((r) => {
       const raw = r.raw;
-      if (norm(raw.hindranceLackInterest) === "yes") lackInterest += 1;
-      if (norm(raw.hindranceLackKnowledge) === "yes") lackKnowledge += 1;
-      if (norm(raw.hindranceLimitedResources) === "yes") limitedResources += 1;
-      if (norm(raw.hindranceFinancialConstraints) === "yes")
+      let hasAnswer = false;
+
+      if (norm(raw.hindranceLackInterest) === "yes") {
+        lackInterest += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.hindranceLackKnowledge) === "yes") {
+        lackKnowledge += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.hindranceLimitedResources) === "yes") {
+        limitedResources += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.hindranceFinancialConstraints) === "yes") {
         financialConstraints += 1;
-      if (norm(raw.hindranceInsufficientTime) === "yes") insufficientTime += 1;
-      if (norm(raw.hindranceLackSupport) === "yes") lackSupport += 1;
-      if (norm(raw.hindranceComplexity) === "yes") complexity += 1;
-      if (norm(raw.hindranceCulturalBarriers) === "yes") culturalBarriers += 1;
-      if (norm(raw.hindranceStakeholderResistance) === "yes")
+        hasAnswer = true;
+      }
+      if (norm(raw.hindranceInsufficientTime) === "yes") {
+        insufficientTime += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.hindranceLackSupport) === "yes") {
+        lackSupport += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.hindranceComplexity) === "yes") {
+        complexity += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.hindranceCulturalBarriers) === "yes") {
+        culturalBarriers += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.hindranceStakeholderResistance) === "yes") {
         stakeholderResistance += 1;
+        hasAnswer = true;
+      }
 
       const otherVal = norm(raw.hindranceOther);
-      if (otherVal === "yes" || (otherVal.length > 0 && otherVal !== "n/a"))
+      if (otherVal === "yes" || (otherVal.length > 0 && otherVal !== "n/a")) {
         other += 1;
+        hasAnswer = true;
+      }
+
+      if (hasAnswer) numberOfRespondents += 1;
     });
 
     const items = [
@@ -82,6 +114,8 @@ const HindrancesToIncorporateSustainability = () => {
     return {
       labels: items.map((item) => item.label),
       values: items.map((item) => item.value),
+      numberOfRespondents,
+      totalEligible: filteredResponses.length,
     } as const;
   }, [responses]);
 
@@ -137,11 +171,10 @@ const HindrancesToIncorporateSustainability = () => {
     [tickColor]
   );
 
-  const numberOfResponses = counts.values.reduce((a, b) => a + b, 0);
-  const totalResponses = responses.length;
+  const numberOfResponses = counts.numberOfRespondents;
   const responseRate =
-    totalResponses > 0
-      ? Math.round((numberOfResponses / totalResponses) * 100)
+    counts.totalEligible > 0
+      ? Math.round((numberOfResponses / counts.totalEligible) * 100)
       : 0;
 
   const question = questionHeader;

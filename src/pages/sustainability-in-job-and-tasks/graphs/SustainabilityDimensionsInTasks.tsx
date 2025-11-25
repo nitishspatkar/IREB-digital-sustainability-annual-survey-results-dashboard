@@ -28,6 +28,7 @@ const SustainabilityDimensionsInTasks = () => {
     let economic = 0;
     let technical = 0;
     let other = 0;
+    let numberOfRespondents = 0;
 
     // --- Precondition: Q28 = Yes ---
     const filteredResponses = responses.filter(
@@ -36,14 +37,36 @@ const SustainabilityDimensionsInTasks = () => {
 
     filteredResponses.forEach((r) => {
       const raw = r.raw;
-      if (norm(raw.roleConsiderEnvironmental) === "yes") environmental += 1;
-      if (norm(raw.roleConsiderSocial) === "yes") social += 1;
-      if (norm(raw.roleConsiderIndividual) === "yes") individual += 1;
-      if (norm(raw.roleConsiderEconomic) === "yes") economic += 1;
-      if (norm(raw.roleConsiderTechnical) === "yes") technical += 1;
+      let hasAnswer = false;
+
+      if (norm(raw.roleConsiderEnvironmental) === "yes") {
+        environmental += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.roleConsiderSocial) === "yes") {
+        social += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.roleConsiderIndividual) === "yes") {
+        individual += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.roleConsiderEconomic) === "yes") {
+        economic += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.roleConsiderTechnical) === "yes") {
+        technical += 1;
+        hasAnswer = true;
+      }
 
       const otherVal = norm(raw.roleConsiderOther);
-      if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
+      if (otherVal.length > 0 && otherVal !== "n/a") {
+        other += 1;
+        hasAnswer = true;
+      }
+
+      if (hasAnswer) numberOfRespondents += 1;
     });
 
     const items = [
@@ -61,6 +84,8 @@ const SustainabilityDimensionsInTasks = () => {
     return {
       labels: items.map((item) => item.label),
       values: items.map((item) => item.value),
+      numberOfRespondents,
+      totalEligible: filteredResponses.length,
     } as const;
   }, [responses]);
 
@@ -118,11 +143,10 @@ const SustainabilityDimensionsInTasks = () => {
     [tickColor]
   );
 
-  const numberOfResponses = counts.values.reduce((a, b) => a + b, 0);
-  const totalResponses = responses.length;
+  const numberOfResponses = counts.numberOfRespondents;
   const responseRate =
-    totalResponses > 0
-      ? Math.round((numberOfResponses / totalResponses) * 100)
+    counts.totalEligible > 0
+      ? Math.round((numberOfResponses / counts.totalEligible) * 100)
       : 0;
 
   const question = questionHeader;

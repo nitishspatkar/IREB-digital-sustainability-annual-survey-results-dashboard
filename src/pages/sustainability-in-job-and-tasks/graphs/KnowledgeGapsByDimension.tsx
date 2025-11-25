@@ -29,18 +29,44 @@ const KnowledgeGapsByDimension = () => {
     let technical = 0;
     let none = 0;
     let other = 0;
+    let numberOfRespondents = 0;
 
     responses.forEach((r) => {
       const raw = r.raw;
-      if (norm(raw.lackKnowledgeEnvironmental) === "yes") environmental += 1;
-      if (norm(raw.lackKnowledgeSocial) === "yes") social += 1;
-      if (norm(raw.lackKnowledgeIndividual) === "yes") individual += 1;
-      if (norm(raw.lackKnowledgeEconomic) === "yes") economic += 1;
-      if (norm(raw.lackKnowledgeTechnical) === "yes") technical += 1;
-      if (norm(raw.lackKnowledgeNone) === "yes") none += 1;
+      let hasAnswer = false;
+
+      if (norm(raw.lackKnowledgeEnvironmental) === "yes") {
+        environmental += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.lackKnowledgeSocial) === "yes") {
+        social += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.lackKnowledgeIndividual) === "yes") {
+        individual += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.lackKnowledgeEconomic) === "yes") {
+        economic += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.lackKnowledgeTechnical) === "yes") {
+        technical += 1;
+        hasAnswer = true;
+      }
+      if (norm(raw.lackKnowledgeNone) === "yes") {
+        none += 1;
+        hasAnswer = true;
+      }
 
       const otherVal = norm(raw.lackKnowledgeOther);
-      if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
+      if (otherVal.length > 0 && otherVal !== "n/a") {
+        other += 1;
+        hasAnswer = true;
+      }
+
+      if (hasAnswer) numberOfRespondents += 1;
     });
 
     const items = [
@@ -59,6 +85,8 @@ const KnowledgeGapsByDimension = () => {
     return {
       labels: items.map((item) => item.label),
       values: items.map((item) => item.value),
+      numberOfRespondents,
+      totalEligible: responses.length,
     } as const;
   }, [responses]);
 
@@ -114,11 +142,10 @@ const KnowledgeGapsByDimension = () => {
     [tickColor]
   );
 
-  const numberOfResponses = counts.values.reduce((a, b) => a + b, 0);
-  const totalResponses = responses.length;
+  const numberOfResponses = counts.numberOfRespondents;
   const responseRate =
-    totalResponses > 0
-      ? Math.round((numberOfResponses / totalResponses) * 100)
+    counts.totalEligible > 0
+      ? Math.round((numberOfResponses / counts.totalEligible) * 100)
       : 0;
 
   const question = questionHeader;
