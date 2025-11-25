@@ -167,9 +167,11 @@ const HindrancesToIncorporateSustainability = () => {
         </div>
       </GraphWrapper>
       {hindranceOtherTexts.length > 0 && (
-          <GraphWrapper
-              question={questionHeaderOther ?? ""}
-          >
+        <GraphWrapper
+          question={questionHeaderOther ?? ""}
+          numberOfResponses={hindranceOtherTexts.length}
+          responseRate={100}
+        >
           <div className="mt-4 h-[520px]">
             <ul
               className="h-[calc(100%-40px)] overflow-y-auto"
@@ -186,7 +188,7 @@ const HindrancesToIncorporateSustainability = () => {
               ))}
             </ul>
           </div>
-          </GraphWrapper>
+        </GraphWrapper>
       )}
     </>
   );

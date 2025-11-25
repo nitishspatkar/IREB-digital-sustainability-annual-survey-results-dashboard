@@ -182,8 +182,10 @@ const SustainabilityDimensions = () => {
       </GraphWrapper>
       {otherNotConsiderTexts.length > 0 && (
         <GraphWrapper
-              question={questionHeaderOther ?? ""}
-          >
+          question={questionHeaderOther ?? ""}
+          numberOfResponses={otherNotConsiderTexts.length}
+          responseRate={100}
+        >
           <div className="mt-4 h-[520px]">
             <ul
               className="h-[calc(100%-40px)] overflow-y-auto"

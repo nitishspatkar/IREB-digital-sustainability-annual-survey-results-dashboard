@@ -72,7 +72,7 @@ const DriversToIncorporateSustainability = () => {
       .filter((value) => {
         if (!value) return false;
         const lower = value.toLowerCase();
-        return lower.length > 0 && lower !== "n/a";
+        return lower.length > 0 && lower !== "n/a" && lower !== "yes";
       });
   }, [surveyResponses]);
 
@@ -148,9 +148,11 @@ const DriversToIncorporateSustainability = () => {
         </div>
       </GraphWrapper>
       {driveOtherTexts.length > 0 && (
-          <GraphWrapper
-              question={questionHeaderOther ?? ""}
-          >
+        <GraphWrapper
+          question={questionHeaderOther ?? ""}
+          numberOfResponses={driveOtherTexts.length}
+          responseRate={100}
+        >
           <div className="mt-4 h-[520px]">
             <ul
               className="h-[calc(100%-40px)] overflow-y-auto"
@@ -167,7 +169,7 @@ const DriversToIncorporateSustainability = () => {
               ))}
             </ul>
           </div>
-          </GraphWrapper>
+        </GraphWrapper>
       )}
     </>
   );

@@ -150,9 +150,11 @@ const AdditionalSupportResources = () => {
         </div>
       </GraphWrapper>
       {supportNeedOtherTexts.length > 0 && (
-          <GraphWrapper
-              question={questionHeaderOther ?? ""}
-          >
+        <GraphWrapper
+          question={questionHeaderOther ?? ""}
+          numberOfResponses={supportNeedOtherTexts.length}
+          responseRate={100}
+        >
           <div className="mt-4 h-[520px]">
             <ul
               className="h-[calc(100%-40px)] overflow-y-auto"
@@ -169,7 +171,7 @@ const AdditionalSupportResources = () => {
               ))}
             </ul>
           </div>
-          </GraphWrapper>
+        </GraphWrapper>
       )}
     </>
   );

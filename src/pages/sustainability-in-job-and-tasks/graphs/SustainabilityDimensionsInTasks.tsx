@@ -148,9 +148,11 @@ const SustainabilityDimensionsInTasks = () => {
         </div>
       </GraphWrapper>
       {roleOtherTexts.length > 0 && (
-          <GraphWrapper
-              question={questionHeaderOther ?? ""}
-          >
+        <GraphWrapper
+          question={questionHeaderOther ?? ""}
+          numberOfResponses={roleOtherTexts.length}
+          responseRate={100}
+        >
           <div className="mt-4 h-[520px]">
             <ul
               className="h-[calc(100%-40px)] overflow-y-auto"
@@ -167,7 +169,7 @@ const SustainabilityDimensionsInTasks = () => {
               ))}
             </ul>
           </div>
-          </GraphWrapper>
+        </GraphWrapper>
       )}
     </>
   );
