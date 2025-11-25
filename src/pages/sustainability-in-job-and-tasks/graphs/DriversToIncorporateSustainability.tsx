@@ -151,7 +151,11 @@ const DriversToIncorporateSustainability = () => {
         <GraphWrapper
           question={questionHeaderOther ?? ""}
           numberOfResponses={driveOtherTexts.length}
-          responseRate={100}
+          responseRate={
+            totalResponses > 0
+              ? (driveOtherTexts.length / totalResponses) * 100
+              : 0
+          }
         >
           <div className="mt-4 h-[520px]">
             <ul

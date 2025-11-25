@@ -174,7 +174,11 @@ const KnowledgeGapsByDimension = () => {
         <GraphWrapper
           question={questionHeaderOther ?? ""}
           numberOfResponses={lackKnowledgeOtherTexts.length}
-          responseRate={100}
+          responseRate={
+            counts.totalEligible > 0
+              ? (lackKnowledgeOtherTexts.length / counts.totalEligible) * 100
+              : 0
+          }
         >
           <div className="mt-4 h-[520px]">
             <ul

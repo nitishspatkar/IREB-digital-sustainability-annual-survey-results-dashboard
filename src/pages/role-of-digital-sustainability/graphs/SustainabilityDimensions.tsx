@@ -33,45 +33,45 @@ const SustainabilityDimensions = () => {
 
     let respondentsWithAnyAnswer = 0;
 
-      surveyResponses.forEach((response) => {
-          const raw = response.raw;
-          let hasAny = false;
+    surveyResponses.forEach((response) => {
+      const raw = response.raw;
+      let hasAny = false;
 
-          if (normalize(raw.considerEnvironmental) === "yes") {
-              environmental += 1;
-              hasAny = true;
-          }
-          if (normalize(raw.considerSocial) === "yes") {
-              social += 1;
-              hasAny = true;
-          }
-          if (normalize(raw.considerIndividual) === "yes") {
-              individual += 1;
-              hasAny = true;
-          }
-          if (normalize(raw.considerEconomic) === "yes") {
-              economic += 1;
-              hasAny = true;
-          }
-          if (normalize(raw.considerTechnical) === "yes") {
-              technical += 1;
-              hasAny = true;
-          }
-          if (normalize(raw.considerNotSure) === "yes") {
-              notSure += 1;
-              hasAny = true;
-          }
+      if (normalize(raw.considerEnvironmental) === "yes") {
+        environmental += 1;
+        hasAny = true;
+      }
+      if (normalize(raw.considerSocial) === "yes") {
+        social += 1;
+        hasAny = true;
+      }
+      if (normalize(raw.considerIndividual) === "yes") {
+        individual += 1;
+        hasAny = true;
+      }
+      if (normalize(raw.considerEconomic) === "yes") {
+        economic += 1;
+        hasAny = true;
+      }
+      if (normalize(raw.considerTechnical) === "yes") {
+        technical += 1;
+        hasAny = true;
+      }
+      if (normalize(raw.considerNotSure) === "yes") {
+        notSure += 1;
+        hasAny = true;
+      }
 
-          const otherVal = normalize(raw.considerOther);
-          if (otherVal.length > 0 && otherVal !== "n/a") {
-              other += 1;
-              hasAny = true;
-          }
+      const otherVal = normalize(raw.considerOther);
+      if (otherVal.length > 0 && otherVal !== "n/a") {
+        other += 1;
+        hasAny = true;
+      }
 
-          if (hasAny) {
-              respondentsWithAnyAnswer += 1;
-          }
-      });
+      if (hasAny) {
+        respondentsWithAnyAnswer += 1;
+      }
+    });
 
     const items = [
       { label: "Environmental", value: environmental },
@@ -148,15 +148,15 @@ const SustainabilityDimensions = () => {
     [tickColor]
   );
 
-    const numberOfRespondents = counts.respondentsWithAnyAnswer;
+  const numberOfRespondents = counts.respondentsWithAnyAnswer;
 
-    const responseRate =
-        surveyResponses.length > 0
-            ? (numberOfRespondents / surveyResponses.length) * 100
-            : 0;
+  const responseRate =
+    surveyResponses.length > 0
+      ? (numberOfRespondents / surveyResponses.length) * 100
+      : 0;
 
-    console.log(numberOfRespondents);
-    console.log(surveyResponses.length);
+  console.log(numberOfRespondents);
+  console.log(surveyResponses.length);
 
   const question = questionHeader;
   const description =
@@ -184,7 +184,11 @@ const SustainabilityDimensions = () => {
         <GraphWrapper
           question={questionHeaderOther ?? ""}
           numberOfResponses={otherNotConsiderTexts.length}
-          responseRate={100}
+          responseRate={
+            surveyResponses.length > 0
+              ? (otherNotConsiderTexts.length / surveyResponses.length) * 100
+              : 0
+          }
         >
           <div className="mt-4 h-[520px]">
             <ul

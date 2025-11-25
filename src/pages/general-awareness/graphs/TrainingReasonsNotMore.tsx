@@ -140,25 +140,16 @@ const TrainingReasonsNotMore = () => {
   );
 
   const participants = responses.filter(
-        (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
-    );
+    (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
+  );
   const numberOfResponses = participants.length;
   const totalResponses = responses.length;
   const responseRate =
-        totalResponses > 0
-            ? (numberOfResponses / totalResponses) * 100
-            : 0;
-
+    totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
 
   const numberOfResponsesOther = otherTrainingReasonsTexts.length;
-  const numberOfResponsesOtherAll = useMemo(() => {
-    const otherStat = stats.find((s) => s.key === "notMoreTrainingOther");
-    return otherStat ? otherStat.count : 0;
-  }, [stats]);
   const otherResponseRate =
-        numberOfResponsesOtherAll > 0
-            ? (numberOfResponsesOther / numberOfResponsesOtherAll) * 100
-            : 0;
+    totalResponses > 0 ? (numberOfResponsesOther / totalResponses) * 100 : 0;
 
   const question = questionHeader;
   const description =
@@ -184,9 +175,9 @@ const TrainingReasonsNotMore = () => {
       </GraphWrapper>
       {otherTrainingReasonsTexts.length > 0 && (
         <GraphWrapper
-            question={questionHeaderOther ?? ""}
-            numberOfResponses={numberOfResponsesOtherAll}
-            responseRate={otherResponseRate}
+          question={questionHeaderOther ?? ""}
+          numberOfResponses={numberOfResponsesOther}
+          responseRate={otherResponseRate}
         >
           <div className="mt-4 h-[520px]">
             <ul
@@ -205,7 +196,6 @@ const TrainingReasonsNotMore = () => {
             </ul>
           </div>
         </GraphWrapper>
-
       )}
     </>
   );

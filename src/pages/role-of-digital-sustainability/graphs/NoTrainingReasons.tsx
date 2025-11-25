@@ -183,7 +183,11 @@ const NoTrainingReasons = () => {
         <GraphWrapper
           question={questionHeaderOther ?? ""}
           numberOfResponses={orgNoTrainingOtherTexts.length}
-          responseRate={100}
+          responseRate={
+            counts.totalEligible > 0
+              ? (orgNoTrainingOtherTexts.length / counts.totalEligible) * 100
+              : 0
+          }
         >
           <div className="mt-4 h-[520px]">
             <ul

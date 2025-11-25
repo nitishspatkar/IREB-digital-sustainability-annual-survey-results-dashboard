@@ -175,7 +175,11 @@ const SustainabilityDimensionsInTasks = () => {
         <GraphWrapper
           question={questionHeaderOther ?? ""}
           numberOfResponses={roleOtherTexts.length}
-          responseRate={100}
+          responseRate={
+            counts.totalEligible > 0
+              ? (roleOtherTexts.length / counts.totalEligible) * 100
+              : 0
+          }
         >
           <div className="mt-4 h-[520px]">
             <ul

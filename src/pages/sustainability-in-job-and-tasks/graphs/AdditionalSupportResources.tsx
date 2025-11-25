@@ -186,7 +186,11 @@ const AdditionalSupportResources = () => {
         <GraphWrapper
           question={questionHeaderOther ?? ""}
           numberOfResponses={supportNeedOtherTexts.length}
-          responseRate={100}
+          responseRate={
+            counts.totalEligible > 0
+              ? (supportNeedOtherTexts.length / counts.totalEligible) * 100
+              : 0
+          }
         >
           <div className="mt-4 h-[520px]">
             <ul

@@ -203,7 +203,11 @@ const HindrancesToIncorporateSustainability = () => {
         <GraphWrapper
           question={questionHeaderOther ?? ""}
           numberOfResponses={hindranceOtherTexts.length}
-          responseRate={100}
+          responseRate={
+            counts.totalEligible > 0
+              ? (hindranceOtherTexts.length / counts.totalEligible) * 100
+              : 0
+          }
         >
           <div className="mt-4 h-[520px]">
             <ul
