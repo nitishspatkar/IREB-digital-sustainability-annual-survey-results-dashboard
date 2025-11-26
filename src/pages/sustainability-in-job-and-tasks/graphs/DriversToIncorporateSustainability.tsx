@@ -1,182 +1,222 @@
 import { useMemo } from "react";
-import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
-import GraphWrapper from "../../../components/GraphWrapper";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
-import { columnDefinitions } from "../../../data/SurveyColumnDefinitions.ts";
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
+import { SurveyChart, SurveyExploreList } from "../../../components/GraphViews";
 
-const DriversToIncorporateSustainability = () => {
-  const questionHeader =
-    "What drives you to incorporate digital sustainability in your role-related tasks?";
-  const questionHeaderOther = columnDefinitions.find(
-    (c) => c.key === "driveOther"
-  )?.header;
-  const barColor = useThemeColor("--color-plum-400");
-  const tickColor = useThemeColor("--color-ink-700");
-  const borderColor = useThemeColor("--color-ink-200");
+// --- SHARED DATA LOGIC ---
+const useDriversData = () => {
+    const surveyResponses = useSurveyData();
+    const barColor = useThemeColor("--color-plum-400");
+    const tickColor = useThemeColor("--color-ink-700");
 
-  const surveyResponses = useSurveyData();
+    const { stats, driveOtherTexts, totalRespondentsWithAnswer } = useMemo(() => {
+        const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
 
-  const counts = useMemo(() => {
-    const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
+        let orgPolicies = 0;
+        let personalBeliefs = 0;
+        let clientReqs = 0;
+        let userReqs = 0;
+        let legalReqs = 0;
+        let other = 0;
+        let respondentsWithAnyAnswer = 0;
 
-    let orgPolicies = 0;
-    let personalBeliefs = 0;
-    let clientReqs = 0;
-    let userReqs = 0;
-    let legalReqs = 0;
-    let other = 0;
+        // --- Precondition: Q28 = Yes ---
+        const filteredResponses = surveyResponses.filter(
+            (r) => normalize(r.raw.personIncorporatesSustainability) === "yes"
+        );
 
-    // --- Precondition: Q28 = Yes ---
-    const filteredResponses = surveyResponses.filter(
-      (r) => normalize(r.raw.personIncorporatesSustainability) === "yes"
-    );
+        filteredResponses.forEach((response) => {
+            const raw = response.raw;
+            let hasAnswer = false;
 
-    filteredResponses.forEach((response) => {
-      const raw = response.raw;
+            if (normalize(raw.driveOrganizationalPolicies) === "yes") {
+                orgPolicies += 1;
+                hasAnswer = true;
+            }
+            if (normalize(raw.drivePersonalBeliefs) === "yes") {
+                personalBeliefs += 1;
+                hasAnswer = true;
+            }
+            if (normalize(raw.driveClientRequirements) === "yes") {
+                clientReqs += 1;
+                hasAnswer = true;
+            }
+            if (normalize(raw.driveUserRequirements) === "yes") {
+                userReqs += 1;
+                hasAnswer = true;
+            }
+            if (normalize(raw.driveLegalRequirements) === "yes") {
+                legalReqs += 1;
+                hasAnswer = true;
+            }
 
-      if (normalize(raw.driveOrganizationalPolicies) === "yes")
-        orgPolicies += 1;
-      if (normalize(raw.drivePersonalBeliefs) === "yes") personalBeliefs += 1;
-      if (normalize(raw.driveClientRequirements) === "yes") clientReqs += 1;
-      if (normalize(raw.driveUserRequirements) === "yes") userReqs += 1;
-      if (normalize(raw.driveLegalRequirements) === "yes") legalReqs += 1;
+            const otherVal = normalize(raw.driveOther);
+            if (otherVal.length > 0 && otherVal !== "n/a") {
+                other += 1;
+                hasAnswer = true;
+            }
 
-      const otherVal = normalize(raw.driveOther);
-      if (otherVal.length > 0 && otherVal !== "n/a") other += 1;
-    });
+            if (hasAnswer) respondentsWithAnyAnswer += 1;
+        });
 
-    const items = [
-      { label: "Organizational policies", value: orgPolicies },
-      { label: "Personal beliefs", value: personalBeliefs },
-      { label: "Client requirements", value: clientReqs },
-      { label: "User requirements", value: userReqs },
-      { label: "Legal requirements", value: legalReqs },
-      { label: "Other", value: other },
-    ];
+        const items = [
+            { label: "Organizational policies", value: orgPolicies },
+            { label: "Personal beliefs", value: personalBeliefs },
+            { label: "Client requirements", value: clientReqs },
+            { label: "User requirements", value: userReqs },
+            { label: "Legal requirements", value: legalReqs },
+            { label: "Other", value: other },
+        ];
 
-    // Sort ascending by value
-    items.sort((a, b) => a.value - b.value);
+        // Sort ascending by value
+        items.sort((a, b) => a.value - b.value);
+
+        // Extract texts
+        const texts = surveyResponses
+            .map((r) => (r.raw.driveOther ?? "").trim())
+            .filter((value) => {
+                if (!value) return false;
+                const lower = value.toLowerCase();
+                return lower.length > 0 && lower !== "n/a" && lower !== "yes";
+            });
+
+        return {
+            stats: items,
+            driveOtherTexts: texts,
+            totalRespondentsWithAnswer: respondentsWithAnyAnswer,
+        };
+    }, [surveyResponses]);
 
     return {
-      labels: items.map((item) => item.label),
-      values: items.map((item) => item.value),
-    } as const;
-  }, [surveyResponses]);
+        stats,
+        driveOtherTexts,
+        totalRespondentsWithAnswer,
+        barColor,
+        tickColor,
+        totalResponses: surveyResponses.length,
+    };
+};
 
-  const driveOtherTexts = useMemo(() => {
-    return surveyResponses
-      .map((r) => (r.raw.driveOther ?? "").trim())
-      .filter((value) => {
-        if (!value) return false;
-        const lower = value.toLowerCase();
-        return lower.length > 0 && lower !== "n/a" && lower !== "yes";
-      });
-  }, [surveyResponses]);
+// --- COMPONENT 1: Main Chart ---
+export const DriversToIncorporateSustainability = ({
+                                                       onExplore,
+                                                       className,
+                                                   }: {
+    onExplore?: () => void;
+    className?: string;
+}) => {
+    const {
+        stats,
+        driveOtherTexts,
+        totalRespondentsWithAnswer,
+        totalResponses,
+        barColor,
+        tickColor,
+    } = useDriversData();
 
-  const data = useMemo<Data[]>(
-    () => [
-      {
-        type: "bar",
-        orientation: "h",
-        x: counts.values,
-        y: counts.labels,
-        marker: { color: barColor },
-        // --- ADDED TEXT LABELS ---
-        text: counts.values.map((v) => v.toString()),
-        textposition: "outside",
-        textfont: {
-          family: "Inter, sans-serif",
-          size: 12,
-          color: tickColor,
-        },
-        cliponaxis: false,
-        hoverinfo: "none",
-      },
-    ],
-    [counts, barColor, tickColor] // Added tickColor
-  );
+    const questionHeader =
+        "What drives you to incorporate digital sustainability in your role-related tasks?";
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 50, r: 40, b: 60, l: 180 }, // Adjusted margins
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
-      xaxis: {
-        title: {
-          text: "Number of Respondents",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
-        },
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-      yaxis: {
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-    }),
-    [tickColor]
-  );
+    const data = useMemo<Data[]>(
+        () => [
+            {
+                type: "bar",
+                orientation: "h",
+                x: stats.map((i) => i.value),
+                y: stats.map((i) => i.label),
+                marker: { color: barColor },
+                text: stats.map((i) => i.value.toString()),
+                textposition: "outside",
+                textfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
+                cliponaxis: false,
+                hoverinfo: "none",
+            },
+        ],
+        [stats, barColor, tickColor]
+    );
 
-  const numberOfResponses = counts.values.reduce((a, b) => a + b, 0);
-  const totalResponses = surveyResponses.length;
-  const responseRate =
-    totalResponses > 0
-      ? Math.round((numberOfResponses / totalResponses) * 100)
-      : 0;
+    const layout = useMemo<Partial<Layout>>(
+        () => ({
+            margin: { t: 50, r: 40, b: 60, l: 180 }, // Preserved specific margin
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            xaxis: {
+                title: {
+                    text: "Number of Respondents",
+                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                },
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+            yaxis: {
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+        }),
+        [tickColor]
+    );
 
-  const question = questionHeader;
-  const description =
-    "Shows which factors motivate respondents to integrate digital sustainability into their role-specific tasks.";
+    const responseRate =
+        totalResponses > 0
+            ? Math.round((totalRespondentsWithAnswer / totalResponses) * 100)
+            : 0;
 
-  return (
-    <>
-      <GraphWrapper
-        question={question}
-        description={description}
-        numberOfResponses={numberOfResponses}
-        responseRate={responseRate}
-      >
-        <div className="h-[520px]">
-          <Plot
+    return (
+        <SurveyChart
+            className={className}
+            question={questionHeader}
+            description="Shows which factors motivate respondents to integrate digital sustainability into their role-specific tasks."
+            numberOfResponses={totalRespondentsWithAnswer}
+            responseRate={responseRate}
             data={data}
             layout={layout}
-            config={{ displayModeBar: false, responsive: true }}
-            useResizeHandler
-            style={{ width: "100%", height: "100%" }}
-          />
-        </div>
-      </GraphWrapper>
-      {driveOtherTexts.length > 0 && (
-        <GraphWrapper
-          question={questionHeaderOther ?? ""}
-          numberOfResponses={driveOtherTexts.length}
-          responseRate={
-            totalResponses > 0
-              ? (driveOtherTexts.length / totalResponses) * 100
-              : 0
-          }
-        >
-          <div className="mt-4 h-[520px]">
-            <ul
-              className="h-[calc(100%-40px)] overflow-y-auto"
-              style={{ color: tickColor }}
-            >
-              {driveOtherTexts.map((text, index) => (
-                <li
-                  key={index}
-                  className="border-b px-2 py-3 text-sm"
-                  style={{ borderColor: borderColor }}
-                >
-                  {text}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </GraphWrapper>
-      )}
-    </>
-  );
+            hasExploreData={driveOtherTexts.length > 0}
+            onExplore={onExplore}
+        />
+    );
+};
+
+// --- COMPONENT 2: Detail List ---
+export const DriversToIncorporateSustainabilityDetails = ({
+                                                              onBack,
+                                                          }: {
+    onBack: () => void;
+}) => {
+    const { stats, driveOtherTexts } = useDriversData();
+
+    const questionHeader =
+        "What drives you to incorporate digital sustainability in your role-related tasks?";
+    const questionHeaderOther = columnDefinitions.find(
+        (c) => c.key === "driveOther"
+    )?.header;
+
+    const wrapperQuestion = questionHeaderOther ?? "";
+
+    // Calculate rate relative to "Other" checkbox selection
+    const otherStat = stats.find((s) => s.label === "Other");
+    const numberOfOtherSelections = otherStat ? otherStat.value : 0;
+
+    const responseRate =
+        numberOfOtherSelections > 0
+            ? (driveOtherTexts.length / numberOfOtherSelections) * 100
+            : 0;
+
+    return (
+        <SurveyExploreList
+            title={questionHeader}
+            items={driveOtherTexts}
+            question={wrapperQuestion}
+            description="Lists the free-text drivers supplied under the Other option."
+            numberOfResponses={driveOtherTexts.length}
+            responseRate={responseRate}
+            onBack={onBack}
+        />
+    );
 };
 
 export default DriversToIncorporateSustainability;

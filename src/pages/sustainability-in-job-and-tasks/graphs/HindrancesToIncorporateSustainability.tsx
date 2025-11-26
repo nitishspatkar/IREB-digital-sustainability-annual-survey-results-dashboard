@@ -1,234 +1,247 @@
 import { useMemo } from "react";
-import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
-import GraphWrapper from "../../../components/GraphWrapper";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
-import { columnDefinitions } from "../../../data/SurveyColumnDefinitions.ts";
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
+import { SurveyChart, SurveyExploreList } from "../../../components/GraphViews";
 
-const HindrancesToIncorporateSustainability = () => {
-  const questionHeader =
-    "What hinders you from incorporating sustainability in your role-specific tasks?";
-  const questionHeaderOther = columnDefinitions.find(
-    (c) => c.key === "hindranceOther"
-  )?.header;
-  const barColor = useThemeColor("--color-plum-400");
-  const tickColor = useThemeColor("--color-ink-700");
-  const borderColor = useThemeColor("--color-ink-200");
+// --- SHARED DATA LOGIC ---
+const useHindrancesData = () => {
+    const responses = useSurveyData();
+    const barColor = useThemeColor("--color-plum-400");
+    const tickColor = useThemeColor("--color-ink-700");
 
-  const responses = useSurveyData();
+    const { stats, hindranceOtherTexts, totalRespondentsWithAnswer, totalEligible } =
+        useMemo(() => {
+            const norm = (v: string) => v?.trim().toLowerCase() ?? "";
 
-  const counts = useMemo(() => {
-    const norm = (v: string) => v?.trim().toLowerCase() ?? "";
+            let lackInterest = 0;
+            let lackKnowledge = 0;
+            let limitedResources = 0;
+            let financialConstraints = 0;
+            let insufficientTime = 0;
+            let lackSupport = 0;
+            let complexity = 0;
+            let culturalBarriers = 0;
+            let stakeholderResistance = 0;
+            let other = 0;
+            let numberOfRespondents = 0;
 
-    let lackInterest = 0;
-    let lackKnowledge = 0;
-    let limitedResources = 0;
-    let financialConstraints = 0;
-    let insufficientTime = 0;
-    let lackSupport = 0;
-    let complexity = 0;
-    let culturalBarriers = 0;
-    let stakeholderResistance = 0;
-    let other = 0;
-    let numberOfRespondents = 0;
+            // --- Precondition: Q28 = No ---
+            const filteredResponses = responses.filter(
+                (r) => norm(r.raw.personIncorporatesSustainability) === "no"
+            );
 
-    // --- Precondition: Q28 = No ---
-    const filteredResponses = responses.filter(
-      (r) => norm(r.raw.personIncorporatesSustainability) === "no"
-    );
+            filteredResponses.forEach((r) => {
+                const raw = r.raw;
+                let hasAnswer = false;
 
-    filteredResponses.forEach((r) => {
-      const raw = r.raw;
-      let hasAnswer = false;
+                if (norm(raw.hindranceLackInterest) === "yes") {
+                    lackInterest += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.hindranceLackKnowledge) === "yes") {
+                    lackKnowledge += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.hindranceLimitedResources) === "yes") {
+                    limitedResources += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.hindranceFinancialConstraints) === "yes") {
+                    financialConstraints += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.hindranceInsufficientTime) === "yes") {
+                    insufficientTime += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.hindranceLackSupport) === "yes") {
+                    lackSupport += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.hindranceComplexity) === "yes") {
+                    complexity += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.hindranceCulturalBarriers) === "yes") {
+                    culturalBarriers += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.hindranceStakeholderResistance) === "yes") {
+                    stakeholderResistance += 1;
+                    hasAnswer = true;
+                }
 
-      if (norm(raw.hindranceLackInterest) === "yes") {
-        lackInterest += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.hindranceLackKnowledge) === "yes") {
-        lackKnowledge += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.hindranceLimitedResources) === "yes") {
-        limitedResources += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.hindranceFinancialConstraints) === "yes") {
-        financialConstraints += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.hindranceInsufficientTime) === "yes") {
-        insufficientTime += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.hindranceLackSupport) === "yes") {
-        lackSupport += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.hindranceComplexity) === "yes") {
-        complexity += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.hindranceCulturalBarriers) === "yes") {
-        culturalBarriers += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.hindranceStakeholderResistance) === "yes") {
-        stakeholderResistance += 1;
-        hasAnswer = true;
-      }
+                const otherVal = norm(raw.hindranceOther);
+                if (otherVal === "yes" || (otherVal.length > 0 && otherVal !== "n/a")) {
+                    other += 1;
+                    hasAnswer = true;
+                }
 
-      const otherVal = norm(raw.hindranceOther);
-      if (otherVal === "yes" || (otherVal.length > 0 && otherVal !== "n/a")) {
-        other += 1;
-        hasAnswer = true;
-      }
+                if (hasAnswer) numberOfRespondents += 1;
+            });
 
-      if (hasAnswer) numberOfRespondents += 1;
-    });
+            const items = [
+                { label: "Lack of personal interest", value: lackInterest },
+                { label: "Lack of knowledge or awareness", value: lackKnowledge },
+                { label: "Limited resources or budget", value: limitedResources },
+                { label: "Financial constraints", value: financialConstraints },
+                { label: "Insufficient time or competing priorities", value: insufficientTime },
+                { label: "Lack of organizational or leadership support", value: lackSupport },
+                { label: "Complexity or uncertainty of solutions", value: complexity },
+                { label: "Cultural or social barriers", value: culturalBarriers },
+                { label: "Resistance from stakeholders", value: stakeholderResistance },
+                { label: "Other", value: other },
+            ];
 
-    const items = [
-      { label: "Lack of personal interest", value: lackInterest },
-      { label: "Lack of knowledge or awareness", value: lackKnowledge },
-      { label: "Limited resources or budget", value: limitedResources },
-      { label: "Financial constraints", value: financialConstraints },
-      {
-        label: "Insufficient time or competing priorities",
-        value: insufficientTime,
-      },
-      {
-        label: "Lack of organizational or leadership support",
-        value: lackSupport,
-      },
-      { label: "Complexity or uncertainty of solutions", value: complexity },
-      { label: "Cultural or social barriers", value: culturalBarriers },
-      { label: "Resistance from stakeholders", value: stakeholderResistance },
-      { label: "Other", value: other },
-    ];
+            // Sort ascending by value
+            items.sort((a, b) => a.value - b.value);
 
-    // Sort ascending by value
-    items.sort((a, b) => a.value - b.value);
+            // Extract texts
+            const texts = responses
+                .map((r) => (r.raw.hindranceOther ?? "").trim())
+                .filter((value) => {
+                    if (!value) return false;
+                    const lower = value.toLowerCase();
+                    return lower.length > 0 && lower !== "n/a";
+                });
+
+            return {
+                stats: items,
+                hindranceOtherTexts: texts,
+                totalRespondentsWithAnswer: numberOfRespondents,
+                totalEligible: filteredResponses.length,
+            };
+        }, [responses]);
 
     return {
-      labels: items.map((item) => item.label),
-      values: items.map((item) => item.value),
-      numberOfRespondents,
-      totalEligible: filteredResponses.length,
-    } as const;
-  }, [responses]);
+        stats,
+        hindranceOtherTexts,
+        totalRespondentsWithAnswer,
+        totalEligible,
+        barColor,
+        tickColor,
+    };
+};
 
-  const hindranceOtherTexts = useMemo(() => {
-    return responses
-      .map((r) => (r.raw.hindranceOther ?? "").trim())
-      .filter((value) => {
-        if (!value) return false;
-        const lower = value.toLowerCase();
-        return lower.length > 0 && lower !== "n/a";
-      });
-  }, [responses]);
+// --- COMPONENT 1: Main Chart ---
+export const HindrancesToIncorporateSustainability = ({
+                                                          onExplore,
+                                                          className,
+                                                      }: {
+    onExplore?: () => void;
+    className?: string;
+}) => {
+    const {
+        stats,
+        hindranceOtherTexts,
+        totalRespondentsWithAnswer,
+        totalEligible,
+        barColor,
+        tickColor,
+    } = useHindrancesData();
 
-  const data = useMemo<Data[]>(
-    () => [
-      {
-        type: "bar",
-        orientation: "h",
-        x: counts.values,
-        y: counts.labels,
-        marker: { color: barColor },
-        // --- ADDED TEXT LABELS ---
-        text: counts.values.map((v) => v.toString()),
-        textposition: "outside",
-        textfont: {
-          family: "Inter, sans-serif",
-          size: 12,
-          color: tickColor,
-        },
-        cliponaxis: false,
-        hoverinfo: "none",
-      },
-    ],
-    [counts, barColor, tickColor] // Added tickColor
-  );
+    const questionHeader =
+        "What hinders you from incorporating sustainability in your role-specific tasks?";
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 50, r: 40, b: 60, l: 300 }, // Wide left margin
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
-      xaxis: {
-        title: {
-          text: "Number of Respondents",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
-        },
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-      yaxis: {
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-    }),
-    [tickColor]
-  );
+    const data = useMemo<Data[]>(
+        () => [
+            {
+                type: "bar",
+                orientation: "h",
+                x: stats.map((i) => i.value),
+                y: stats.map((i) => i.label),
+                marker: { color: barColor },
+                text: stats.map((i) => i.value.toString()),
+                textposition: "outside",
+                textfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
+                cliponaxis: false,
+                hoverinfo: "none",
+            },
+        ],
+        [stats, barColor, tickColor]
+    );
 
-  const numberOfResponses = counts.numberOfRespondents;
-  const responseRate =
-    counts.totalEligible > 0
-      ? Math.round((numberOfResponses / counts.totalEligible) * 100)
-      : 0;
+    const layout = useMemo<Partial<Layout>>(
+        () => ({
+            margin: { t: 50, r: 40, b: 60, l: 300 }, // Preserved wide margin
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            xaxis: {
+                title: {
+                    text: "Number of Respondents",
+                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                },
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+            yaxis: {
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+        }),
+        [tickColor]
+    );
 
-  const question = questionHeader;
-  const description =
-    "Shows barriers preventing respondents from incorporating sustainability in their tasks.";
+    const responseRate =
+        totalEligible > 0
+            ? Math.round((totalRespondentsWithAnswer / totalEligible) * 100)
+            : 0;
 
-  return (
-    <>
-      <GraphWrapper
-        question={question}
-        description={description}
-        numberOfResponses={numberOfResponses}
-        responseRate={responseRate}
-      >
-        <div className="h-[520px]">
-          <Plot
+    return (
+        <SurveyChart
+            className={className}
+            question={questionHeader}
+            description="Shows barriers preventing respondents from incorporating sustainability in their tasks."
+            numberOfResponses={totalRespondentsWithAnswer}
+            responseRate={responseRate}
             data={data}
             layout={layout}
-            config={{ displayModeBar: false, responsive: true }}
-            useResizeHandler
-            style={{ width: "100%", height: "100%" }}
-          />
-        </div>
-      </GraphWrapper>
-      {hindranceOtherTexts.length > 0 && (
-        <GraphWrapper
-          question={questionHeaderOther ?? ""}
-          numberOfResponses={hindranceOtherTexts.length}
-          responseRate={
-            counts.totalEligible > 0
-              ? (hindranceOtherTexts.length / counts.totalEligible) * 100
-              : 0
-          }
-        >
-          <div className="mt-4 h-[520px]">
-            <ul
-              className="h-[calc(100%-40px)] overflow-y-auto"
-              style={{ color: tickColor }}
-            >
-              {hindranceOtherTexts.map((text, index) => (
-                <li
-                  key={index}
-                  className="border-b px-2 py-3 text-sm"
-                  style={{ borderColor: borderColor }}
-                >
-                  {text}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </GraphWrapper>
-      )}
-    </>
-  );
+            hasExploreData={hindranceOtherTexts.length > 0}
+            onExplore={onExplore}
+        />
+    );
+};
+
+// --- COMPONENT 2: Detail List ---
+export const HindrancesToIncorporateSustainabilityDetails = ({
+                                                                 onBack,
+                                                             }: {
+    onBack: () => void;
+}) => {
+    const { stats, hindranceOtherTexts } = useHindrancesData();
+
+    const questionHeader =
+        "What hinders you from incorporating sustainability in your role-specific tasks?";
+    const questionHeaderOther = columnDefinitions.find(
+        (c) => c.key === "hindranceOther"
+    )?.header;
+
+    const wrapperQuestion = questionHeaderOther ?? "";
+
+    // Calculate rate relative to "Other" checkbox selection
+    const otherStat = stats.find((s) => s.label === "Other");
+    const numberOfOtherSelections = otherStat ? otherStat.value : 0;
+
+    const responseRate = numberOfOtherSelections > 0
+        ? (hindranceOtherTexts.length / numberOfOtherSelections) * 100
+        : 0;
+
+    return (
+        <SurveyExploreList
+            title={questionHeader}
+            items={hindranceOtherTexts}
+            question={wrapperQuestion}
+            description="Lists the free-text hindrances provided under the Other option."
+            numberOfResponses={hindranceOtherTexts.length}
+            responseRate={responseRate}
+            onBack={onBack}
+        />
+    );
 };
 
 export default HindrancesToIncorporateSustainability;

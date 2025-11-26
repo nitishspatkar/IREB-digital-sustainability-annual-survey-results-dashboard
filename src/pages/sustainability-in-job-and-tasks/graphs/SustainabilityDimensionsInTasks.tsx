@@ -1,206 +1,223 @@
 import { useMemo } from "react";
-import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
-import GraphWrapper from "../../../components/GraphWrapper";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
-import { columnDefinitions } from "../../../data/SurveyColumnDefinitions.ts";
+import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
+import { SurveyChart, SurveyExploreList } from "../../../components/GraphViews";
 
-const SustainabilityDimensionsInTasks = () => {
-  const questionHeader =
-    "Which sustainability dimensions do you consider in your role-specific tasks?";
-  const questionHeaderOther = columnDefinitions.find(
-    (c) => c.key === "roleConsiderOther"
-  )?.header;
-  const barColor = useThemeColor("--color-plum-400");
-  const tickColor = useThemeColor("--color-ink-700");
-  const borderColor = useThemeColor("--color-ink-200");
+// --- SHARED DATA LOGIC ---
+const useSustainabilityDimensionsInTasksData = () => {
+    const responses = useSurveyData();
+    const barColor = useThemeColor("--color-plum-400");
+    const tickColor = useThemeColor("--color-ink-700");
 
-  const responses = useSurveyData();
+    const { stats, roleOtherTexts, totalRespondentsWithAnswer, totalEligible } =
+        useMemo(() => {
+            const norm = (v: string) => v?.trim().toLowerCase() ?? "";
 
-  const counts = useMemo(() => {
-    const norm = (v: string) => v?.trim().toLowerCase() ?? "";
+            let environmental = 0;
+            let social = 0;
+            let individual = 0;
+            let economic = 0;
+            let technical = 0;
+            let other = 0;
+            let numberOfRespondents = 0;
 
-    let environmental = 0;
-    let social = 0;
-    let individual = 0;
-    let economic = 0;
-    let technical = 0;
-    let other = 0;
-    let numberOfRespondents = 0;
+            // --- Precondition: Q28 = Yes ---
+            const filteredResponses = responses.filter(
+                (r) => norm(r.raw.personIncorporatesSustainability) === "yes"
+            );
 
-    // --- Precondition: Q28 = Yes ---
-    const filteredResponses = responses.filter(
-      (r) => norm(r.raw.personIncorporatesSustainability) === "yes"
-    );
+            filteredResponses.forEach((r) => {
+                const raw = r.raw;
+                let hasAnswer = false;
 
-    filteredResponses.forEach((r) => {
-      const raw = r.raw;
-      let hasAnswer = false;
+                if (norm(raw.roleConsiderEnvironmental) === "yes") {
+                    environmental += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.roleConsiderSocial) === "yes") {
+                    social += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.roleConsiderIndividual) === "yes") {
+                    individual += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.roleConsiderEconomic) === "yes") {
+                    economic += 1;
+                    hasAnswer = true;
+                }
+                if (norm(raw.roleConsiderTechnical) === "yes") {
+                    technical += 1;
+                    hasAnswer = true;
+                }
 
-      if (norm(raw.roleConsiderEnvironmental) === "yes") {
-        environmental += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.roleConsiderSocial) === "yes") {
-        social += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.roleConsiderIndividual) === "yes") {
-        individual += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.roleConsiderEconomic) === "yes") {
-        economic += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.roleConsiderTechnical) === "yes") {
-        technical += 1;
-        hasAnswer = true;
-      }
+                const otherVal = norm(raw.roleConsiderOther);
+                if (otherVal.length > 0 && otherVal !== "n/a") {
+                    other += 1;
+                    hasAnswer = true;
+                }
 
-      const otherVal = norm(raw.roleConsiderOther);
-      if (otherVal.length > 0 && otherVal !== "n/a") {
-        other += 1;
-        hasAnswer = true;
-      }
+                if (hasAnswer) numberOfRespondents += 1;
+            });
 
-      if (hasAnswer) numberOfRespondents += 1;
-    });
+            const items = [
+                { label: "Environmental", value: environmental },
+                { label: "Social", value: social },
+                { label: "Individual", value: individual },
+                { label: "Economic", value: economic },
+                { label: "Technical", value: technical },
+                { label: "Other", value: other },
+            ];
 
-    const items = [
-      { label: "Environmental", value: environmental },
-      { label: "Social", value: social },
-      { label: "Individual", value: individual },
-      { label: "Economic", value: economic },
-      { label: "Technical", value: technical },
-      { label: "Other", value: other },
-    ];
+            // Sort ascending by value for horizontal chart
+            items.sort((a, b) => a.value - b.value);
 
-    // Sort ascending by value for horizontal chart
-    items.sort((a, b) => a.value - b.value);
+            // Extract texts
+            const texts = responses
+                .map((r) => (r.raw.roleConsiderOther ?? "").trim())
+                .filter((value) => {
+                    if (!value) return false;
+                    const lower = value.toLowerCase();
+                    return lower.length > 0 && lower !== "n/a";
+                });
+
+            return {
+                stats: items,
+                roleOtherTexts: texts,
+                totalRespondentsWithAnswer: numberOfRespondents,
+                totalEligible: filteredResponses.length,
+            };
+        }, [responses]);
 
     return {
-      labels: items.map((item) => item.label),
-      values: items.map((item) => item.value),
-      numberOfRespondents,
-      totalEligible: filteredResponses.length,
-    } as const;
-  }, [responses]);
+        stats,
+        roleOtherTexts,
+        totalRespondentsWithAnswer,
+        totalEligible,
+        barColor,
+        tickColor,
+    };
+};
 
-  const roleOtherTexts = useMemo(() => {
-    return responses
-      .map((r) => (r.raw.roleConsiderOther ?? "").trim())
-      .filter((value) => {
-        if (!value) return false;
-        const lower = value.toLowerCase();
-        return lower.length > 0 && lower !== "n/a";
-      });
-  }, [responses]);
+// --- COMPONENT 1: Main Chart ---
+export const SustainabilityDimensionsInTasks = ({
+                                                    onExplore,
+                                                    className,
+                                                }: {
+    onExplore?: () => void;
+    className?: string;
+}) => {
+    const {
+        stats,
+        roleOtherTexts,
+        totalRespondentsWithAnswer,
+        totalEligible,
+        barColor,
+        tickColor,
+    } = useSustainabilityDimensionsInTasksData();
 
-  const data = useMemo<Data[]>(
-    () => [
-      {
-        type: "bar",
-        orientation: "h",
-        x: counts.values,
-        y: counts.labels,
-        marker: { color: barColor },
-        // --- ADDED TEXT LABELS ---
-        text: counts.values.map((v) => v.toString()),
-        textposition: "outside",
-        textfont: {
-          family: "Inter, sans-serif",
-          size: 12,
-          color: tickColor,
-        },
-        cliponaxis: false,
-        hoverinfo: "none",
-      },
-    ],
-    [counts, barColor, tickColor] // Added tickColor
-  );
+    const questionHeader =
+        "Which sustainability dimensions do you consider in your role-specific tasks?";
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 50, r: 40, b: 60, l: 120 }, // Adjusted margins
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
-      xaxis: {
-        // Now the value axis
-        title: {
-          text: "Number of Respondents",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
-        },
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-      yaxis: {
-        // Now the category axis
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
-      },
-    }),
-    [tickColor]
-  );
+    const data = useMemo<Data[]>(
+        () => [
+            {
+                type: "bar",
+                orientation: "h",
+                x: stats.map((i) => i.value),
+                y: stats.map((i) => i.label),
+                marker: { color: barColor },
+                text: stats.map((i) => i.value.toString()),
+                textposition: "outside",
+                textfont: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
+                cliponaxis: false,
+                hoverinfo: "none",
+            },
+        ],
+        [stats, barColor, tickColor]
+    );
 
-  const numberOfResponses = counts.numberOfRespondents;
-  const responseRate =
-    counts.totalEligible > 0
-      ? Math.round((numberOfResponses / counts.totalEligible) * 100)
-      : 0;
+    const layout = useMemo<Partial<Layout>>(
+        () => ({
+            margin: { t: 50, r: 40, b: 60, l: 120 }, // Preserved margin
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            xaxis: {
+                title: {
+                    text: "Number of Respondents",
+                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                },
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+            yaxis: {
+                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            },
+        }),
+        [tickColor]
+    );
 
-  const question = questionHeader;
-  const description =
-    "Shows which sustainability dimensions respondents consider in their role-specific tasks.";
+    const responseRate =
+        totalEligible > 0
+            ? Math.round((totalRespondentsWithAnswer / totalEligible) * 100)
+            : 0;
 
-  return (
-    <>
-      <GraphWrapper
-        question={question}
-        description={description}
-        numberOfResponses={numberOfResponses}
-        responseRate={responseRate}
-      >
-        <div className="h-[520px]">
-          <Plot
+    return (
+        <SurveyChart
+            className={className}
+            question={questionHeader}
+            description="Shows which sustainability dimensions respondents consider in their role-specific tasks."
+            numberOfResponses={totalRespondentsWithAnswer}
+            responseRate={responseRate}
             data={data}
             layout={layout}
-            config={{ displayModeBar: false, responsive: true }}
-            useResizeHandler
-            style={{ width: "100%", height: "100%" }}
-          />
-        </div>
-      </GraphWrapper>
-      {roleOtherTexts.length > 0 && (
-        <GraphWrapper
-          question={questionHeaderOther ?? ""}
-          numberOfResponses={roleOtherTexts.length}
-          responseRate={
-            counts.totalEligible > 0
-              ? (roleOtherTexts.length / counts.totalEligible) * 100
-              : 0
-          }
-        >
-          <div className="mt-4 h-[520px]">
-            <ul
-              className="h-[calc(100%-40px)] overflow-y-auto"
-              style={{ color: tickColor }}
-            >
-              {roleOtherTexts.map((text, index) => (
-                <li
-                  key={index}
-                  className="border-b px-2 py-3 text-sm"
-                  style={{ borderColor: borderColor }}
-                >
-                  {text}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </GraphWrapper>
-      )}
-    </>
-  );
+            hasExploreData={roleOtherTexts.length > 0}
+            onExplore={onExplore}
+        />
+    );
+};
+
+// --- COMPONENT 2: Detail List ---
+export const SustainabilityDimensionsInTasksDetails = ({
+                                                           onBack,
+                                                       }: {
+    onBack: () => void;
+}) => {
+    const { stats, roleOtherTexts } = useSustainabilityDimensionsInTasksData();
+
+    const questionHeader =
+        "Which sustainability dimensions do you consider in your role-specific tasks?";
+    const questionHeaderOther = columnDefinitions.find(
+        (c) => c.key === "roleConsiderOther"
+    )?.header;
+
+    const wrapperQuestion = questionHeaderOther ?? "";
+
+    // Calculate rate relative to "Other" checkbox selection
+    const otherStat = stats.find((s) => s.label === "Other");
+    const numberOfOtherSelections = otherStat ? otherStat.value : 0;
+
+    const responseRate = numberOfOtherSelections > 0
+        ? (roleOtherTexts.length / numberOfOtherSelections) * 100
+        : 0;
+
+    return (
+        <SurveyExploreList
+            title={questionHeader}
+            items={roleOtherTexts}
+            question={wrapperQuestion}
+            description="Lists the free-text dimensions provided under the Other option."
+            numberOfResponses={roleOtherTexts.length}
+            responseRate={responseRate}
+            onBack={onBack}
+        />
+    );
 };
 
 export default SustainabilityDimensionsInTasks;
