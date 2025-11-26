@@ -20,7 +20,7 @@ import {
 
 // --- HELPER COMPONENT ---
 const GraphAnchor = ({ id, children }: { id: string; children: React.ReactNode }) => (
-    <div id={id} className="scroll-mt-24">
+    <div id={id}>
         {children}
     </div>
 );
