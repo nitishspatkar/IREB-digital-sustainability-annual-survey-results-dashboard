@@ -6,6 +6,8 @@ interface GraphWrapperProps {
     numberOfResponses?: number;
     responseRate?: number;
     children: ReactNode;
+    onExplore?: () => void;
+    showExploreButton?: boolean;
 }
 
 const GraphWrapper = ({
@@ -14,6 +16,8 @@ const GraphWrapper = ({
                           numberOfResponses,
                           responseRate,
                           children,
+                          onExplore,
+                          showExploreButton = false,
                       }: GraphWrapperProps) => {
     const showNumberOfResponses = typeof numberOfResponses === "number";
     const showResponseRate = typeof responseRate === "number";
@@ -23,17 +27,18 @@ const GraphWrapper = ({
         <div className="space-y-4">
             {/* Stats boxes */}
             {showStats && (
-                <div className="flex gap-4" style={{
-                    fontFamily:
-                        '"GT Pressura Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                }}>
+                <div
+                    className="flex gap-4"
+                    style={{
+                        fontFamily:
+                            '"GT Pressura Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                    }}
+                >
                     {showNumberOfResponses && (
                         <div className="bg-ireb-light-berry px-6 py-3">
               <span className="text-base text-ireb-berry">
                 Number of responses:{" "}
-                  <span className="text-ireb-berry">
-                  {numberOfResponses}
-                </span>
+                  <span className="text-ireb-berry">{numberOfResponses}</span>
               </span>
                         </div>
                     )}
@@ -73,9 +78,14 @@ const GraphWrapper = ({
                 <button className="cursor-pointer border border-ireb-berry bg-ireb-berry px-4 py-2 text-base font-medium text-white transition-colors hover:brightness-75">
                     results
                 </button>
-                <button className="cursor-pointer border border-ireb-berry bg-ireb-superlight-berry px-4 py-2 text-base font-medium text-ireb-berry transition-colors hover:brightness-75">
-                    explore
-                </button>
+                {showExploreButton && (
+                    <button
+                        onClick={onExplore}
+                        className="cursor-pointer border border-ireb-berry bg-ireb-superlight-berry px-4 py-2 text-base font-medium text-ireb-berry transition-colors hover:brightness-75"
+                    >
+                        explore
+                    </button>
+                )}
             </div>
         </div>
     );

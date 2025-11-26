@@ -1,197 +1,131 @@
 import { useMemo } from "react";
-import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
-import GraphWrapper from "../../../components/GraphWrapper";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
+// IMPORTIERE DIE NEUEN GENERISCHEN VIEWS
+import { SurveyChart, SurveyExploreList } from "../../../components/GraphViews";
 
-interface Props {
-  className?: string;
-}
+// --- DATEN LOGIK (Hook) ---
+// Das bleibt lokal, da es spezifisch für DIESE Frage ist
+const useApplicationDomainData = () => {
+    const surveyResponses = useSurveyData();
+    const chartBarColor = useThemeColor("--color-plum-400");
+    const tickColor = useThemeColor("--color-ink-700");
 
-const normalizeApplicationDomain = (value: string) =>
-  value.replace(/\s+/g, " ").trim();
+    const normalize = (val: string) => val.replace(/\s+/g, " ").trim();
 
-const DemographicApplicationDomain = ({ className }: Props) => {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === "primaryApplicationDomain"
-  )?.header;
-  const questionHeaderOther = columnDefinitions.find(
-    (c) => c.key === "primaryApplicationDomainOther"
-  )?.header;
-  const chartBarColor = useThemeColor("--color-plum-400");
-  const tickColor = useThemeColor("--color-ink-700");
-  const surveyResponses = useSurveyData();
-  const borderColor = useThemeColor("--color-ink-200");
+    // Stats berechnen
+    const stats = useMemo(() => {
+        const counts = new Map<string, number>();
+        surveyResponses.forEach((r) => {
+            const val = normalize(r.raw.primaryApplicationDomain ?? "");
+            if (val && val.toLowerCase() !== "n/a") {
+                counts.set(val, (counts.get(val) ?? 0) + 1);
+            }
+        });
+        return Array.from(counts.entries())
+            .map(([domain, count]) => ({ domain, count }))
+            .sort((a, b) => b.count - a.count);
+    }, [surveyResponses]);
 
-  const applicationDomainStats = useMemo(() => {
-    const counts = new Map<string, number>();
+    // "Other" Texte sammeln
+    const otherTexts = useMemo(() => {
+        return surveyResponses
+            .map((r) => normalize(r.raw.primaryApplicationDomainOther ?? ""))
+            .filter((v) => v.length > 0);
+    }, [surveyResponses]);
 
-    surveyResponses.forEach((response) => {
-      const primaryDomain = normalizeApplicationDomain(
-        response.raw.primaryApplicationDomain ?? ""
-      );
-
-      const domain = primaryDomain;
-
-      if (domain.length > 0 && domain.toLowerCase() !== "n/a") {
-        counts.set(domain, (counts.get(domain) ?? 0) + 1);
-      }
-    });
-
-    return Array.from(counts.entries())
-      .map(([domain, count]) => ({ domain, count }))
-      .sort((a, b) => b.count - a.count);
-  }, [surveyResponses]);
-
-  const otherApplicationDomainTexts = useMemo(() => {
-    return surveyResponses
-      .map((response) =>
-        normalizeApplicationDomain(
-          response.raw.primaryApplicationDomainOther ?? ""
-        )
-      )
-      .filter((value) => value.length > 0);
-  }, [surveyResponses]);
-
-  const numberOfResponses = applicationDomainStats.reduce(
-    (sum, stat) => sum + stat.count,
-    0
-  );
-  const totalResponses = surveyResponses.length;
-  const responseRate =
-    totalResponses > 0
-      ? (numberOfResponses / totalResponses) * 100
-      : 0;
+    return { stats, otherTexts, chartBarColor, tickColor, surveyResponses };
+};
 
 
-  const numberOfResponsesOther = otherApplicationDomainTexts.length;
+// --- EXPORT 1: DAS DIAGRAMM (für das Dashboard) ---
+export const DemographicApplicationDomain = ({
+                                                 className,
+                                                 onExplore
+                                             }: {
+    className?: string;
+    onExplore?: () => void
+}) => {
+    const { stats, otherTexts, chartBarColor, tickColor, surveyResponses } = useApplicationDomainData();
 
-  const numberOfResponsesOtherAll = useMemo(() => {
-        const otherStat = applicationDomainStats.find(s => s.domain.toLowerCase().includes("other"));
-        return otherStat ? otherStat.count : 0;
-  }, [applicationDomainStats]);
-
-  const otherResponseRate =
-    totalResponses > 0
-        ? (numberOfResponsesOther / numberOfResponsesOtherAll) * 100
-        : 0;
-
-  const chartData = useMemo<Data[]>(
-    () => [
-      {
-        x: applicationDomainStats.map((item) => item.count),
-        y: applicationDomainStats.map((item) => item.domain),
+    // Plotly Daten konfigurieren
+    const chartData: Data[] = useMemo(() => [{
+        x: stats.map((i) => i.count),
+        y: stats.map((i) => i.domain),
         type: "bar",
         orientation: "h",
-        marker: {
-          color: chartBarColor,
-        },
-        text: applicationDomainStats.map((item) => item.count.toString()),
+        marker: { color: chartBarColor },
+        text: stats.map((i) => i.count.toString()),
         textposition: "outside",
         hoverinfo: "y+x",
-        textfont: {
-          color: tickColor,
-        },
-      },
-    ],
-    [applicationDomainStats, chartBarColor, tickColor]
-  );
+        textfont: { color: tickColor },
+    }], [stats, chartBarColor, tickColor]);
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 40, r: 40, b: 40, l: 250 },
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
-      xaxis: {
-        tickangle: 0,
-        tickfont: {
-          family: "Inter, sans-serif",
-          size: 12,
-          color: tickColor,
-        },
-        zeroline: false,
-      },
-      yaxis: {
-        autorange: "reversed",
-        tickfont: {
-          family: "Inter, sans-serif",
-          size: 12,
-          color: tickColor,
-        },
-        showline: false,
-        automargin: true,
-      },
-      showlegend: false,
-    }),
-    [tickColor]
-  );
+    const layout: Partial<Layout> = useMemo(() => ({
+        margin: { t: 40, r: 40, b: 40, l: 250 },
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "rgba(0,0,0,0)",
+        xaxis: { zeroline: false, tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor } },
+        yaxis: { autorange: "reversed", showline: false, tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor } },
+        showlegend: false,
+    }), [tickColor]);
 
-  const question =
-    questionHeader ??
-    "In which application domain do you currently primarily work?";
-  const description =
-    "Breaks down the primary application domains represented by respondents.";
+    // Texte holen
+    const header = columnDefinitions.find(c => c.key === "primaryApplicationDomain")?.header;
+    const question = header ?? "In which application domain do you currently primarily work?";
 
-  const otherQuestion =
-    questionHeaderOther ??
-    "In which application domain do you currently primarily work? [Other]";
-  const otherDescription =
-    "Lists the free-text application domains supplied under the Other option.";
+    // Raten berechnen
+    const numResp = stats.reduce((acc, curr) => acc + curr.count, 0);
+    const rate = surveyResponses.length > 0 ? (numResp / surveyResponses.length) * 100 : 0;
 
-  const chartContent = (
-    <GraphWrapper
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-    >
-      <div className="h-[520px]">
-        <Plot
-          data={chartData}
-          layout={layout}
-          config={{ displayModeBar: false, responsive: true }}
-          useResizeHandler
-          style={{ width: "100%", height: "100%" }}
+    // --> RENDER GENERISCHE KOMPONENTE
+    return (
+        <SurveyChart
+            className={className}
+            question={question}
+            description="Breaks down the primary application domains represented by respondents."
+            numberOfResponses={numResp}
+            responseRate={rate}
+            data={chartData}
+            layout={layout}
+            hasExploreData={otherTexts.length > 0}
+            onExplore={onExplore}
         />
-      </div>
-    </GraphWrapper>
-  );
+    );
+};
 
-  return (
-    <>
-      {className ? (
-        <div className={className}>{chartContent}</div>
-      ) : (
-        chartContent
-      )}
 
-      {otherApplicationDomainTexts.length > 0 && (
-        <GraphWrapper
-          question={otherQuestion}
-          description={otherDescription}
-          numberOfResponses={numberOfResponsesOther}
-          responseRate={otherResponseRate}
-        >
-          <div className="h-[520px] overflow-y-auto">
-            <ul style={{ color: tickColor }}>
-              {otherApplicationDomainTexts.map((text, index) => (
-                <li
-                  key={index}
-                  className="border-b px-2 py-3 text-sm"
-                  style={{ borderColor: borderColor }}
-                >
-                  {text}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </GraphWrapper>
-      )}
-    </>
-  );
+// --- EXPORT 2: DIE DETAIL SEITE (für die Explore Ansicht) ---
+export const DemographicApplicationDomainDetails = ({ onBack }: { onBack: () => void }) => {
+    const { stats, otherTexts } = useApplicationDomainData();
+
+    // Texte holen
+    const mainHeader = columnDefinitions.find(c => c.key === "primaryApplicationDomain")?.header;
+    const otherHeader = columnDefinitions.find(c => c.key === "primaryApplicationDomainOther")?.header;
+
+    const title = mainHeader ?? "Primary Application Domain";
+    const question = otherHeader ?? "In which application domain do you currently primarily work? [Other]";
+
+    // Raten für "Other" berechnen
+    const numOther = otherTexts.length;
+    const totalOtherCategory = stats.find(s => s.domain.toLowerCase().includes("other"))?.count ?? 0;
+    const rate = totalOtherCategory > 0 ? (numOther / totalOtherCategory) * 100 : 0;
+
+    // --> RENDER GENERISCHE KOMPONENTE
+    return (
+        <SurveyExploreList
+            title={title}
+            items={otherTexts}
+            question={question}
+            description="Lists the free-text application domains supplied under the Other option."
+            numberOfResponses={numOther}
+            responseRate={rate}
+            onBack={onBack}
+        />
+    );
 };
 
 export default DemographicApplicationDomain;
