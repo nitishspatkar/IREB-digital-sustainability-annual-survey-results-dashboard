@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
 
-import GraphWrapper from "../../../components/GraphWrapper";
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
+// Import der neuen generischen Views
+import { SurveyChart, SurveyExploreList } from "../../../components/GraphViews";
 
 type DiscussionFrequencyStat = {
     frequency: string;
@@ -14,16 +14,12 @@ type DiscussionFrequencyStat = {
 
 const normalizeFrequency = (value: string) => value.replace(/\s+/g, " ").trim();
 
-const DiscussionFrequency = () => {
-    const questionHeader =
-        columnDefinitions.find((c) => c.key === "discussionFrequency")?.header
-    const questionHeaderOther =
-        columnDefinitions.find((c) => c.key === "discussionFrequencyOther")?.header
-    const chartBarColor = useThemeColor("--color-plum-400");
-    const titleColor = useThemeColor("--color-ink-900");
-    const tickColor = useThemeColor("--color-ink-700");
-    const borderColor = useThemeColor("--color-ink-200");
+// --- SHARED DATA LOGIC ---
+const useDiscussionFrequencyData = () => {
     const surveyResponses = useSurveyData();
+    const chartBarColor = useThemeColor("--color-plum-400");
+    const tickColor = useThemeColor("--color-ink-700");
+    const titleColor = useThemeColor("--color-ink-900");
 
     const frequencyStats = useMemo<DiscussionFrequencyStat[]>(() => {
         const counts = new Map<string, number>();
@@ -32,10 +28,7 @@ const DiscussionFrequency = () => {
             const frequency = normalizeFrequency(
                 response.raw.discussionFrequency ?? ""
             );
-            if (
-                frequency.length > 0 &&
-                frequency.toLowerCase() !== "n/a"
-            ) {
+            if (frequency.length > 0 && frequency.toLowerCase() !== "n/a") {
                 counts.set(frequency, (counts.get(frequency) ?? 0) + 1);
             }
         });
@@ -47,20 +40,55 @@ const DiscussionFrequency = () => {
 
     const otherFrequencyTexts = useMemo(() => {
         return surveyResponses
-            .map((response) => normalizeFrequency(response.raw.discussionFrequencyOther ?? ""))
+            .map((response) =>
+                normalizeFrequency(response.raw.discussionFrequencyOther ?? "")
+            )
             .filter((value) => value.length > 0);
     }, [surveyResponses]);
 
-    const chartData = useMemo<Data[]>(() => {
+    return {
+        frequencyStats,
+        otherFrequencyTexts,
+        chartBarColor,
+        tickColor,
+        titleColor,
+        surveyResponses,
+    };
+};
 
+// --- COMPONENT 1: Main Chart (Dashboard) ---
+export const DiscussionFrequency = ({
+                                        onExplore,
+                                        className,
+                                    }: {
+    onExplore: () => void;
+    className?: string;
+}) => {
+    const { frequencyStats, otherFrequencyTexts, chartBarColor, tickColor, surveyResponses, titleColor } =
+        useDiscussionFrequencyData();
+
+    const questionHeader = columnDefinitions.find(
+        (c) => c.key === "discussionFrequency"
+    )?.header;
+
+    // Stats Logic
+    const numberOfResponses = frequencyStats.reduce(
+        (sum, stat) => sum + stat.count,
+        0
+    );
+    const responseRate =
+        surveyResponses.length > 0
+            ? (numberOfResponses / surveyResponses.length) * 100
+            : 0;
+
+    // Chart Configuration
+    const chartData = useMemo<Data[]>(() => {
         return [
             {
-                // --- CHANGES FOR HORIZONTAL BAR ---
                 type: "bar",
                 orientation: "h",
                 x: frequencyStats.map((item) => item.count),
                 y: frequencyStats.map((item) => item.frequency),
-                // --- END CHANGES ---
                 marker: {
                     color: chartBarColor,
                 },
@@ -79,7 +107,7 @@ const DiscussionFrequency = () => {
 
     const layout = useMemo<Partial<Layout>>(
         () => ({
-            margin: { t: 50, r: 40, b: 60, l: 240 }, // mehr Platz links
+            margin: { t: 50, r: 40, b: 60, l: 240 }, // specific margins preserved
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
             xaxis: {
@@ -103,21 +131,54 @@ const DiscussionFrequency = () => {
                     size: 12,
                     color: tickColor,
                 },
-                automargin: true, // wichtig
+                automargin: true,
             },
         }),
         [titleColor, tickColor]
     );
 
+    const question =
+        questionHeader ??
+        "How often do you discuss digital sustainability in your professional environment?";
+    const description =
+        "Shows the frequency of digital sustainability discussions among respondents.";
 
-    const numberOfResponses = frequencyStats.reduce((sum, stat) => sum + stat.count, 0);
-    const totalResponses = surveyResponses.length;
-    const responseRate =
-        totalResponses > 0
-            ? (numberOfResponses / totalResponses) * 100
-            : 0;
+    return (
+        <SurveyChart
+            className={className}
+            question={question}
+            description={description}
+            numberOfResponses={numberOfResponses}
+            responseRate={responseRate}
+            data={chartData}
+            layout={layout}
+            hasExploreData={otherFrequencyTexts.length > 0}
+            onExplore={onExplore}
+        />
+    );
+};
 
+// --- COMPONENT 2: Detail List (Explore Page) ---
+export const DiscussionFrequencyDetails = ({
+                                               onBack,
+                                           }: {
+    onBack: () => void;
+}) => {
+    const { frequencyStats, otherFrequencyTexts } = useDiscussionFrequencyData();
 
+    const mainQuestionHeader = columnDefinitions.find(
+        (c) => c.key === "discussionFrequency"
+    )?.header;
+    const questionHeaderOther = columnDefinitions.find(
+        (c) => c.key === "discussionFrequencyOther"
+    )?.header;
+
+    // Title Logic
+    const mainQuestionTitle =
+        mainQuestionHeader ??
+        "How often do you discuss digital sustainability in your professional environment?";
+
+    // Stats Logic for "Other"
     const numberOfResponsesOther = otherFrequencyTexts.length;
     const numberOfResponsesOtherAll = useMemo(() => {
         const otherStat = frequencyStats.find((s) =>
@@ -131,53 +192,20 @@ const DiscussionFrequency = () => {
             ? (numberOfResponsesOther / numberOfResponsesOtherAll) * 100
             : 0;
 
-    const question = questionHeader ?? "How often do you discuss digital sustainability in your professional environment?";
-    const description = "Shows the frequency of digital sustainability discussions among respondents.";
+    const wrapperQuestion = questionHeaderOther ?? ""; // Original code had empty fallback or specific string?
+    // Note: Original code passed empty string if undefined for "Other" title in the list wrapper,
+    // but usually we want the "Other" question text there.
 
     return (
-        <>
-        <GraphWrapper
-            question={question}
-            description={description}
-            numberOfResponses={numberOfResponses}
-            responseRate={responseRate}
-        >
-            <div className="h-[520px]">
-                <Plot
-                    data={chartData}
-                    layout={layout}
-                    style={{ width: "100%", height: "100%" }}
-                    useResizeHandler
-                    config={{ displayModeBar: false, responsive: true }}
-                />
-            </div>
-        </GraphWrapper>
-
-        {otherFrequencyTexts.length > 0 && (
-            <GraphWrapper
-                question={questionHeaderOther ?? ""}
-                numberOfResponses={numberOfResponsesOtherAll}
-                responseRate={otherResponseRate}
-            >
-            <div className="mt-4 h-[520px]">
-                <ul
-                    className="h-[calc(100%-40px)] overflow-y-auto"
-                    style={{ color: tickColor }}
-                >
-                    {otherFrequencyTexts.map((text, index) => (
-                        <li
-                            key={index}
-                            className="border-b px-2 py-3 text-sm"
-                            style={{ borderColor: borderColor }}
-                        >
-                            {text}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            </GraphWrapper>
-        )}
-        </>
+        <SurveyExploreList
+            title={mainQuestionTitle}
+            items={otherFrequencyTexts}
+            question={wrapperQuestion}
+            description="Lists the free-text entries for the discussion frequency."
+            numberOfResponses={numberOfResponsesOther}
+            responseRate={otherResponseRate}
+            onBack={onBack}
+        />
     );
 };
 
