@@ -9,8 +9,8 @@ import { SurveyChart, SurveyExploreList } from "../../../components/GraphViews";
 // --- SHARED DATA LOGIC ---
 const useDriversData = () => {
     const surveyResponses = useSurveyData();
-    const barColor = useThemeColor("--color-plum-400");
-    const tickColor = useThemeColor("--color-ink-700");
+    const barColor = useThemeColor("--color-ireb-berry");
+    const tickColor = useThemeColor("--color-ireb-grey-01");
 
     const { stats, driveOtherTexts, totalRespondentsWithAnswer } = useMemo(() => {
         const normalize = (v: string) => v?.trim().toLowerCase() ?? "";

@@ -18,9 +18,10 @@ const DefinitionAwareness = () => {
   const questionHeader = columnDefinitions.find(
     (c) => c.key === "heardOfDigitalSustainabilityDefinition"
   )?.header;
-  const barColor = useThemeColor("--color-plum-400");
-  const titleColor = useThemeColor("--color-ink-900");
-  const tickColor = useThemeColor("--color-ink-700");
+  const yesColor = useThemeColor("--color-ireb-spring");
+  const noColor = useThemeColor("--color-ireb-mandarin");
+  const titleColor = useThemeColor("--color-ireb-grey-01");
+  const tickColor = useThemeColor("--color-ireb-grey-01");
 
   const responses = useSurveyData();
 
@@ -53,7 +54,7 @@ const DefinitionAwareness = () => {
         y: stats.map((s) => s.count),
         type: "bar",
         marker: {
-          color: barColor,
+            color: stats.map((s) => (s.label === "Yes" ? yesColor : noColor)),
         },
         // --- CHANGES START HERE ---
         text: stats.map((s) => s.count.toString()),
@@ -68,7 +69,7 @@ const DefinitionAwareness = () => {
         hoverinfo: "none",
       },
     ];
-  }, [stats, barColor, tickColor]); // Added tickColor
+  }, [stats, yesColor, noColor, tickColor]); // Added tickColor
 
   const layout = useMemo<Partial<Layout>>(
     () => ({

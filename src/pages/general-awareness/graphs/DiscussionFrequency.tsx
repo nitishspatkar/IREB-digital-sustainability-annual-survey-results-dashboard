@@ -17,9 +17,9 @@ const normalizeFrequency = (value: string) => value.replace(/\s+/g, " ").trim();
 // --- SHARED DATA LOGIC ---
 const useDiscussionFrequencyData = () => {
     const surveyResponses = useSurveyData();
-    const chartBarColor = useThemeColor("--color-plum-400");
-    const tickColor = useThemeColor("--color-ink-700");
-    const titleColor = useThemeColor("--color-ink-900");
+    const chartBarColor = useThemeColor("--color-ireb-berry");
+    const tickColor = useThemeColor("--color-ireb-grey-01");
+    const titleColor = useThemeColor("--color-ireb-grey-01");
 
     const frequencyStats = useMemo<DiscussionFrequencyStat[]>(() => {
         const counts = new Map<string, number>();

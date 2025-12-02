@@ -15,10 +15,10 @@ type DemographicCountryTableProps = {
 const DemographicCountryTable = ({
   respondentStats,
 }: DemographicCountryTableProps) => {
-  const tableHeaderFillColor = useThemeColor("--color-lavender-50");
-  const tableCellFillColor = useThemeColor("--color-lavender-100");
-  const headerFontColor = useThemeColor("--color-ink-900");
-  const cellFontColor = useThemeColor("--color-ink-700");
+  const tableHeaderFillColor = useThemeColor("--color-ireb-light-berry");
+  const tableCellFillColor = useThemeColor("--color-ireb-superlight-berry");
+  const headerFontColor = useThemeColor("--color-ireb-grey-01");
+  const cellFontColor = useThemeColor("--color-ireb-grey-01");
   const surveyResponses = useSurveyData();
 
   const tableData = useMemo<Data[]>(

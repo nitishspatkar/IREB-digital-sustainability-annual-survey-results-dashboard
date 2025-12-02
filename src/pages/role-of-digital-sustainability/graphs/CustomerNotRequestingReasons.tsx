@@ -10,8 +10,8 @@ const CustomerNotRequestingReasons = () => {
   const questionHeader = columnDefinitions.find(
     (c) => c.key === "customerNotRequestingReasons"
   )?.header;
-  const tickColor = useThemeColor("--color-ink-700");
-  const borderColor = useThemeColor("--color-ink-200");
+  const tickColor = useThemeColor("--color-ireb-grey-01");
+  const borderColor = useThemeColor("--color-ireb-grey-01");
 
   const responses = useSurveyData();
 

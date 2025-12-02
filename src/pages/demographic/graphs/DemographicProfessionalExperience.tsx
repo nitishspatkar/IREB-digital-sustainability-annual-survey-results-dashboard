@@ -12,8 +12,8 @@ export function DemographicProfessionalExperience() {
     (c) => c.key === "professionalExperienceYears"
   )?.header;
   const surveyResponses = useSurveyData();
-  const chartBarColor = useThemeColor("--color-plum-400");
-  const tickColor = useThemeColor("--color-ink-700");
+  const chartBarColor = useThemeColor("--color-ireb-berry");
+  const tickColor = useThemeColor("--color-ireb-grey-01");
 
   const experienceStats = useMemo(() => {
     const counts = new Map<string, number>();

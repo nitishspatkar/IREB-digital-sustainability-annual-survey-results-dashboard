@@ -11,8 +11,10 @@ const OrganizationOffersTraining = () => {
   const questionHeader = columnDefinitions.find(
     (c) => c.key === "organizationOffersTraining"
   )?.header;
-  const barColor = useThemeColor("--color-plum-400");
-  const tickColor = useThemeColor("--color-ink-700");
+  const yesColor = useThemeColor("--color-ireb-spring");
+  const noColor = useThemeColor("--color-ireb-mandarin");
+  const barColor = useThemeColor("--color-ireb-grey-02");
+  const tickColor = useThemeColor("--color-ireb-grey-01");
 
   const responses = useSurveyData();
 
@@ -51,7 +53,17 @@ const OrganizationOffersTraining = () => {
         x: counts.labels,
         y: counts.values,
         type: "bar",
-        marker: { color: barColor },
+        marker: {
+            color: counts.labels.map((label) => {
+                if (label === "Yes") {
+                    return yesColor;
+                } else if (label === "No") {
+                    return noColor;
+                } else {
+                    return barColor;
+                }
+            }),
+        },
         // --- ADDED TEXT LABELS ---
         text: counts.values.map((v) => v.toString()),
         textposition: "outside",
@@ -64,7 +76,7 @@ const OrganizationOffersTraining = () => {
         hoverinfo: "none",
       },
     ],
-    [counts, barColor, tickColor] // Added tickColor
+    [counts, barColor, yesColor, noColor, tickColor] // Added tickColor
   );
 
   const layout = useMemo<Partial<Layout>>(

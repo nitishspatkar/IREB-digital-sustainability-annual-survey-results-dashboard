@@ -11,8 +11,8 @@ import { SurveyChart, SurveyExploreList } from "../../../components/GraphViews";
 // Das bleibt lokal, da es spezifisch für DIESE Frage ist
 const useApplicationDomainData = () => {
     const surveyResponses = useSurveyData();
-    const chartBarColor = useThemeColor("--color-plum-400");
-    const tickColor = useThemeColor("--color-ink-700");
+    const chartBarColor = useThemeColor("--color-ireb-berry");
+    const tickColor = useThemeColor("--color-ireb-grey-01");
 
     const normalize = (val: string) => val.replace(/\s+/g, " ").trim();
 

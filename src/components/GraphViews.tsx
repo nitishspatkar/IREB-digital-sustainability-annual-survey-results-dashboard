@@ -73,8 +73,8 @@ export const SurveyExploreList = ({
                                       onBack,
                                       className,
                                   }: ExploreListProps) => {
-    const tickColor = useThemeColor("--color-ink-700");
-    const borderColor = useThemeColor("--color-ink-200");
+    const tickColor = useThemeColor("--color-ireb-grey-01");
+    const borderColor = useThemeColor("--color-ireb-grey-01");
 
     return (
         <div className={`space-y-6 ${className ?? ""}`}>

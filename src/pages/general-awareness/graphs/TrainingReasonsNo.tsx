@@ -27,8 +27,8 @@ const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
 // --- SHARED DATA LOGIC ---
 const useTrainingReasonsData = () => {
     const responses = useSurveyData();
-    const barColor = useThemeColor("--color-plum-400");
-    const tickColor = useThemeColor("--color-ink-700");
+    const barColor = useThemeColor("--color-ireb-berry");
+    const tickColor = useThemeColor("--color-ireb-grey-01");
 
     // 1. Filter for users who answered "No" to Q10
     const nonParticipants = useMemo(() =>

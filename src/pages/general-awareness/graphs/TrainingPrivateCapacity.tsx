@@ -37,9 +37,12 @@ const TrainingPrivateCapacity = () => {
   const questionHeader = columnDefinitions.find(
     (c) => c.key === "trainingPrivateCapacity"
   )?.header;
-  const barColor = useThemeColor("--color-plum-400");
-  const titleColor = useThemeColor("--color-ink-900");
-  const tickColor = useThemeColor("--color-ink-700");
+
+  const yesColor = useThemeColor("--color-ireb-spring");
+  const noColor = useThemeColor("--color-ireb-mandarin");
+  const barColor = useThemeColor("--color-ireb-grey-02");
+  const titleColor = useThemeColor("--color-ireb-grey-01");
+  const tickColor = useThemeColor("--color-ireb-grey-01");
 
   const responses = useSurveyData();
 
@@ -84,7 +87,17 @@ const TrainingPrivateCapacity = () => {
         orientation: "h",
         x: stats.map((s) => s.count),
         y: stats.map((s) => s.label),
-        marker: { color: barColor },
+        marker: {
+            color: stats.map(function(s) {
+                if (s.label === "Yes") {
+                    return yesColor;
+                } else if(s.label === "No") {
+                    return noColor;
+                } else {
+                    return barColor;
+                }
+            }),
+        },
         text: stats.map((s) => s.count.toString()),
         textposition: "outside",
         textfont: {
@@ -96,7 +109,7 @@ const TrainingPrivateCapacity = () => {
         hoverinfo: "none",
       },
     ];
-  }, [stats, barColor, tickColor]);
+  }, [stats, barColor, yesColor, noColor, tickColor]);
 
   const layout = useMemo<Partial<Layout>>(
     () => ({

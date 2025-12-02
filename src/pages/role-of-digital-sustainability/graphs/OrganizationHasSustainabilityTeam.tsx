@@ -14,8 +14,10 @@ const OrganizationHasSustainabilityTeam = () => {
   const questionHeader = columnDefinitions.find(
     (c) => c.key === "organizationHasSustainabilityTeam"
   )?.header;
-  const barColor = useThemeColor("--color-plum-400");
-  const tickColor = useThemeColor("--color-ink-700");
+  const yesColor = useThemeColor("--color-ireb-spring");
+  const noColor = useThemeColor("--color-ireb-mandarin");
+  const barColor = useThemeColor("--color-ireb-grey-02");
+  const tickColor = useThemeColor("--color-ireb-grey-01");
 
   const responses = useSurveyData();
 
@@ -52,7 +54,17 @@ const OrganizationHasSustainabilityTeam = () => {
         x: stats.labels,
         y: stats.values,
         type: "bar",
-        marker: { color: barColor },
+        marker: {
+            color: stats.labels.map((label) => {
+                if (label === "Yes") {
+                    return yesColor;
+                } else if (label === "No") {
+                    return noColor;
+                } else {
+                    return barColor;
+                }
+            }),
+        },
         text: stats.values.map((v) => v.toString()),
         textposition: "outside",
         textfont: {
@@ -64,7 +76,7 @@ const OrganizationHasSustainabilityTeam = () => {
         hoverinfo: "none",
       },
     ],
-    [stats, barColor, tickColor]
+    [stats, barColor, yesColor, noColor, tickColor]
   );
 
   const layout = useMemo<Partial<Layout>>(

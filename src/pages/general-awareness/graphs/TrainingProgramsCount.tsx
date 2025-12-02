@@ -66,9 +66,9 @@ const TrainingProgramsCount = () => {
   const questionHeader = columnDefinitions.find(
     (c) => c.key === "trainingCount"
   )?.header;
-  const barColor = useThemeColor("--color-plum-400");
-  const titleColor = useThemeColor("--color-ink-900");
-  const tickColor = useThemeColor("--color-ink-700");
+  const barColor = useThemeColor("--color-ireb-berry");
+  const titleColor = useThemeColor("--color-ireb-grey-01");
+  const tickColor = useThemeColor("--color-ireb-grey-01");
 
   const responses = useSurveyData();
 

@@ -16,8 +16,8 @@ const normalizeRole = (value: string) => value.replace(/\s+/g, " ").trim();
 // --- SHARED DATA LOGIC (Bleibt unverändert) ---
 const useRoleData = () => {
     const surveyResponses = useSurveyData();
-    const chartBarColor = useThemeColor("--color-plum-400");
-    const tickColor = useThemeColor("--color-ink-700");
+    const chartBarColor = useThemeColor("--color-ireb-berry");
+    const tickColor = useThemeColor("--color-ireb-grey-01");
 
     const roleStats = useMemo<RoleStat[]>(() => {
         const counts = new Map<string, number>();

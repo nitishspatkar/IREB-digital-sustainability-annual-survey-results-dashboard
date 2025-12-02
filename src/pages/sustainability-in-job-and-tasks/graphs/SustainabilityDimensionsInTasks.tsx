@@ -9,8 +9,8 @@ import { SurveyChart, SurveyExploreList } from "../../../components/GraphViews";
 // --- SHARED DATA LOGIC ---
 const useSustainabilityDimensionsInTasksData = () => {
     const responses = useSurveyData();
-    const barColor = useThemeColor("--color-plum-400");
-    const tickColor = useThemeColor("--color-ink-700");
+    const barColor = useThemeColor("--color-ireb-berry");
+    const tickColor = useThemeColor("--color-ireb-grey-01");
 
     const { stats, roleOtherTexts, totalRespondentsWithAnswer, totalEligible } =
         useMemo(() => {

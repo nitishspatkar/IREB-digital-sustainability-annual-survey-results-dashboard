@@ -16,7 +16,7 @@ const DemographicChoropleth = ({
   respondentStats,
 }: DemographicChoroplethProps) => {
   const landColor = useThemeColor("--color-lavender-50");
-  const coastlineColor = useThemeColor("--color-ink-900");
+  const coastlineColor = useThemeColor("--color-ireb-grey-01");
   const lakeColor = useThemeColor("--color-lavender-100");
   const markerLineColor = useThemeColor("--color-lavender-100");
   const surveyResponses = useSurveyData();

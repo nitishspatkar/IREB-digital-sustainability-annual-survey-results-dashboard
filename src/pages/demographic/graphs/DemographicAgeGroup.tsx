@@ -14,8 +14,8 @@ const DemographicAgeGroup = () => {
   const questionHeader = columnDefinitions.find(
     (c) => c.key === "ageGroup"
   )?.header;
-  const chartBarColor = useThemeColor("--color-plum-400");
-  const tickColor = useThemeColor("--color-ink-700");
+  const chartBarColor = useThemeColor("--color-ireb-berry");
+  const tickColor = useThemeColor("--color-ireb-grey-01");
   const surveyResponses = useSurveyData();
 
   const ageGroupStats = useMemo<AgeGroupStat[]>(() => {
