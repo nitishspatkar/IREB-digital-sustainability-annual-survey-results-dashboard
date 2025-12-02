@@ -40,6 +40,15 @@ const useDiscussionFrequencyData = () => {
 
     const otherFrequencyTexts = useMemo(() => {
         return surveyResponses
+            .filter((response) => {
+                // 1. Get the main frequency
+                const frequency = normalizeFrequency(
+                    response.raw.discussionFrequency ?? ""
+                );
+                // 2. Only keep this response if the frequency is actually "other"
+                // (Adjust "other" to match exactly how your normalizeFrequency outputs it)
+                return frequency.toLowerCase() === "other";
+            })
             .map((response) =>
                 normalizeFrequency(response.raw.discussionFrequencyOther ?? "")
             )

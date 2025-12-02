@@ -32,11 +32,19 @@ const useRoleData = () => {
             .sort((a, b) => a.count - b.count);
     }, [surveyResponses]);
 
+    // --- CHANGED SECTION ---
     const otherRoleTexts = useMemo(() => {
         return surveyResponses
+            .filter((response) => {
+                // 1. Get the primary role
+                const role = normalizeRole(response.raw.role ?? "");
+                // 2. Check if the primary role is "other"
+                return role.toLowerCase() === "other";
+            })
             .map((response) => normalizeRole(response.raw.roleOther ?? ""))
             .filter((value) => value.length > 0);
     }, [surveyResponses]);
+    // -----------------------
 
     return { roleStats, otherRoleTexts, chartBarColor, tickColor, surveyResponses };
 };

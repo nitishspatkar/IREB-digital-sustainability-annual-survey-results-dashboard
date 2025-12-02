@@ -31,11 +31,19 @@ const useApplicationDomainData = () => {
     }, [surveyResponses]);
 
     // "Other" Texte sammeln
+    // --- CHANGED SECTION ---
     const otherTexts = useMemo(() => {
         return surveyResponses
+            .filter((r) => {
+                // 1. Get the main domain selection
+                const domain = normalize(r.raw.primaryApplicationDomain ?? "");
+                // 2. Only proceed if the selection is "other"
+                return domain.toLowerCase() === "other";
+            })
             .map((r) => normalize(r.raw.primaryApplicationDomainOther ?? ""))
             .filter((v) => v.length > 0);
     }, [surveyResponses]);
+    // -----------------------
 
     return { stats, otherTexts, chartBarColor, tickColor, surveyResponses };
 };
