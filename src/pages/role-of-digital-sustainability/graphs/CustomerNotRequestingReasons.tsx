@@ -42,7 +42,7 @@ const CustomerNotRequestingReasons = () => {
     return freq === "rarely, but it has happened" || freq === "never";
   }).length;
   const responseRate =
-    filteredTotal > 0 ? Math.round((reasons.length / filteredTotal) * 100) : 0;
+    filteredTotal > 0 ? (reasons.length / filteredTotal) * 100 : 0;
 
   const question =
     questionHeader ??

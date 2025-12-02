@@ -64,6 +64,10 @@ const useSupportResourcesData = () => {
                     hasAnswer = true;
                 }
 
+                if (norm(raw.supportNeedTheoretical) === "no" && norm(raw.supportNeedTutorials) === "no" && norm(raw.supportNeedCurricula) === "no" && norm(raw.supportNeedPractical) === "no" && norm(raw.supportNeedCaseStudies) === "no" && norm(raw.supportNeedStructures) === "no" && norm(raw.supportNeedTools) === "no" && norm(raw.supportNeedNone) === "no") {
+                    hasAnswer = true;
+                }
+
                 const otherVal = norm(raw.supportNeedOther);
                 if (otherVal.length > 0 && otherVal !== "n/a") {
                     other += 1;
@@ -178,7 +182,7 @@ export const AdditionalSupportResources = ({
 
     const responseRate =
         totalEligible > 0
-            ? Math.round((totalRespondentsWithAnswer / totalEligible) * 100)
+            ? (totalRespondentsWithAnswer / totalEligible) * 100
             : 0;
 
     return (

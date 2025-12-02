@@ -37,7 +37,7 @@ const OrganizationTrainingDescriptionList = () => {
   ).length;
   const responseRate =
     filteredTotal > 0
-      ? Math.round((descriptions.length / filteredTotal) * 100)
+      ? (descriptions.length / filteredTotal) * 100
       : 0;
 
   const question =

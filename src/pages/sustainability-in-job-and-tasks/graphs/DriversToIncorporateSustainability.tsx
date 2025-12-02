@@ -163,7 +163,7 @@ export const DriversToIncorporateSustainability = ({
 
     const responseRate =
         totalResponses > 0
-            ? Math.round((totalRespondentsWithAnswer / totalResponses) * 100)
+            ? (totalRespondentsWithAnswer / totalResponses) * 100
             : 0;
 
     return (

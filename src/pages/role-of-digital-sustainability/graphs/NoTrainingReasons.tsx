@@ -174,7 +174,7 @@ export const NoTrainingReasons = ({
     const totalEligible = eligibleResponses.length;
     const responseRate =
         totalEligible > 0
-            ? Math.round((totalRespondentsWithAnswer / totalEligible) * 100)
+            ? (totalRespondentsWithAnswer / totalEligible) * 100
             : 0;
 
     return (

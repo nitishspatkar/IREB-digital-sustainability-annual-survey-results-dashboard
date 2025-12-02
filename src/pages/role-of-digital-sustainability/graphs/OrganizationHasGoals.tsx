@@ -101,7 +101,7 @@ const OrganizationHasGoals = () => {
 
   const total = stats.values.reduce((a, b) => a + b, 0);
   const responseRate =
-    responses.length > 0 ? Math.round((total / responses.length) * 100) : 0;
+    responses.length > 0 ? (total / responses.length) * 100 : 0;
 
   const question =
     questionHeader ??

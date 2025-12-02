@@ -12,6 +12,8 @@ const useKnowledgeGapsData = () => {
     const barColor = useThemeColor("--color-ireb-berry");
     const tickColor = useThemeColor("--color-ireb-grey-01");
 
+    console.log(responses.length);
+
     const { stats, otherTexts, totalRespondentsWithAnswer, totalEligible } =
         useMemo(() => {
             const norm = (v: string) => v?.trim().toLowerCase() ?? "";
@@ -54,13 +56,19 @@ const useKnowledgeGapsData = () => {
                     hasAnswer = true;
                 }
 
+                if(norm(raw.lackKnowledgeEnvironmental) === "no" && norm(raw.lackKnowledgeSocial) === "no" && norm(raw.lackKnowledgeIndividual) === "no" && norm(raw.lackKnowledgeEconomic) === "no" && norm(raw.lackKnowledgeTechnical) === "no" && norm(raw.lackKnowledgeNone) === "no") {
+                    hasAnswer = true;
+                }
+
                 const otherVal = norm(raw.lackKnowledgeOther);
                 if (otherVal.length > 0 && otherVal !== "n/a") {
                     other += 1;
                     hasAnswer = true;
                 }
 
-                if (hasAnswer) numberOfRespondents += 1;
+                if (hasAnswer) {
+                    numberOfRespondents += 1;
+                }
             });
 
             const items = [
@@ -166,7 +174,7 @@ export const KnowledgeGapsByDimension = ({
 
     const responseRate =
         totalEligible > 0
-            ? Math.round((totalRespondentsWithAnswer / totalEligible) * 100)
+            ? (totalRespondentsWithAnswer / totalEligible) * 100
             : 0;
 
     return (

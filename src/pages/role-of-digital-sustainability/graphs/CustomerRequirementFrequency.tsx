@@ -96,7 +96,7 @@ const CustomerRequirementFrequency = () => {
 
   const total = stats.reduce((a, b) => a + b.count, 0);
   const responseRate =
-    responses.length > 0 ? Math.round((total / responses.length) * 100) : 0;
+    responses.length > 0 ? (total / responses.length) * 100 : 0;
 
   const question =
     questionHeader ??

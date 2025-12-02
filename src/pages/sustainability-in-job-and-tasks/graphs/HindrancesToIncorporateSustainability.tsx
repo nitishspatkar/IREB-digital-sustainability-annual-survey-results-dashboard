@@ -74,6 +74,11 @@ const useHindrancesData = () => {
                     hasAnswer = true;
                 }
 
+                if (norm(raw.hindranceLackInterest) === "no" && norm(raw.hindranceLackKnowledge) === "no" && norm(raw.hindranceLimitedResources) === "no" && norm(raw.hindranceFinancialConstraints) === "no" && norm(raw.hindranceInsufficientTime) === "no" && norm(raw.hindranceLackSupport) === "no" && norm(raw.hindranceComplexity) === "no" && norm(raw.hindranceCulturalBarriers) === "no" && norm(raw.hindranceStakeholderResistance) === "no") {
+                    hasAnswer = true;
+                }
+
+
                 const otherVal = norm(raw.hindranceOther);
                 if (otherVal === "yes" || (otherVal.length > 0 && otherVal !== "n/a")) {
                     other += 1;
@@ -189,7 +194,7 @@ export const HindrancesToIncorporateSustainability = ({
 
     const responseRate =
         totalEligible > 0
-            ? Math.round((totalRespondentsWithAnswer / totalEligible) * 100)
+            ? (totalRespondentsWithAnswer / totalEligible) * 100
             : 0;
 
     return (

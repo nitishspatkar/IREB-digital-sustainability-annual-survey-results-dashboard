@@ -109,7 +109,7 @@ const OrganizationDepartmentCoordination = () => {
   const total = stats.values.reduce((a, b) => a + b, 0);
   const responseRate =
     stats.totalEligible > 0
-      ? Math.round((total / stats.totalEligible) * 100)
+      ? (total / stats.totalEligible) * 100
       : 0;
 
   const question =
