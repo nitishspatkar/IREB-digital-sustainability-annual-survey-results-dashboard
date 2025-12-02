@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { Data, Layout } from "plotly.js";
 
+// Make sure these paths are correct in your project
 import { useSurveyData } from "../../../data/SurveyContext";
 import useThemeColor from "../../../hooks/useThemeColor";
 import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
@@ -12,7 +13,8 @@ const useDriversData = () => {
     const barColor = useThemeColor("--color-ireb-berry");
     const tickColor = useThemeColor("--color-ireb-grey-01");
 
-    const { stats, driveOtherTexts, totalRespondentsWithAnswer } = useMemo(() => {
+    // We extract all calculation logic into useMemo to prevent re-calc on every render
+    const { stats, driveOtherTexts, totalRespondentsWithAnswer, totalResponses } = useMemo(() => {
         const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
 
         let orgPolicies = 0;
@@ -71,11 +73,13 @@ const useDriversData = () => {
             { label: "Other", value: other },
         ];
 
-        // Sort ascending by value
+        // Sort ascending by value (so largest bar is at the bottom in a horizontal chart)
+        // Switch to b.value - a.value if you want largest at top
         items.sort((a, b) => a.value - b.value);
 
         // Extract texts
-        const texts = surveyResponses
+        // Note: We map over 'filteredResponses' here to ensure consistency with the precondition
+        const texts = filteredResponses
             .map((r) => (r.raw.driveOther ?? "").trim())
             .filter((value) => {
                 if (!value) return false;
@@ -87,6 +91,7 @@ const useDriversData = () => {
             stats: items,
             driveOtherTexts: texts,
             totalRespondentsWithAnswer: respondentsWithAnyAnswer,
+            totalResponses: filteredResponses.length, // <--- FIXED: Calculated inside scope
         };
     }, [surveyResponses]);
 
@@ -94,9 +99,9 @@ const useDriversData = () => {
         stats,
         driveOtherTexts,
         totalRespondentsWithAnswer,
+        totalResponses, // <--- Passed through from useMemo
         barColor,
         tickColor,
-        totalResponses: surveyResponses.length,
     };
 };
 
@@ -144,7 +149,7 @@ export const DriversToIncorporateSustainability = ({
 
     const layout = useMemo<Partial<Layout>>(
         () => ({
-            margin: { t: 50, r: 40, b: 60, l: 180 }, // Preserved specific margin
+            margin: { t: 50, r: 40, b: 60, l: 180 },
             paper_bgcolor: "rgba(0,0,0,0)",
             plot_bgcolor: "rgba(0,0,0,0)",
             xaxis: {
@@ -157,6 +162,7 @@ export const DriversToIncorporateSustainability = ({
             yaxis: {
                 tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
             },
+            autosize: true, // Recommended for responsive layouts
         }),
         [tickColor]
     );
@@ -191,11 +197,13 @@ export const DriversToIncorporateSustainabilityDetails = ({
 
     const questionHeader =
         "What drives you to incorporate digital sustainability in your role-related tasks?";
+
+    // Safety check in case columnDefinitions is missing the key
     const questionHeaderOther = columnDefinitions.find(
         (c) => c.key === "driveOther"
-    )?.header;
+    )?.header ?? "Other Comments";
 
-    const wrapperQuestion = questionHeaderOther ?? "";
+    const wrapperQuestion = questionHeaderOther;
 
     // Calculate rate relative to "Other" checkbox selection
     const otherStat = stats.find((s) => s.label === "Other");
