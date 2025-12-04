@@ -93,7 +93,7 @@ function Sidebar({
                 />{" "}
                 {/* Oben etwas Platz für den X-Button auf mobil */}
                 <div className="text-4xl md:text-4xl tracking-tight text-ireb-berry">
-                    Sustainability Survey {activeYear}
+                    Digital Sustainability Survey {activeYear}
                 </div>
                 <nav className="mt-6">
                     <ul className="flex flex-col gap-4 text-base">
