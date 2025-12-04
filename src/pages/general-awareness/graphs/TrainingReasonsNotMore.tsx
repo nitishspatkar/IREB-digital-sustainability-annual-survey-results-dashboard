@@ -118,7 +118,15 @@ export const TrainingReasonsNotMore = ({
             tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
         },
         yaxis: {
-            tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+            tickfont: {
+                family: "Inter, sans-serif",
+                size: 12,
+                color: tickColor,
+            },
+            automargin: true,
+            ticks: "outside",
+            ticklen: 10,
+            tickcolor: "rgba(0,0,0,0)",
         },
     }), [tickColor]);
 

@@ -141,6 +141,9 @@ export const DiscussionFrequency = ({
                     color: tickColor,
                 },
                 automargin: true,
+                ticks: "outside",
+                ticklen: 10,
+                tickcolor: "rgba(0,0,0,0)",
             },
         }),
         [titleColor, tickColor]

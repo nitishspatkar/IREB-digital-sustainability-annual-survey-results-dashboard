@@ -76,8 +76,35 @@ export const DemographicApplicationDomain = ({
         margin: { t: 40, r: 40, b: 40, l: 250 },
         paper_bgcolor: "rgba(0,0,0,0)",
         plot_bgcolor: "rgba(0,0,0,0)",
-        xaxis: { zeroline: false, tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor } },
-        yaxis: { autorange: "reversed", showline: false, tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor } },
+        xaxis: {
+            zeroline: false,
+            tickfont: {
+                family: "Inter, sans-serif",
+                size: 12,
+                color: tickColor
+            },
+            title: {
+                text: "Number of Respondents",
+                font: {
+                    family: "Inter, sans-serif",
+                    size: 12,
+                    color: tickColor,
+                },
+            },
+        },
+        yaxis: {
+            autorange: "reversed",
+            showline: true,
+            tickfont: {
+                family: "Inter, sans-serif",
+                size: 12,
+                color: tickColor,
+            },
+            automargin: true,
+            ticks: "outside",
+            ticklen: 10,
+            tickcolor: "rgba(0,0,0,0)",
+        },
         showlegend: false,
     }), [tickColor]);
 
