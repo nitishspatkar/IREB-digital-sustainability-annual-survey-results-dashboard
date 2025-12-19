@@ -30,7 +30,7 @@ const OrganizationDepartmentCoordination = () => {
     const filteredResponses = responses.filter(
       (r) =>
         normalize(
-          r.raw.organizationHasDigitalSustainabilityGoals ?? ""
+          r.raw.organizationIncorporatesSustainablePractices ?? ""
         ).toLowerCase() === "yes"
     );
 

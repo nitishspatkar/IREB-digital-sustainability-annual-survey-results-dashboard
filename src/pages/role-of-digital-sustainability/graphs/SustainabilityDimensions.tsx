@@ -22,11 +22,17 @@ const useSustainabilityDimensionsData = () => {
         let technical = 0;
         let other = 0;
         let notSure = 0;
+        let eligibleParticipants = 0;
         let respondentsWithAnyAnswer = 0;
 
         surveyResponses.forEach((response) => {
             const raw = response.raw;
             let hasAny = false;
+
+            // Wer die Vorfrage mit "Yes" beantwortet hat, ist "eligible"
+            if (normalize(raw.organizationIncorporatesSustainablePractices) === "yes") {
+                eligibleParticipants += 1;
+            }
 
             if (normalize(raw.considerEnvironmental) === "yes") {
                 environmental += 1;
@@ -48,6 +54,11 @@ const useSustainabilityDimensionsData = () => {
                 technical += 1;
                 hasAny = true;
             }
+
+            if(normalize(raw.considerEnvironmental) === "no" && normalize(raw.considerSocial) === "no" && normalize(raw.considerIndividual) === "no" && normalize(raw.considerEconomic) === "no" && normalize(raw.considerTechnical) === "no") {
+                hasAny = true;
+            }
+
             if (normalize(raw.considerNotSure) === "yes") {
                 notSure += 1;
                 hasAny = true;
@@ -80,6 +91,7 @@ const useSustainabilityDimensionsData = () => {
             labels: items.map((item) => item.label),
             values: items.map((item) => item.value),
             respondentsWithAnyAnswer,
+            eligibleParticipants
         };
     }, [surveyResponses]);
 
@@ -104,7 +116,7 @@ export const SustainabilityDimensions = ({
     onExplore?: () => void;
     className?: string;
 }) => {
-    const { counts, otherTexts, barColor, tickColor, surveyResponses } =
+    const { counts, otherTexts, barColor, tickColor } =
         useSustainabilityDimensionsData();
 
     const questionHeader =
@@ -161,10 +173,9 @@ export const SustainabilityDimensions = ({
     );
 
     const numberOfRespondents = counts.respondentsWithAnyAnswer;
-    const responseRate =
-        surveyResponses.length > 0
-            ? (numberOfRespondents / surveyResponses.length) * 100
-            : 0;
+    const responseRate = counts.eligibleParticipants > 0
+        ? (numberOfRespondents / counts.eligibleParticipants) * 100
+        : 0;
 
     return (
         <SurveyChart

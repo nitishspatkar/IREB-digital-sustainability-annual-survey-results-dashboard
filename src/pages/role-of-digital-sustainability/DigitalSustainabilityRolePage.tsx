@@ -69,25 +69,22 @@ const DigitalSustainabilityRole = () => {
                 <OrganizationHasSustainabilityTeam />
                 <OrganizationIncorporatesPractices />
                 <OrganizationDepartmentCoordination />
-                <OrganizationReportsOnSustainability />
-
                 <GraphAnchor id="graph-sustainability-dims">
                     <SustainabilityDimensions
                         onExplore={() => setActiveView("sustainability_dims")}
                     />
                 </GraphAnchor>
-
-                <CustomerRequirementFrequency />
-                <CustomerNotRequestingReasons />
+                <OrganizationReportsOnSustainability />
                 <OrganizationOffersTraining />
                 <OrganizationTrainingDescriptionList />
-
                 {/* Wrapped Component */}
                 <GraphAnchor id="graph-no-training-reasons">
                     <NoTrainingReasons
                         onExplore={() => setActiveView("no_training_reasons")}
                     />
                 </GraphAnchor>
+                <CustomerRequirementFrequency />
+                <CustomerNotRequestingReasons />
             </div>
         </div>
     );
