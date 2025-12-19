@@ -89,7 +89,7 @@ function Sidebar({
                 <img
                     src={irebLogo}
                     alt="IREB Logo"
-                    className="mb-4 mt-8 md:mt-0"
+                    className="mb-4 mt-8 w-64 max-w-full h-auto md:mt-0"
                 />{" "}
                 {/* Oben etwas Platz für den X-Button auf mobil */}
                 <div className="text-4xl md:text-4xl tracking-tight text-ireb-berry">
