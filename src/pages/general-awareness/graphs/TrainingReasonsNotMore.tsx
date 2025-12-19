@@ -88,12 +88,27 @@ export const TrainingReasonsNotMore = ({
     onExplore?: () => void;
     className?: string;
 }) => {
-    const { stats, otherTexts, participants, responses, barColor, tickColor } = useTrainingReasonsNotMoreData();
+    const { stats, otherTexts, participants, barColor, tickColor } = useTrainingReasonsNotMoreData();
 
     // Stats Logic
-    const numberOfResponses = participants.length;
-    const totalResponses = responses.length;
-    const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
+    const eligibleParticipants = participants.length;
+
+    // 2. Anzahl der Personen, die mindestens einen Grund angegeben haben
+    const numberOfResponses = useMemo(() => {
+        return participants.filter(r => {
+            return reasonsList.some(reason => {
+                const val = normalize(r.raw[reason.key as keyof typeof r.raw] ?? "");
+                return reason.key === "notMoreTrainingOther"
+                    ? val.length > 0
+                    : val.toLowerCase() === "yes";
+            });
+        }).length;
+    }, [participants]);
+
+    // 3. Quote: Personen mit Angabe / Ja-Sager (z.B. 20 / 21)
+    const responseRate = eligibleParticipants > 0
+        ? (numberOfResponses / eligibleParticipants) * 100
+        : 0;
 
     // Chart Logic
     const chartData = useMemo<Data[]>(() => [{

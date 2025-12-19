@@ -140,15 +140,16 @@ const TrainingProgramsCount = () => {
     [titleColor, tickColor]
   );
 
-  const participants = responses.filter(
-    (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
+
+  const eligibleParticipants = responses.filter(
+      (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
   );
-  const numberOfResponses = participants.length;
-  const totalResponses = responses.length;
+
+  const numberOfResponses = stats.reduce((sum, s) => sum + s.count, 0);
   const responseRate =
-    totalResponses > 0
-      ? (numberOfResponses / totalResponses) * 100
-      : 0;
+      eligibleParticipants.length > 0
+          ? (numberOfResponses / eligibleParticipants.length) * 100
+          : 0;
 
   const question =
     questionHeader?.replace("times", "") ?? "How many training programs have you attended?";

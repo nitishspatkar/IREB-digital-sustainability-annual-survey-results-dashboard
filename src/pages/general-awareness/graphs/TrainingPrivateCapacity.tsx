@@ -138,14 +138,25 @@ const TrainingPrivateCapacity = () => {
     [titleColor, tickColor]
   );
 
-  const numberOfResponses = useMemo(() => {
-      return stats.reduce((sum, item) => sum + item.count, 0);
-  }, [stats]);
-  const totalResponses = responses.length;
-  const responseRate =
-    totalResponses > 0
-      ? (numberOfResponses / totalResponses) * 100
-      : 0;
+
+    const eligibleParticipants = useMemo(() => {
+        return responses.filter(
+            (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
+        ).length;
+    }, [responses]);
+
+    console.log(stats);
+
+    const numberOfResponses = useMemo(() => {
+        return stats.reduce((sum, item) => sum + item.count, 0);
+    }, [stats]);
+
+    console.log(numberOfResponses);
+
+    const responseRate =
+        eligibleParticipants > 0
+            ? (numberOfResponses / eligibleParticipants) * 100
+            : 0;
 
   const question =
     questionHeader ?? "Did you attend training in your private capacity?";

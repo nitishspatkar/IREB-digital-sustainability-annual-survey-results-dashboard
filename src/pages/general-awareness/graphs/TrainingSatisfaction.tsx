@@ -103,15 +103,17 @@ const TrainingSatisfaction = () => {
     [titleColor, tickColor]
   );
 
-  const participants = responses.filter(
-    (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
-  );
-  const numberOfResponses = participants.length;
-  const totalResponses = responses.length;
+
+  const eligibleParticipants = responses.filter(
+      (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
+  ).length;
+
+  const numberOfResponses = stats.reduce((sum, s) => sum + s.count, 0);
+
   const responseRate =
-    totalResponses > 0
-      ? (numberOfResponses / totalResponses) * 100
-      : 0;
+      eligibleParticipants > 0
+          ? (numberOfResponses / eligibleParticipants) * 100
+          : 0;
 
   const question =
     questionHeader ?? "Are you satisfied with the training you received?";
