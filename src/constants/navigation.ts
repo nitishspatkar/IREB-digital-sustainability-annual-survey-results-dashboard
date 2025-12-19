@@ -12,12 +12,12 @@ export const navigationSections = [
   },
   {
     id: "digital-sustainability-role",
-    label: "The Role of Digital Sustainability in Your Organization",
+    label: "The Role of Digital Sustainability in Organizations",
     component: DigitalSustainabilityRole,
   },
   {
     id: "sustainability-tasks",
-    label: "Sustainability in Your Job and Tasks",
+    label: "Sustainability in Role-specific Tasks",
     component: SustainabilityTasks,
   },
 ] as const;

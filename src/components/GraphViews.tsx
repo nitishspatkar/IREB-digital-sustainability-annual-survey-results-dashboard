@@ -78,16 +78,6 @@ export const SurveyExploreList = ({
 
     return (
         <div className={`space-y-6 ${className ?? ""}`}>
-            {/* 1. Navigation Button (Style analog zu Explore Button) */}
-            <div>
-                <button
-                    onClick={onBack}
-                    className="cursor-pointer border border-ireb-berry bg-ireb-superlight-berry px-4 py-2 text-base font-medium text-ireb-berry transition-colors hover:brightness-75 w-fit flex items-center gap-2"
-                >
-                    <span>←</span> Back to Overview
-                </button>
-            </div>
-
             {/* 2. Page Title */}
             <h1 className="text-2xl font-semibold tracking-tight text-plum-500">
                 Explore: {title}
@@ -100,6 +90,8 @@ export const SurveyExploreList = ({
                 numberOfResponses={numberOfResponses}
                 responseRate={responseRate}
                 showExploreButton={false}
+                showBackButton={true} // Neu
+                onBack={onBack}
             >
                 <div className="h-[520px] overflow-y-auto">
                     <ul style={{ color: tickColor }}>

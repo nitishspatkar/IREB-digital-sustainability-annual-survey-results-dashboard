@@ -8,6 +8,8 @@ interface GraphWrapperProps {
     children: ReactNode;
     onExplore?: () => void;
     showExploreButton?: boolean;
+    onBack?: () => void;
+    showBackButton?: boolean;
 }
 
 const GraphWrapper = ({
@@ -18,6 +20,8 @@ const GraphWrapper = ({
                           children,
                           onExplore,
                           showExploreButton = false,
+                          onBack,
+                          showBackButton = false,
                       }: GraphWrapperProps) => {
     const showNumberOfResponses = typeof numberOfResponses === "number";
     const showResponseRate = typeof responseRate === "number";
@@ -84,6 +88,14 @@ const GraphWrapper = ({
                         className="cursor-pointer border border-ireb-berry bg-ireb-superlight-berry px-4 py-2 text-base font-medium text-ireb-berry transition-colors hover:brightness-75"
                     >
                         explore
+                    </button>
+                )}
+                {showBackButton && (
+                    <button
+                        onClick={onBack}
+                        className="cursor-pointer border border-ireb-berry bg-ireb-superlight-berry px-4 py-2 text-base font-medium text-ireb-berry transition-colors hover:brightness-75 flex items-center gap-2"
+                    >
+                        <span>←</span> Back to Overview
                     </button>
                 )}
             </div>

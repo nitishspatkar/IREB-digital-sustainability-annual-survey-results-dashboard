@@ -61,7 +61,7 @@ const DigitalSustainabilityRole = () => {
     return (
         <div className="space-y-8">
             <h1 className="text-3xl font-semibold tracking-tight text-plum-500">
-                The Role of Digital Sustainability in Your Organization
+                The Role of Digital Sustainability in Organizations
             </h1>
 
             <div className="grid grid-cols-1 gap-18">
