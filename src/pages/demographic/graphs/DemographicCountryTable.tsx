@@ -33,7 +33,7 @@ const DemographicCountryTable = ({
             color: tableHeaderFillColor,
           },
           font: {
-            family: "Inter, sans-serif",
+            family: "PP Mori, sans-serif",
             size: 14,
             color: headerFontColor,
             weight: 600,
@@ -53,7 +53,7 @@ const DemographicCountryTable = ({
             color: tableCellFillColor,
           },
           font: {
-            family: "Inter, sans-serif",
+            family: "PP Mori, sans-serif",
             size: 13,
             color: cellFontColor,
           },

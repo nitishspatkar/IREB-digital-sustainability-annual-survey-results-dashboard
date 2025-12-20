@@ -69,7 +69,7 @@ const DemographicAgeGroup = () => {
         text: sortedStats.map((item) => item.count.toString()),
         textposition: "outside",
         textfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -88,7 +88,7 @@ const DemographicAgeGroup = () => {
       xaxis: {
         // --- REMOVED tickangle: -45 ---
         tickfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -98,13 +98,13 @@ const DemographicAgeGroup = () => {
         title: {
           text: "Number of Respondents",
           font: {
-            family: "Inter, sans-serif",
+            family: "PP Mori, sans-serif",
             size: 12,
             color: tickColor,
           },
         },
         tickfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },

@@ -65,7 +65,7 @@ export function DemographicProfessionalExperience() {
         text: experienceStats.map((item) => item.count.toString()),
         textposition: "outside",
         textfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -86,13 +86,13 @@ export function DemographicProfessionalExperience() {
         title: {
           text: "Years of Experience",
           font: {
-            family: "Inter, sans-serif",
+            family: "PP Mori, sans-serif",
             size: 12,
             color: tickColor,
           },
         },
         tickfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -101,13 +101,13 @@ export function DemographicProfessionalExperience() {
         title: {
           text: "Number of Respondents",
           font: {
-            family: "Inter, sans-serif",
+            family: "PP Mori, sans-serif",
             size: 12,
             color: tickColor,
           },
         },
         tickfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },

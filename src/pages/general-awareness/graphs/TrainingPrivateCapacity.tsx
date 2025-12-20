@@ -101,7 +101,7 @@ const TrainingPrivateCapacity = () => {
         text: stats.map((s) => s.count.toString()),
         textposition: "outside",
         textfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -119,13 +119,13 @@ const TrainingPrivateCapacity = () => {
       xaxis: {
         title: {
           text: "Number of Respondents",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
         },
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
       },
       yaxis: {
           tickfont: {
-              family: "Inter, sans-serif",
+              family: "PP Mori, sans-serif",
               size: 12,
               color: tickColor,
           },

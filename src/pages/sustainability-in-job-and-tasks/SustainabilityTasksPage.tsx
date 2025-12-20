@@ -72,10 +72,10 @@ const SustainabilityTasks = () => {
     return (
         <div className="space-y-6">
             <header>
-                <h1 className="text-3xl font-semibold tracking-tight text-plum-500">
+                <h1 className="text-3xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
                     Sustainability in Role-specific Tasks
                 </h1>
-                <p className="mt-2 max-w-2xl text-sm text-slate-600">
+                <p className="mt-2 max-w-2xl text-sm text-ireb-grey-01 font-mori">
                     What drives professionals to integrate digital sustainability into their
                     role-specific tasks based on the latest survey data.
                 </p>

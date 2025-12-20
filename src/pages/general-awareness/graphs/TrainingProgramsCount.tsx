@@ -105,7 +105,7 @@ const TrainingProgramsCount = () => {
         text: stats.map((s) => s.count.toString()),
         textposition: "outside",
         textfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -124,17 +124,17 @@ const TrainingProgramsCount = () => {
         type: "category",
         title: {
           text: "Number of trainings",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
         },
         // --- REMOVED tickangle: -30 ---
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
       },
       yaxis: {
         title: {
           text: "Number of respondents",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
         },
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
       },
     }),
     [titleColor, tickColor]

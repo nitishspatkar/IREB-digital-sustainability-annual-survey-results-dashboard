@@ -60,7 +60,7 @@ const DigitalSustainabilityRole = () => {
     // 2. RENDER MAIN DASHBOARD
     return (
         <div className="space-y-8">
-            <h1 className="text-3xl font-semibold tracking-tight text-plum-500">
+            <h1 className="text-3xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
                 The Role of Digital Sustainability in Organizations
             </h1>
 

@@ -64,7 +64,7 @@ const TrainingParticipation = () => {
         text: stats.map((s) => s.count.toString()),
         textposition: "outside",
         textfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -81,7 +81,7 @@ const TrainingParticipation = () => {
       plot_bgcolor: "rgba(0,0,0,0)",
       xaxis: {
         tickfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -90,13 +90,13 @@ const TrainingParticipation = () => {
         title: {
           text: "Number of Respondents",
           font: {
-            family: "Inter, sans-serif",
+            family: "PP Mori, sans-serif",
             size: 12,
             color: tickColor,
           },
         },
         tickfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },

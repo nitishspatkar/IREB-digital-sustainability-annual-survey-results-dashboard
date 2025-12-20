@@ -79,14 +79,14 @@ export const DemographicApplicationDomain = ({
         xaxis: {
             zeroline: false,
             tickfont: {
-                family: "Inter, sans-serif",
+                family: "PP Mori, sans-serif",
                 size: 12,
                 color: tickColor
             },
             title: {
                 text: "Number of Respondents",
                 font: {
-                    family: "Inter, sans-serif",
+                    family: "PP Mori, sans-serif",
                     size: 12,
                     color: tickColor,
                 },
@@ -96,7 +96,7 @@ export const DemographicApplicationDomain = ({
             autorange: "reversed",
             showline: true,
             tickfont: {
-                family: "Inter, sans-serif",
+                family: "PP Mori, sans-serif",
                 size: 12,
                 color: tickColor,
             },

@@ -68,7 +68,7 @@ const OrganizationOffersTraining = () => {
         text: counts.values.map((v) => v.toString()),
         textposition: "outside",
         textfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -86,14 +86,14 @@ const OrganizationOffersTraining = () => {
       plot_bgcolor: "rgba(0,0,0,0)",
       xaxis: {
         // --- REMOVED tickangle ---
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
       },
       yaxis: {
         title: {
           text: "Number of respondents",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
         },
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
       },
     }),
     [tickColor]

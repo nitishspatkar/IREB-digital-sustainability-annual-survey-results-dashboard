@@ -69,7 +69,7 @@ const OrganizationHasGoals = () => {
         text: stats.values.map((v) => v.toString()),
         textposition: "outside",
         textfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -86,14 +86,14 @@ const OrganizationHasGoals = () => {
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
       xaxis: {
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
       },
       yaxis: {
         title: {
           text: "Number of Respondents",
-          font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
         },
-        tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
       },
     }),
     [tickColor]

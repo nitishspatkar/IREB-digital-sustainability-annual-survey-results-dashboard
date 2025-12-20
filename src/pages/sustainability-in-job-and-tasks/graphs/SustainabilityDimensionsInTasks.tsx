@@ -133,7 +133,7 @@ export const SustainabilityDimensionsInTasks = ({
                 text: stats.map((i) => i.value.toString()),
                 textposition: "outside",
                 textfont: {
-                    family: "Inter, sans-serif",
+                    family: "PP Mori, sans-serif",
                     size: 12,
                     color: tickColor,
                 },
@@ -152,13 +152,13 @@ export const SustainabilityDimensionsInTasks = ({
             xaxis: {
                 title: {
                     text: "Number of Respondents",
-                    font: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                    font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
                 },
-                tickfont: { family: "Inter, sans-serif", size: 12, color: tickColor },
+                tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
             },
             yaxis: {
                 tickfont: {
-                    family: "Inter, sans-serif",
+                    family: "PP Mori, sans-serif",
                     size: 12,
                     color: tickColor,
                 },

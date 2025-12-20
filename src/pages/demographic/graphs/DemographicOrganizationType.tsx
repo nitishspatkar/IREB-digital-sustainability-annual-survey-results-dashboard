@@ -64,7 +64,7 @@ const DemographicOrganizationType = () => {
         text: organizationTypeStats.map((item) => item.count.toString()),
         textposition: "outside",
         textfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
@@ -82,14 +82,14 @@ const DemographicOrganizationType = () => {
       plot_bgcolor: "rgba(0,0,0,0)",
       xaxis: {
         tickfont: {
-          family: "Inter, sans-serif",
+          family: "PP Mori, sans-serif",
           size: 12,
           color: tickColor,
         },
         title: {
           text: "Number of Respondents",
           font: {
-            family: "Inter, sans-serif",
+            family: "PP Mori, sans-serif",
             size: 12,
             color: tickColor,
           },
@@ -97,7 +97,7 @@ const DemographicOrganizationType = () => {
       },
       yaxis: {
           tickfont: {
-              family: "Inter, sans-serif",
+              family: "PP Mori, sans-serif",
               size: 12,
               color: tickColor,
           },

@@ -79,7 +79,7 @@ export const SurveyExploreList = ({
     return (
         <div className={`space-y-6 ${className ?? ""}`}>
             {/* 2. Page Title */}
-            <h1 className="text-2xl font-semibold tracking-tight text-plum-500">
+            <h1 className="text-2xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
                 Explore: {title}
             </h1>
 

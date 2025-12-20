@@ -51,12 +51,8 @@ function Sidebar({
             )}
 
             <aside
-                style={{
-                    fontFamily:
-                        '"GT Pressura Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                }}
                 className={`
-        fixed top-0 left-0 z-50 flex h-screen w-100 shrink-0 flex-col gap-6 overflow-y-auto 
+        font-pressura fixed top-0 left-0 z-50 flex h-screen w-100 shrink-0 flex-col gap-6 overflow-y-auto 
         border-r border-ireb-light-berry/60 md:border-r-0 bg-white px-8 py-8
         transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
@@ -86,13 +82,21 @@ function Sidebar({
                     </svg>
                 </button>
                 {/* Image added here */}
+                <button
+                    type="button"
+                    onClick={() => {
+                        setActiveSectionId('demographic'); // Ersetze 'home' durch deine tatsächliche Home-ID
+                        setIsSidebarOpen(false);
+                    }}
+                    className="mt-8 w-64 max-w-full cursor-pointer border-none bg-transparent p-0 text-left md:mt-0"
+                >
                 <img
                     src={irebLogo}
                     alt="IREB Logo"
                     className="mb-4 mt-8 w-64 max-w-full h-auto md:mt-0"
-                />{" "}
+                /></button>
                 {/* Oben etwas Platz für den X-Button auf mobil */}
-                <div className="text-4xl md:text-4xl tracking-tight text-ireb-berry">
+                <div className="text-4xl md:text-4xl tracking-tight text-ireb-berry font-bold">
                     Digital Sustainability Survey {activeYear}
                 </div>
                 <nav className="mt-6">
@@ -108,7 +112,7 @@ function Sidebar({
                                             setActiveSectionId(section.id);
                                             setIsSidebarOpen(false); // Menü bei Klick schließen (mobil)
                                         }}
-                                        className={`flex w-full items-center justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 ${
+                                        className={`flex w-full items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 ${
                                             isActive
                                                 ? "bg-ireb-berry text-white border-ireb-berry shadow-card"
                                                 : "bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"

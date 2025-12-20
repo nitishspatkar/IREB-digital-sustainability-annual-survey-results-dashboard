@@ -1,6 +1,87 @@
 @import "tailwindcss";
 
+/* GT Pressura Mono */
+@font-face {
+  font-family: 'GT Pressura Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/GT-Pressura-Mono-Regular.woff2') format("woff2"),
+  url('./assets/fonts/GT-Pressura-Mono-Regular.woff') format("woff");
+}
+
+@font-face {
+  font-family: 'GT Pressura Mono';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/GT-Pressura-Mono-Regular-Italic.woff2') format("woff2"),
+  url('./assets/fonts/GT-Pressura-Mono-Regular-Italic.woff') format("woff");
+}
+
+@font-face {
+  font-family: 'GT Pressura Mono';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('./assets/fonts/GT-Pressura-Mono-Light.woff2') format("woff2"),
+  url('./assets/fonts/GT-Pressura-Mono-Light.woff') format("woff");
+}
+
+@font-face {
+  font-family: 'GT Pressura Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./assets/fonts/GT-Pressura-Mono-Bold.woff2') format("woff2"),
+  url('./assets/fonts/GT-Pressura-Mono-Bold.woff') format("woff");
+}
+
+/* PP Mori */
+@font-face {
+  font-family: 'PP Mori';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/PPMori-Regular.woff2') format("woff2"),
+  url('./assets/fonts/PPMori-Regular.woff') format("woff");
+}
+
+@font-face {
+  font-family: 'PP Mori';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/PPMori-RegularItalic.woff2') format("woff2"),
+  url('./assets/fonts/PPMori-RegularItalic.woff') format("woff");
+}
+
+@font-face {
+  font-family: 'PP Mori';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('./assets/fonts/PPMori-Light.woff2') format("woff2"),
+  url('./assets/fonts/PPMori-Light.woff') format("woff");
+}
+
+@font-face {
+  font-family: 'PP Mori';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./assets/fonts/PPMori-Bold.woff2') format("woff2"),
+  url('./assets/fonts/PPMori-Bold.woff') format("woff");
+}
+
 @theme {
+  --font-pressura: "GT Pressura Mono", ui-monospace, monospace;
+  --font-mori: "PP Mori", sans-serif;
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+
   /* IREB color palette */
   --color-ireb-berry: #831f82;
   --color-ireb-light-berry: #c6a1cf;

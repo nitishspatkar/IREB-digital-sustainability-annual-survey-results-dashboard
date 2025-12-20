@@ -104,7 +104,7 @@ export const DiscussionFrequency = ({
                 text: frequencyStats.map((item) => item.count.toString()),
                 textposition: "outside",
                 textfont: {
-                    family: "Inter, sans-serif",
+                    family: "PP Mori, sans-serif",
                     size: 12,
                     color: tickColor,
                 },
@@ -123,20 +123,20 @@ export const DiscussionFrequency = ({
                 title: {
                     text: "Number of Respondents",
                     font: {
-                        family: "Inter, sans-serif",
+                        family: "PP Mori, sans-serif",
                         size: 12,
                         color: tickColor,
                     },
                 },
                 tickfont: {
-                    family: "Inter, sans-serif",
+                    family: "PP Mori, sans-serif",
                     size: 12,
                     color: tickColor,
                 },
             },
             yaxis: {
                 tickfont: {
-                    family: "Inter, sans-serif",
+                    family: "PP Mori, sans-serif",
                     size: 12,
                     color: tickColor,
                 },

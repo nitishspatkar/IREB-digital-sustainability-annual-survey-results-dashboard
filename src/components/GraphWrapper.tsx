@@ -32,11 +32,7 @@ const GraphWrapper = ({
             {/* Stats boxes */}
             {showStats && (
                 <div
-                    className="flex gap-4"
-                    style={{
-                        fontFamily:
-                            '"GT Pressura Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                    }}
+                    className="flex gap-4 font-mori"
                 >
                     {showNumberOfResponses && (
                         <div className="bg-ireb-light-berry px-6 py-3">
@@ -63,10 +59,10 @@ const GraphWrapper = ({
             <div className="bg-white shadow-sm overflow-hidden">
                 <div className="grid grid-cols-1 xl:grid-cols-4">
                     {/* Left side - Text content (1/4) */}
-                    <div className="col-span-1 space-y-3 bg-ireb-berry p-6">
+                    <div className="col-span-1 space-y-3 bg-ireb-berry p-6 font-pressura">
                         <h2 className="text-xl text-white">{question}</h2>
                         {description && (
-                            <p className="text-sm text-white leading-relaxed">
+                            <p className="text-sm text-white leading-relaxed font-mori">
                                 {description}
                             </p>
                         )}
@@ -79,23 +75,23 @@ const GraphWrapper = ({
 
             {/* Action buttons */}
             <div className="flex gap-4">
-                <button className="cursor-pointer border border-ireb-berry bg-ireb-berry px-4 py-2 text-base font-medium text-white transition-colors hover:brightness-75">
-                    results
+                <button className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-berry text-white border-ireb-berry shadow-card">
+                    Results
                 </button>
                 {showExploreButton && (
                     <button
                         onClick={onExplore}
-                        className="cursor-pointer border border-ireb-berry bg-ireb-superlight-berry px-4 py-2 text-base font-medium text-ireb-berry transition-colors hover:brightness-75"
+                        className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
                     >
-                        explore
+                        Explore
                     </button>
                 )}
                 {showBackButton && (
                     <button
                         onClick={onBack}
-                        className="cursor-pointer border border-ireb-berry bg-ireb-superlight-berry px-4 py-2 text-base font-medium text-ireb-berry transition-colors hover:brightness-75 flex items-center gap-2"
+                        className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
                     >
-                        <span>←</span> Back to Overview
+                        <span className="pr-2">←</span> Back to Overview
                     </button>
                 )}
             </div>

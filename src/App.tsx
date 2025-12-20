@@ -48,10 +48,10 @@ function App() {
                                 key={year}
                                 type="button"
                                 onClick={() => setActiveYear(year)}
-                                className={`cursor-pointer border border-ireb-berry px-4 py-2 text-base font-medium transition-colors hover:brightness-75 ${
+                                className={`font-mori flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 border-ireb-berry shadow-card ${
                                     year === activeYear
-                                        ? "bg-ireb-berry text-white"
-                                        : "bg-ireb-superlight-berry text-ireb-berry"
+                                        ? "bg-ireb-berry text-white font-bold"
+                                        : "bg-ireb-superlight-berry text-ireb-berry font-normal hover:bg-ireb-light-berry"
                                 }`}
                             >
                                 {year}
