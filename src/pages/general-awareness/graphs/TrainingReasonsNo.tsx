@@ -100,10 +100,15 @@ export const TrainingReasonsNo = ({
     useTrainingReasonsData();
 
   // Stats Logic
+  const eligibleParticipants = responses.filter(
+    (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "no"
+  );
+
   const numberOfResponses = nonParticipants.length;
-  const totalResponses = responses.length;
   const responseRate =
-    totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
+    eligibleParticipants.length > 0
+      ? (numberOfResponses / eligibleParticipants.length) * 100
+      : 0;
 
   // Chart Logic
   const chartData = useMemo<Data[]>(
