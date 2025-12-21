@@ -36,56 +36,59 @@ const useTrainingReasonsData = () => {
   const barColor = useThemeColor("--color-ireb-berry");
   const tickColor = useThemeColor("--color-ireb-grey-01");
 
-  // 1. Filter for users who answered "No" to Q10
-  const nonParticipants = useMemo(
-    () =>
-      responses.filter(
-        (r) =>
-          normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "no"
-      ),
-    [responses]
-  );
-
-  // 2. Calculate Stats
-  const stats = useMemo<ReasonStat[]>(() => {
+  const data = useMemo(() => {
     const counts = new Map<string, number>();
     reasonsList.forEach((r) => counts.set(r.key, 0));
 
-    nonParticipants.forEach((r) => {
-      reasonsList.forEach((reason) => {
-        const rawValue = r.raw[reason.key as keyof typeof r.raw] ?? "";
-        const normalized = normalize(rawValue);
+    let eligibleParticipants = 0;
+    let respondentsWithAnyAnswer = 0;
 
-        if (reason.key === "trainingOtherReason") {
-          // For 'Other', any text is a "yes"
-          if (normalized.length > 0) {
-            counts.set(reason.key, (counts.get(reason.key) ?? 0) + 1);
-          }
-        } else {
-          // For standard checkboxes, assume "Yes" means selected
-          if (normalized.toLowerCase() === "yes") {
-            counts.set(reason.key, (counts.get(reason.key) ?? 0) + 1);
-          }
+    responses.forEach((r) => {
+        const participated = normalize(r.raw.participatedInTraining ?? "").toLowerCase();
+
+        // Wer mit "No" geantwortet hat, ist berechtigt
+        if (participated === "no") {
+            eligibleParticipants++;
+
+            let hasAny = false;
+            reasonsList.forEach((reason) => {
+                const rawValue = r.raw[reason.key as keyof typeof r.raw] ?? "";
+                const normalized = normalize(rawValue);
+
+                const isSelected = reason.key === "trainingOtherReason"
+                    ? normalized.length > 0
+                    : normalized.toLowerCase() === "yes";
+
+                if (isSelected) {
+                    counts.set(reason.key, (counts.get(reason.key) ?? 0) + 1);
+                    hasAny = true;
+                }
+            });
+
+            if (hasAny) {
+                respondentsWithAnyAnswer++;
+            }
         }
-      });
     });
 
-    return reasonsList
+    const stats = reasonsList
       .map((reason) => ({
         ...reason,
         count: counts.get(reason.key) ?? 0,
       }))
       .sort((a, b) => a.count - b.count);
-  }, [nonParticipants]);
 
-  // 3. Extract "Other" Texts
+    return { stats, eligibleParticipants, respondentsWithAnyAnswer };
+  }, [responses]);
+
   const otherTexts = useMemo(() => {
-    return nonParticipants
+     return responses
+      .filter(r => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "no")
       .map((r) => normalize(r.raw.trainingOtherReason ?? ""))
       .filter((value) => value.length > 0);
-  }, [nonParticipants]);
+  }, [responses]);
 
-  return { stats, otherTexts, nonParticipants, barColor, tickColor, responses };
+    return { ...data, otherTexts, barColor, tickColor };
 };
 
 // --- COMPONENT 1: Main Chart (Dashboard) ---
@@ -96,18 +99,13 @@ export const TrainingReasonsNo = ({
   onExplore?: () => void;
   className?: string;
 }) => {
-  const { stats, otherTexts, nonParticipants, barColor, tickColor, responses } =
+  const { stats, otherTexts, eligibleParticipants, respondentsWithAnyAnswer, barColor, tickColor } =
     useTrainingReasonsData();
 
-  // Stats Logic
-  const eligibleParticipants = responses.filter(
-    (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "no"
-  );
-
-  const numberOfResponses = nonParticipants.length;
+  const numberOfResponses = respondentsWithAnyAnswer;
   const responseRate =
-    eligibleParticipants.length > 0
-      ? (numberOfResponses / eligibleParticipants.length) * 100
+    eligibleParticipants > 0
+      ? (numberOfResponses / eligibleParticipants) * 100
       : 0;
 
   // Chart Logic
