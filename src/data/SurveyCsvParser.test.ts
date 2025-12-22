@@ -15,7 +15,7 @@ describe("SurveyCsvParser", () => {
 
     const expectedRecord: SurveyRecord = {
       responseId: "29",
-      dateSubmitted: "1980-01-01 00:00:00",
+      dateSubmitted: "01/01/1980 00:00",
       lastPage: "4",
       startLanguage: "en",
       seed: "1941877023",
@@ -56,7 +56,7 @@ describe("SurveyCsvParser", () => {
       organizationHasDigitalSustainabilityGoals: "No",
       organizationHasSustainabilityTeam: "No",
       organizationIncorporatesSustainablePractices: "No",
-      organizationDepartmentCoordination: "",
+      organizationDepartmentCoordination: "N/A",
       considerEnvironmental: "N/A",
       considerSocial: "N/A",
       considerIndividual: "N/A",
@@ -88,7 +88,7 @@ describe("SurveyCsvParser", () => {
       roleConsiderEconomic: "N/A",
       roleConsiderTechnical: "N/A",
       roleConsiderOther: "",
-      usesTools: "",
+      usesTools: "N/A",
       toolsDescription: "",
       hindranceLackInterest: "No",
       hindranceLackKnowledge: "No",
