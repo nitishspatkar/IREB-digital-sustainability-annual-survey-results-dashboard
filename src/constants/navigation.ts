@@ -1,24 +1,19 @@
-import Demographic from "../pages/demographic/DemographicPage";
-import DigitalSustainabilityRole from "../pages/role-of-digital-sustainability/DigitalSustainabilityRolePage";
-import GeneralAwareness from "../pages/general-awareness/GeneralAwarenessPage";
-import SustainabilityTasks from "../pages/sustainability-in-job-and-tasks/SustainabilityTasksPage";
-
 export const navigationSections = [
-  { id: "demographic", label: "Demographics", component: Demographic },
+  { id: "demographic", label: "Demographics", path: "/demographics" },
   {
     id: "general-awareness",
     label: "General Awareness of Sustainability",
-    component: GeneralAwareness,
+    path: "/general-awareness",
   },
   {
     id: "digital-sustainability-role",
     label: "The Role of Digital Sustainability in Organizations",
-    component: DigitalSustainabilityRole,
+    path: "/digital-sustainability-role",
   },
   {
     id: "sustainability-tasks",
     label: "Sustainability in Role-specific Tasks",
-    component: SustainabilityTasks,
+    path: "/sustainability-tasks",
   },
 ] as const;
 

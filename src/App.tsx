@@ -1,22 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
+import YearSwitcher from "./components/YearSwitcher"; // Import YearSwitcher
 import { SurveyProvider } from "./data/SurveyContext";
 import { SurveyRepository } from "./data/SurveyRepository";
 import "./index.css";
-import { navigationSections, type SectionId } from "./constants/navigation";
+
+const Demographic = lazy(() => import("./pages/demographic/DemographicPage"));
+const GeneralAwareness = lazy(() => import("./pages/general-awareness/GeneralAwarenessPage"));
+const DigitalSustainabilityRole = lazy(() => import("./pages/role-of-digital-sustainability/DigitalSustainabilityRolePage"));
+const SustainabilityTasks = lazy(() => import("./pages/sustainability-in-job-and-tasks/SustainabilityTasksPage"));
 
 const availableYears = SurveyRepository.getAvailableYears();
-const sortedYears = [...availableYears].sort((a, b) => Number(b) - Number(a));
-
 const currentYear = new Date().getFullYear().toString();
 const initialYear = availableYears.includes(currentYear)
     ? currentYear
-    : sortedYears[0];
+    : availableYears.length > 0 ? [...availableYears].sort((a, b) => Number(b) - Number(a))[0] : ""; // Safely get the latest year if current is not available
+
+const PageLoader = () => (
+  <div className="flex h-64 w-full items-center justify-center text-ireb-berry font-mori">
+    Loading...
+  </div>
+);
 
 function App() {
-    const [activeSectionId, setActiveSectionId] = useState<SectionId>(
-        navigationSections[0].id
-    );
     const [activeYear, setActiveYear] = useState<string>(initialYear);
 
     const surveyData = SurveyRepository.getSurvey(activeYear);
@@ -25,48 +32,34 @@ function App() {
         console.log(`Data for year ${activeYear}:`, surveyData);
     }, [activeYear, surveyData]);
 
-    const activeSection = navigationSections.find(
-        (section) => section.id === activeSectionId
-    );
-
-    const ActiveSectionComponent = activeSection?.component ?? (() => null);
-
     return (
-        <div className="flex min-h-screen bg-transparent text-ink-900">
-            <Sidebar
-                activeSectionId={activeSectionId}
-                setActiveSectionId={setActiveSectionId}
-                availableYears={availableYears}
-                activeYear={activeYear}
-                setActiveYear={setActiveYear}
-            />
-            <main className="flex flex-1 flex-col px-4 pb-12 pt-20 md:p-12 bg-ireb-superlight-berry">
-                <div className="w-full">
-                    {sortedYears.length > 1 && (
-                        <div className="mb-8 flex gap-4">
-                            {sortedYears.map((year) => (
-                                <button
-                                    key={year}
-                                    type="button"
-                                    onClick={() => setActiveYear(year)}
-                                    className={`font-mori flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 border-ireb-berry shadow-card ${
-                                        year === activeYear
-                                            ? "bg-ireb-berry text-white font-bold"
-                                            : "bg-ireb-superlight-berry text-ireb-berry font-normal hover:bg-ireb-light-berry"
-                                    }`}
-                                >
-                                    {year}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+        <BrowserRouter>
+            <div className="flex min-h-screen bg-transparent text-ink-900">
+                <Sidebar activeYear={activeYear} />
+                <main className="flex flex-1 flex-col px-4 pb-12 pt-20 md:p-12 bg-ireb-superlight-berry">
+                    <div className="w-full">
+                        <YearSwitcher
+                            availableYears={availableYears}
+                            activeYear={activeYear}
+                            setActiveYear={setActiveYear}
+                        />
 
-                    <SurveyProvider value={surveyData}>
-                        <ActiveSectionComponent />
-                    </SurveyProvider>
-                </div>
-            </main>
-        </div>
+                        <SurveyProvider value={surveyData}>
+                            <Suspense fallback={<PageLoader />}>
+                                <Routes>
+                                    <Route path="/" element={<Navigate to="/demographics" replace />} />
+                                    <Route path="/demographics" element={<Demographic />} />
+                                    <Route path="/general-awareness" element={<GeneralAwareness />} />
+                                    <Route path="/digital-sustainability-role" element={<DigitalSustainabilityRole />} />
+                                    <Route path="/sustainability-tasks" element={<SustainabilityTasks />} />
+                                    <Route path="*" element={<Navigate to="/demographics" replace />} />
+                                </Routes>
+                            </Suspense>
+                        </SurveyProvider>
+                    </div>
+                </main>
+            </div>
+        </BrowserRouter>
     );
 }
 
