@@ -1,20 +1,18 @@
-import React from 'react';
-
 type YearSwitcherProps = {
   availableYears: readonly string[];
   activeYear: string;
   setActiveYear: (year: string) => void;
 };
 
-const YearSwitcher: React.FC<YearSwitcherProps> = ({
+const YearSwitcher = ({
   availableYears,
   activeYear,
   setActiveYear,
-}) => {
+}:YearSwitcherProps) => {
   const sortedYears = [...availableYears].sort((a, b) => Number(b) - Number(a));
 
   if (sortedYears.length <= 1) {
-    return null; // No need for a switcher if there's only one or no year
+    return null;
   }
 
   return (
