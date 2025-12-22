@@ -16,5 +16,3 @@ export const navigationSections = [
     path: "/sustainability-tasks",
   },
 ] as const;
-
-export type SectionId = (typeof navigationSections)[number]["id"];
