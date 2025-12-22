@@ -55,6 +55,10 @@ const useDriversData = () => {
                 hasAnswer = true;
             }
 
+            if(normalize(raw.driveOrganizationalPolicies) === "no" && normalize(raw.drivePersonalBeliefs) === "no" && normalize(raw.driveClientRequirements) === "no" && normalize(raw.driveUserRequirements) === "no" && normalize(raw.driveLegalRequirements) === "no") {
+                hasAnswer = true;
+            }
+
             const otherVal = normalize(raw.driveOther);
             if (otherVal.length > 0 && otherVal !== "n/a") {
                 other += 1;

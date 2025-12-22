@@ -6,89 +6,91 @@ import useThemeColor from "../../../hooks/useThemeColor";
 import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
 import { SurveyChart, SurveyExploreList } from "../../../components/GraphViews";
 
-// --- TYPES & CONSTANTS ---
-type ReasonStat = {
-  label: string;
-  key: string;
-  count: number;
-};
-
-const reasonsList: Omit<ReasonStat, "count">[] = [
-  { label: "I was not aware such programs existed", key: "trainingNotAware" },
-  {
-    label: "My organization does not offer such programs",
-    key: "trainingNoOrganizationOffer",
-  },
-  {
-    label: "I have not had the opportunity to attend",
-    key: "trainingNoOpportunity",
-  },
-  { label: "I don't see the need for such training", key: "trainingNoNeed" },
-  { label: "The cost is too high", key: "trainingTooExpensive" },
-  { label: "Other", key: "trainingOtherReason" },
-];
-
-const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
-
 // --- SHARED DATA LOGIC ---
 const useTrainingReasonsData = () => {
-  const responses = useSurveyData();
-  const barColor = useThemeColor("--color-ireb-berry");
-  const tickColor = useThemeColor("--color-ireb-grey-01");
+    const responses = useSurveyData();
+    const barColor = useThemeColor("--color-ireb-berry");
+    const tickColor = useThemeColor("--color-ireb-grey-01");
 
-  const data = useMemo(() => {
-    const counts = new Map<string, number>();
-    reasonsList.forEach((r) => counts.set(r.key, 0));
+    const { stats, otherTexts, respondentsWithAnyAnswer, totalEligible } = useMemo(() => {
+        const norm = (v: string) => v?.trim().toLowerCase() ?? "";
 
-    let eligibleParticipants = 0;
-    let respondentsWithAnyAnswer = 0;
+        // Precondition: Q27 = No
+        const filteredResponses = responses.filter(
+            (r) => norm(r.raw.participatedInTraining) === "no"
+        );
 
-    responses.forEach((r) => {
-        const participated = normalize(r.raw.participatedInTraining ?? "").toLowerCase();
+        let countAware = 0;
+        let countNoOffer = 0;
+        let countNoOpp = 0;
+        let countNoNeed = 0;
+        let countExpensive = 0;
+        let countOther = 0;
+        let withAnswer = 0;
 
-        // Wer mit "No" geantwortet hat, ist berechtigt
-        if (participated === "no") {
-            eligibleParticipants++;
+        filteredResponses.forEach((r) => {
+            const raw = r.raw;
+            let hasAnswer = false;
 
-            let hasAny = false;
-            reasonsList.forEach((reason) => {
-                const rawValue = r.raw[reason.key as keyof typeof r.raw] ?? "";
-                const normalized = normalize(rawValue);
+            if (norm(raw.trainingNotAware) === "yes") {
+                countAware++;
+                hasAnswer = true;
+            }
+            if (norm(raw.trainingNoOrganizationOffer) === "yes") {
+                countNoOffer++;
+                hasAnswer = true;
+            }
+            if (norm(raw.trainingNoOpportunity) === "yes") {
+                countNoOpp++;
+                hasAnswer = true;
+            }
+            if (norm(raw.trainingNoNeed) === "yes") {
+                countNoNeed++;
+                hasAnswer = true;
+            }
+            if (norm(raw.trainingTooExpensive) === "yes") {
+                countExpensive++;
+                hasAnswer = true;
+            }
 
-                const isSelected = reason.key === "trainingOtherReason"
-                    ? normalized.length > 0
-                    : normalized.toLowerCase() === "yes";
+            if(norm(raw.trainingNotAware) === "no" && norm(raw.trainingNoOrganizationOffer) == "no" && norm(raw.trainingNoOpportunity) === "no" && norm(raw.trainingNoNeed) === "no" && norm(raw.trainingTooExpensive) === "no") (
+                hasAnswer = true
+            )
 
-                if (isSelected) {
-                    counts.set(reason.key, (counts.get(reason.key) ?? 0) + 1);
-                    hasAny = true;
-                }
+            const oVal = norm(raw.trainingOtherReason);
+            if (oVal.length > 0 && oVal !== "n/a") {
+                countOther++;
+                hasAnswer = true;
+            }
+
+            if (hasAnswer) withAnswer++;
+        });
+
+        const items = [
+            { label: "I was not aware such programs existed", key: "trainingNotAware", count: countAware },
+            { label: "My organization does not offer such programs", key: "trainingNoOrganizationOffer", count: countNoOffer },
+            { label: "I have not had the opportunity to attend", key: "trainingNoOpportunity", count: countNoOpp },
+            { label: "I don't see the need for such training", key: "trainingNoNeed", count: countNoNeed },
+            { label: "The cost is too high", key: "trainingTooExpensive", count: countExpensive },
+            { label: "Other", key: "trainingOtherReason", count: countOther },
+        ].sort((a, b) => a.count - b.count);
+
+        const texts = filteredResponses
+            .map((r) => (r.raw.trainingOtherReason ?? "").trim())
+            .filter((v) => {
+                const low = v.toLowerCase();
+                return low.length > 0 && low !== "n/a";
             });
 
-            if (hasAny) {
-                respondentsWithAnyAnswer++;
-            }
-        }
-    });
+        return {
+            stats: items,
+            otherTexts: texts,
+            respondentsWithAnyAnswer: withAnswer,
+            totalEligible: filteredResponses.length,
+        };
+    }, [responses]);
 
-    const stats = reasonsList
-      .map((reason) => ({
-        ...reason,
-        count: counts.get(reason.key) ?? 0,
-      }))
-      .sort((a, b) => a.count - b.count);
-
-    return { stats, eligibleParticipants, respondentsWithAnyAnswer };
-  }, [responses]);
-
-  const otherTexts = useMemo(() => {
-     return responses
-      .filter(r => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "no")
-      .map((r) => normalize(r.raw.trainingOtherReason ?? ""))
-      .filter((value) => value.length > 0);
-  }, [responses]);
-
-    return { ...data, otherTexts, barColor, tickColor };
+    return { stats, otherTexts, respondentsWithAnyAnswer, totalEligible, barColor, tickColor };
 };
 
 // --- COMPONENT 1: Main Chart (Dashboard) ---
@@ -99,14 +101,10 @@ export const TrainingReasonsNo = ({
   onExplore?: () => void;
   className?: string;
 }) => {
-  const { stats, otherTexts, eligibleParticipants, respondentsWithAnyAnswer, barColor, tickColor } =
+    const { stats, otherTexts, respondentsWithAnyAnswer, totalEligible, barColor, tickColor } =
     useTrainingReasonsData();
 
-  const numberOfResponses = respondentsWithAnyAnswer;
-  const responseRate =
-    eligibleParticipants > 0
-      ? (numberOfResponses / eligibleParticipants) * 100
-      : 0;
+    const responseRate = totalEligible > 0 ? (respondentsWithAnyAnswer / totalEligible) * 100 : 0;
 
   // Chart Logic
   const chartData = useMemo<Data[]>(
@@ -164,7 +162,7 @@ export const TrainingReasonsNo = ({
       className={className}
       question={question}
       description={description}
-      numberOfResponses={numberOfResponses}
+      numberOfResponses={respondentsWithAnyAnswer}
       responseRate={responseRate}
       data={chartData}
       layout={layout}
@@ -186,29 +184,19 @@ export const TrainingReasonsNoDetails = ({
     (c) => c.key === "trainingOtherReason"
   )?.header;
 
-  const mainQuestion =
-    "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?";
-  const wrapperQuestion =
-    questionHeaderOther ??
-    "What are the reasons you haven’t participated in a training or educational program on digital sustainability before? [Other]";
+    const mainQuestion = "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?";
+    const otherStat = stats.find((s) => s.key === "trainingOtherReason");
+    const numberOfOtherSelections = otherStat ? otherStat.count : 0;
 
-  // Calculate rate relative to the "Other" bar count
-  const numberOfOtherTexts = otherTexts.length;
-  const numberOfOtherSelections =
-    stats.find((s) => s.key === "trainingOtherReason")?.count ?? 0;
-
-  const responseRate =
-    numberOfOtherSelections > 0
-      ? (numberOfOtherTexts / numberOfOtherSelections) * 100
-      : 0;
+    const responseRate = numberOfOtherSelections > 0 ? (otherTexts.length / numberOfOtherSelections) * 100 : 0;
 
   return (
     <SurveyExploreList
       title={mainQuestion}
       items={otherTexts}
-      question={wrapperQuestion}
+      question={questionHeaderOther ?? mainQuestion}
       description="Lists the free-text reasons supplied under the Other option."
-      numberOfResponses={numberOfOtherTexts}
+      numberOfResponses={otherTexts.length}
       responseRate={responseRate}
       onBack={onBack}
     />

@@ -61,6 +61,10 @@ const useNoTrainingReasonsData = () => {
                     hasAnswer = true;
                 }
 
+                if(normalize(raw.orgNoTrainingLackAwareness) === "no" && normalize(raw.orgNoTrainingLackUnderstanding) === "no" && normalize(raw.orgNoTrainingNoDemand) === "no" && normalize(raw.orgNoTrainingLimitedBudget) === "no" && normalize(raw.orgNoTrainingNotPriority) === "no" && normalize(raw.orgNoTrainingNotSure) === "no") (
+                    hasAnswer = true
+                )
+
                 const otherVal = normalize(raw.orgNoTrainingOther);
                 if (otherVal.length > 0 && otherVal !== "n/a") {
                     other += 1;

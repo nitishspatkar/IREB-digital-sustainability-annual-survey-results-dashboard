@@ -54,6 +54,10 @@ const useSustainabilityDimensionsInTasksData = () => {
                     hasAnswer = true;
                 }
 
+                if (norm(raw.roleConsiderEnvironmental) === "no" && norm(raw.roleConsiderSocial) === "no" && norm(raw.roleConsiderIndividual) === "no" && norm(raw.roleConsiderEconomic) === "no" && norm(raw.roleConsiderTechnical) === "no") {
+                    hasAnswer = true;
+                }
+
                 const otherVal = norm(raw.roleConsiderOther);
                 if (otherVal.length > 0 && otherVal !== "n/a") {
                     other += 1;
