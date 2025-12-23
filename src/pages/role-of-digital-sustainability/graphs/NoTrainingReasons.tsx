@@ -16,12 +16,6 @@ const useNoTrainingReasonsData = () => {
         useMemo(() => {
             const normalize = (v: string) => v?.trim().toLowerCase() ?? "";
 
-            // 1. Filter: organizationOffersTraining != "yes" and not empty
-            const filtered = surveyResponses.filter((r) => {
-                const offer = normalize(r.raw.organizationOffersTraining);
-                return offer !== "yes" && offer !== "";
-            });
-
             // 2. Count Logic
             let lackAwareness = 0;
             let lackUnderstanding = 0;
@@ -32,7 +26,7 @@ const useNoTrainingReasonsData = () => {
             let other = 0;
             let numberOfRespondents = 0;
 
-            filtered.forEach((response) => {
+            surveyResponses.forEach((response) => {
                 const raw = response.raw;
                 let hasAnswer = false;
 
@@ -88,7 +82,7 @@ const useNoTrainingReasonsData = () => {
             items.sort((a, b) => a.value - b.value);
 
             // 3. Extract Other Texts
-            const texts = filtered
+            const texts = surveyResponses
                 .map((r) => (r.raw.orgNoTrainingOther ?? "").trim())
                 .filter((value) => {
                     if (!value) return false;
@@ -99,7 +93,7 @@ const useNoTrainingReasonsData = () => {
             return {
                 stats: items,
                 otherTexts: texts,
-                eligibleResponses: filtered,
+                eligibleResponses: surveyResponses,
                 totalRespondentsWithAnswer: numberOfRespondents,
             };
         }, [surveyResponses]);
