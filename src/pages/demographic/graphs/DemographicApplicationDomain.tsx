@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 // IMPORTIERE DIE NEUEN GENERISCHEN VIEWS
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 
@@ -117,8 +116,7 @@ export const DemographicApplicationDomain = ({
   );
 
   // Texte holen
-  const header = columnDefinitions.find((c) => c.key === 'primaryApplicationDomain')?.header;
-  const question = header ?? 'In which application domain do you currently primarily work?';
+  const question = 'In which application domain do you currently primarily work? ';
 
   // Raten berechnen
   const numResp = stats.reduce((acc, curr) => acc + curr.count, 0);
@@ -145,14 +143,8 @@ export const DemographicApplicationDomainDetails = ({ onBack }: { onBack: () => 
   const { stats, otherTexts } = useApplicationDomainData();
 
   // Texte holen
-  const mainHeader = columnDefinitions.find((c) => c.key === 'primaryApplicationDomain')?.header;
-  const otherHeader = columnDefinitions.find(
-    (c) => c.key === 'primaryApplicationDomainOther'
-  )?.header;
-
-  const title = mainHeader ?? 'Primary Application Domain';
-  const question =
-    otherHeader ?? 'In which application domain do you currently primarily work? [Other]';
+  const title = 'In which application domain do you currently primarily work? ';
+  const question = 'In which application domain do you currently primarily work?  [Other]';
 
   // Raten für "Other" berechnen
   const numOther = otherTexts.length;

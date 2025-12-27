@@ -3,7 +3,6 @@ import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 
 import GraphWrapper from '../../../components/GraphWrapper';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import type { RespondentStat } from '../demographicTypes';
@@ -75,9 +74,7 @@ const DemographicChoropleth = ({ respondentStats }: DemographicChoroplethProps) 
   const totalResponses = surveyResponses.length;
   const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
 
-  const question =
-    columnDefinitions.find((c) => c.key === 'countryOfResidence')?.header ??
-    'What is your current country of residence?';
+  const question = 'What is your current country of residence? ';
   const description = 'Visualizes the geographic distribution of respondents using a world map.';
 
   return (

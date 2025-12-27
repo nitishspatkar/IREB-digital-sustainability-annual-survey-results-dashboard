@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { useSurveyData } from '../../../data/SurveyContext';
 import type { AgeGroupStat } from '../demographicTypes';
 import useThemeColor from '../../../hooks/useThemeColor';
@@ -11,7 +10,6 @@ import GraphWrapper from '../../../components/GraphWrapper';
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const DemographicAgeGroup = () => {
-  const questionHeader = columnDefinitions.find((c) => c.key === 'ageGroup')?.header;
   const chartBarColor = useThemeColor('--color-ireb-berry');
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const surveyResponses = useSurveyData();
@@ -31,7 +29,7 @@ const DemographicAgeGroup = () => {
       .sort((a, b) => b.count - a.count);
   }, [surveyResponses]);
 
-  const question = questionHeader ?? 'Which age group do you belong to?';
+  const question = 'Which age group do you belong to?';
   const description =
     'This chart shows the distribution of survey respondents across different age groups. The data helps us understand the demographic composition of the survey participants and identify which age groups are most represented in the responses.';
   const numberOfResponses = ageGroupStats.reduce((sum, stat) => sum + stat.count, 0);

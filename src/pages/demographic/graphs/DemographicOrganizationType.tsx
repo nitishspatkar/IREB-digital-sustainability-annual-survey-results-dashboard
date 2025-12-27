@@ -5,7 +5,6 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 
 interface OrganizationTypeStat {
   organizationType: string;
@@ -15,7 +14,6 @@ interface OrganizationTypeStat {
 const normalizeOrganizationType = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const DemographicOrganizationType = () => {
-  const questionHeader = columnDefinitions.find((c) => c.key === 'organizationType')?.header;
   const chartBarColor = useThemeColor('--color-ireb-berry');
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const surveyResponses = useSurveyData();
@@ -99,9 +97,7 @@ const DemographicOrganizationType = () => {
     [tickColor]
   );
 
-  const question =
-    questionHeader ??
-    'Which of the following organizational types best describes your organization?';
+  const question = 'Which of the following organizational types best describes your organization? ';
   const description =
     'Visualizes how respondents classify their organizations across the provided types.';
 

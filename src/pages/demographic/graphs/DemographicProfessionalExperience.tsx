@@ -3,14 +3,10 @@ import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 
 import GraphWrapper from '../../../components/GraphWrapper';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 
 export function DemographicProfessionalExperience() {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === 'professionalExperienceYears'
-  )?.header;
   const surveyResponses = useSurveyData();
   const chartBarColor = useThemeColor('--color-ireb-berry');
   const tickColor = useThemeColor('--color-ireb-grey-01');
@@ -111,8 +107,7 @@ export function DemographicProfessionalExperience() {
   );
 
   const question =
-    questionHeader ??
-    'How many years of professional experience do you have in IT/software engineering?';
+    'How many years of professional experience do you have in IT/software engineering? ';
   const description = 'Shows how respondents distribute across professional experience brackets.';
 
   return (
