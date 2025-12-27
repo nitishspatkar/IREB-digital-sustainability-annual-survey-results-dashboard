@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 
 const useTrainingReasonsNotMoreData = () => {
@@ -193,9 +192,8 @@ export const TrainingReasonsNotMore = ({
 export const TrainingReasonsNotMoreDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useTrainingReasonsNotMoreData();
 
-  const questionHeaderOther = columnDefinitions.find(
-    (c) => c.key === 'notMoreTrainingOther'
-  )?.header;
+  const questionHeaderOther =
+    'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [Other]';
 
   const mainQuestion =
     'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?';

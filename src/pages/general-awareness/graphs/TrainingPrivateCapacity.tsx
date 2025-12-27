@@ -3,7 +3,6 @@ import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 
 import GraphWrapper from '../../../components/GraphWrapper';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 
@@ -31,7 +30,8 @@ const capacityOptions = [
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingPrivateCapacity = () => {
-  const questionHeader = columnDefinitions.find((c) => c.key === 'trainingPrivateCapacity')?.header;
+  const questionHeader =
+    'Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)? ';
 
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');

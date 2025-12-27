@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 
 // --- SHARED DATA LOGIC ---
@@ -195,9 +194,8 @@ export const TrainingReasonsNo = ({
 export const TrainingReasonsNoDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useTrainingReasonsData();
 
-  const questionHeaderOther = columnDefinitions.find(
-    (c) => c.key === 'trainingOtherReason'
-  )?.header;
+  const questionHeaderOther =
+    'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [Other]';
 
   const mainQuestion =
     'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?';

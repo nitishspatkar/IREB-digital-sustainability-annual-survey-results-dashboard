@@ -5,7 +5,6 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 
 type SatisfactionStat = {
   label: string;
@@ -15,7 +14,8 @@ type SatisfactionStat = {
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingSatisfaction = () => {
-  const questionHeader = columnDefinitions.find((c) => c.key === 'trainingSatisfaction')?.header;
+  const questionHeader =
+    'Are you satisfied with the number of trainings or educational programs you participated in?  ';
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const titleColor = useThemeColor('--color-ireb-grey-01');

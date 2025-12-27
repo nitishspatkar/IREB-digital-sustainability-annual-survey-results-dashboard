@@ -5,7 +5,6 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions.ts';
 
 type CountStat = {
   label: string;
@@ -61,7 +60,8 @@ function categorizeCount(rawValue: string): { label: string; sortKey: number } |
 }
 
 const TrainingProgramsCount = () => {
-  const questionHeader = columnDefinitions.find((c) => c.key === 'trainingCount')?.header;
+  const questionHeader =
+    'How many times training(s) or educational program(s) on digital sustainability did you participate in?  ';
   const barColor = useThemeColor('--color-ireb-berry');
   const titleColor = useThemeColor('--color-ireb-grey-01');
   const tickColor = useThemeColor('--color-ireb-grey-01');

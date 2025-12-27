@@ -76,7 +76,8 @@ export const DiscussionFrequency = ({
     titleColor,
   } = useDiscussionFrequencyData();
 
-  const questionHeader = columnDefinitions.find((c) => c.key === 'discussionFrequency')?.header;
+  const questionHeader =
+    'How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?  ';
 
   // Stats Logic
   const numberOfResponses = frequencyStats.reduce((sum, stat) => sum + stat.count, 0);
@@ -167,10 +168,10 @@ export const DiscussionFrequency = ({
 export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) => {
   const { frequencyStats, otherFrequencyTexts } = useDiscussionFrequencyData();
 
-  const mainQuestionHeader = columnDefinitions.find((c) => c.key === 'discussionFrequency')?.header;
-  const questionHeaderOther = columnDefinitions.find(
-    (c) => c.key === 'discussionFrequencyOther'
-  )?.header;
+  const mainQuestionHeader =
+    'How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?  ';
+  const questionHeaderOther =
+    'How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?   [Other]';
 
   // Title Logic
   const mainQuestionTitle =

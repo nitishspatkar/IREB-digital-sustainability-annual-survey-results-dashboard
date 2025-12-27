@@ -5,7 +5,6 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 
 type ParticipationStat = {
   label: string;
@@ -15,7 +14,8 @@ type ParticipationStat = {
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingParticipation = () => {
-  const questionHeader = columnDefinitions.find((c) => c.key === 'participatedInTraining')?.header;
+  const questionHeader =
+    'Have you participated in one or more training or educational programs on digital sustainability? ';
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
 

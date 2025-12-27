@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingDescriptionList = () => {
-  const questionHeader = columnDefinitions.find((c) => c.key === 'trainingDescription')?.header;
+  const questionHeader =
+    'Please tell us a little about the training or educational programs on digital sustainability you participated in. ';
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');
 
