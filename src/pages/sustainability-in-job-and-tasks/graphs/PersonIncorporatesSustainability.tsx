@@ -5,12 +5,12 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const PersonIncorporatesSustainability = () => {
-  const questionHeader =
-    'Do you incorporate digital sustainability considerations in your role-specific tasks?';
+  const { question, description } = graphDescriptions.PersonIncorporatesSustainability;
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const tickColor = useThemeColor('--color-ireb-grey-01');
@@ -92,11 +92,6 @@ const PersonIncorporatesSustainability = () => {
   const numberOfResponses = stats.values.reduce((a, b) => a + b, 0);
   const totalResponses = responses.length;
   const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
-
-  const question =
-    questionHeader ?? 'Do you incorporate digital sustainability in your role-related tasks?';
-  const description =
-    'Shows the proportion of respondents who incorporate digital sustainability in their tasks.';
 
   return (
     <GraphWrapper

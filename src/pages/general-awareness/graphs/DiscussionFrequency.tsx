@@ -6,6 +6,7 @@ import useThemeColor from '../../../hooks/useThemeColor';
 import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 // Import der neuen generischen Views
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 type DiscussionFrequencyStat = {
   frequency: string;
@@ -143,11 +144,8 @@ export const DiscussionFrequency = ({
     [titleColor, tickColor]
   );
 
-  const question =
-    questionHeader ??
-    'How often do you discuss digital sustainability in your professional environment?';
-  const description =
-    'Shows the frequency of digital sustainability discussions among respondents.';
+  const question = questionHeader ?? graphDescriptions.DiscussionFrequency.question;
+  const description = graphDescriptions.DiscussionFrequency.description;
 
   return (
     <SurveyChart
@@ -175,8 +173,7 @@ export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) =
 
   // Title Logic
   const mainQuestionTitle =
-    mainQuestionHeader ??
-    'How often do you discuss digital sustainability in your professional environment?';
+    mainQuestionHeader ?? graphDescriptions.DiscussionFrequencyDetails.title;
 
   // Stats Logic for "Other"
   const numberOfResponsesOther = otherFrequencyTexts.length;
@@ -197,7 +194,7 @@ export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) =
       title={mainQuestionTitle}
       items={otherFrequencyTexts}
       question={wrapperQuestion}
-      description="Lists the free-text entries for the discussion frequency."
+      description={graphDescriptions.DiscussionFrequencyDetails.description}
       numberOfResponses={numberOfResponsesOther}
       responseRate={otherResponseRate}
       onBack={onBack}

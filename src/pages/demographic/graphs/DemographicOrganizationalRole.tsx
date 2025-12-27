@@ -5,6 +5,7 @@ import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 interface RoleStat {
   role: string;
@@ -113,13 +114,8 @@ export const DemographicOrganizationalRole = ({
   return (
     <SurveyChart
       className={className}
-      question={
-        questionHeader ??
-        'Which of the following best describes your current role in the organization?'
-      }
-      description={
-        'Shows how respondents distribute across the provided organizational role options.'
-      }
+      question={questionHeader ?? graphDescriptions.DemographicOrganizationalRole.question}
+      description={graphDescriptions.DemographicOrganizationalRole.description}
       numberOfResponses={numberOfResponses}
       responseRate={responseRate}
       data={chartData}
@@ -149,16 +145,12 @@ export const DemographicOrganizationalRoleDetails = ({ onBack }: { onBack: () =>
 
   return (
     <SurveyExploreList
-      title={
-        mainQuestionHeader ??
-        'Which of the following best describes your current role in the organization?'
-      }
+      title={mainQuestionHeader ?? graphDescriptions.DemographicOrganizationalRoleDetails.title}
       items={otherRoleTexts}
       question={
-        questionHeaderOther ??
-        'Which of the following best describes your current role in the organization? [Other]'
+        questionHeaderOther ?? graphDescriptions.DemographicOrganizationalRoleDetails.question
       }
-      description={'Lists the free-text role descriptions supplied under the Other option.'}
+      description={graphDescriptions.DemographicOrganizationalRoleDetails.description}
       numberOfResponses={numberOfResponsesOther}
       responseRate={otherResponseRate}
       onBack={onBack}

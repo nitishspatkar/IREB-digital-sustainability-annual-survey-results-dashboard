@@ -5,6 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 type CountStat = {
   label: string;
@@ -144,8 +145,8 @@ const TrainingProgramsCount = () => {
     eligibleParticipants.length > 0 ? (numberOfResponses / eligibleParticipants.length) * 100 : 0;
 
   const question =
-    questionHeader?.replace('times', '') ?? 'How many training programs have you attended?';
-  const description = 'Distribution of the number of training programs attended by respondents.';
+    questionHeader?.replace('times', '') ?? graphDescriptions.TrainingProgramsCount.question;
+  const description = graphDescriptions.TrainingProgramsCount.description;
 
   return (
     <GraphWrapper

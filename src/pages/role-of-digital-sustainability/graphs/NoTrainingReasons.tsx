@@ -5,6 +5,7 @@ import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // --- SHARED DATA LOGIC ---
 const useNoTrainingReasonsData = () => {
@@ -123,9 +124,7 @@ export const NoTrainingReasons = ({
 }) => {
   const { stats, otherTexts, eligibleResponses, totalRespondentsWithAnswer, barColor, tickColor } =
     useNoTrainingReasonsData();
-
-  const questionHeader =
-    'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?';
+  const { question, description } = graphDescriptions.NoTrainingReasons;
 
   const data = useMemo<Data[]>(
     () => [
@@ -182,8 +181,8 @@ export const NoTrainingReasons = ({
   return (
     <SurveyChart
       className={className}
-      question={questionHeader}
-      description="Shows the reasons why organizations do not offer training on sustainable digital solutions."
+      question={question}
+      description={description}
       numberOfResponses={totalRespondentsWithAnswer}
       responseRate={responseRate}
       data={data}
@@ -197,10 +196,7 @@ export const NoTrainingReasons = ({
 // --- COMPONENT 2: Detail List ---
 export const NoTrainingReasonsDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useNoTrainingReasonsData();
-
-  const questionHeader =
-    'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?';
-  const questionHeaderOther = columnDefinitions.find((c) => c.key === 'orgNoTrainingOther')?.header;
+  const { question, questionHeaderOther, descriptionDetails } = graphDescriptions.NoTrainingReasons;
 
   const wrapperQuestion = questionHeaderOther ?? '';
 
@@ -213,10 +209,10 @@ export const NoTrainingReasonsDetails = ({ onBack }: { onBack: () => void }) => 
 
   return (
     <SurveyExploreList
-      title={questionHeader}
+      title={question}
       items={otherTexts}
       question={wrapperQuestion}
-      description="Lists the free-text reasons provided under the Other option."
+      description={descriptionDetails}
       numberOfResponses={otherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

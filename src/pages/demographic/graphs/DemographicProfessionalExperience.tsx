@@ -5,6 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 export function DemographicProfessionalExperience() {
   const surveyResponses = useSurveyData();
@@ -106,9 +107,7 @@ export function DemographicProfessionalExperience() {
     [tickColor]
   );
 
-  const question =
-    'How many years of professional experience do you have in IT/software engineering? ';
-  const description = 'Shows how respondents distribute across professional experience brackets.';
+  const { question, description } = graphDescriptions.DemographicProfessionalExperience;
 
   return (
     <GraphWrapper

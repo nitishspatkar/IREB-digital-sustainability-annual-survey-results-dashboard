@@ -5,11 +5,12 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const OrganizationIncorporatesPractices = () => {
-  const questionHeader = 'Does your organization incorporate sustainable development practices? ';
+  const { question, description } = graphDescriptions.OrganizationIncorporatesPractices;
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const barColor = useThemeColor('--color-ireb-grey-02');
@@ -96,10 +97,6 @@ const OrganizationIncorporatesPractices = () => {
 
   const total = stats.values.reduce((a, b) => a + b, 0);
   const responseRate = responses.length > 0 ? (total / responses.length) * 100 : 0;
-
-  const question = questionHeader ?? 'Does your organization incorporate sustainable practices?';
-  const description =
-    'Shows whether organizations incorporate sustainable practices in their software development.';
 
   return (
     <GraphWrapper

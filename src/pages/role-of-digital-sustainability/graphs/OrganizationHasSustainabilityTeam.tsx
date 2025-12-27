@@ -5,13 +5,13 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 // Component name matches the data key
 const OrganizationHasSustainabilityTeam = () => {
-  const questionHeader =
-    'Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department? ';
+  const { question, description } = graphDescriptions.OrganizationHasSustainabilityTeam;
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const barColor = useThemeColor('--color-ireb-grey-02');
@@ -98,9 +98,6 @@ const OrganizationHasSustainabilityTeam = () => {
 
   const total = stats.values.reduce((a, b) => a + b, 0);
   const responseRate = responses.length > 0 ? (total / responses.length) * 100 : 0;
-
-  const question = questionHeader ?? 'Does your organization have a sustainability team?';
-  const description = 'Shows whether organizations have a sustainability team.';
 
   return (
     <GraphWrapper

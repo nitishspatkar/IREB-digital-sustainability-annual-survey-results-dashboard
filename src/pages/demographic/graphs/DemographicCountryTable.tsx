@@ -6,6 +6,7 @@ import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import type { RespondentStat } from '../demographicTypes';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 type DemographicCountryTableProps = {
   respondentStats: RespondentStat[];
@@ -79,8 +80,7 @@ const DemographicCountryTable = ({ respondentStats }: DemographicCountryTablePro
   const totalResponses = surveyResponses.length;
   const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
 
-  const question = 'What is your current country of residence? ';
-  const description = 'Tabulates how many respondents we received from each country.';
+  const { question, description } = graphDescriptions.DemographicCountryTable;
 
   return (
     <GraphWrapper

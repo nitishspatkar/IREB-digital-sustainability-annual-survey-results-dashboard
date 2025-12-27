@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const CustomerNotRequestingReasons = () => {
-  const questionHeader =
-    'Why do you think that your customers and users have not asked explicitly to build sustainable digital solutions? ';
+  const { question, description } = graphDescriptions.CustomerNotRequestingReasons;
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');
 
@@ -36,10 +36,6 @@ const CustomerNotRequestingReasons = () => {
     return freq === 'rarely, but it has happened' || freq === 'never';
   }).length;
   const responseRate = filteredTotal > 0 ? (reasons.length / filteredTotal) * 100 : 0;
-
-  const question = questionHeader ?? 'Why do customers not request sustainable digital solutions?';
-  const description =
-    "Open-text responses from those who selected 'Rarely' or 'Never' for customer requirements.";
 
   return (
     <GraphWrapper

@@ -6,6 +6,7 @@ import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 type AwarenessStat = {
   label: string;
@@ -106,11 +107,11 @@ const DefinitionAwareness = () => {
   const totalResponses = responses.length;
   const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
 
-  const question = questionHeader ?? "Have you heard of the term 'digital sustainability'?";
+  const question = questionHeader ?? graphDescriptions.DefinitionAwareness.question;
 
   return (
     <GraphWrapper
-      question={"Have you heard of the term 'digital sustainability'?"}
+      question={graphDescriptions.DefinitionAwareness.question}
       description={
         question
       } /* the question is wayyy to long, so for now we put it into the description */

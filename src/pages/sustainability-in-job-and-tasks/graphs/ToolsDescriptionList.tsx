@@ -3,13 +3,13 @@ import { useMemo } from 'react';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // Helper to clean strings
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const ToolsDescriptionList = () => {
-  const questionHeader =
-    'Can you name the tools, software, and/or frameworks, and tell us how and for what you use them?';
+  const { question, description } = graphDescriptions.ToolsDescriptionList;
 
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');
@@ -39,10 +39,6 @@ const ToolsDescriptionList = () => {
   // Calculate rate based on those who said "Yes" (eligible) vs those who actually wrote text
   const responseRate =
     totalEligibleRespondents > 0 ? (numberOfResponses / totalEligibleRespondents) * 100 : 0;
-
-  const question = questionHeader ?? 'What tools, methods, or checklists do you use?';
-  const description =
-    'Free-text responses from tool users describing the tools and methods they employ.';
 
   return (
     <GraphWrapper

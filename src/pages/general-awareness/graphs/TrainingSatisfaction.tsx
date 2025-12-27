@@ -5,6 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 type SatisfactionStat = {
   label: string;
@@ -14,8 +15,7 @@ type SatisfactionStat = {
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingSatisfaction = () => {
-  const questionHeader =
-    'Are you satisfied with the number of trainings or educational programs you participated in?  ';
+  const { question, description } = graphDescriptions.TrainingSatisfaction;
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const titleColor = useThemeColor('--color-ireb-grey-01');
@@ -106,9 +106,6 @@ const TrainingSatisfaction = () => {
 
   const responseRate =
     eligibleParticipants > 0 ? (numberOfResponses / eligibleParticipants) * 100 : 0;
-
-  const question = questionHeader ?? 'Are you satisfied with the training you received?';
-  const description = 'Shows satisfaction levels with digital sustainability training programs.';
 
   return (
     <GraphWrapper

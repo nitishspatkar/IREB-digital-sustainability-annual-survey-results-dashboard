@@ -5,6 +5,7 @@ import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // --- SHARED DATA LOGIC ---
 const useSustainabilityDimensionsData = () => {
@@ -123,9 +124,7 @@ export const SustainabilityDimensions = ({
   className?: string;
 }) => {
   const { counts, otherTexts, barColor, tickColor } = useSustainabilityDimensionsData();
-
-  const questionHeader =
-    "Which dimensions of sustainability are actively considered in your organization's software development projects?";
+  const { question, description } = graphDescriptions.SustainabilityDimensions;
 
   // Chart Logic
   const data = useMemo<Data[]>(
@@ -184,8 +183,8 @@ export const SustainabilityDimensions = ({
   return (
     <SurveyChart
       className={className}
-      question={questionHeader}
-      description="Shows which dimensions of sustainability are actively considered in software development projects."
+      question={question}
+      description={description}
       numberOfResponses={numberOfRespondents}
       responseRate={responseRate}
       data={data}
@@ -199,10 +198,8 @@ export const SustainabilityDimensions = ({
 // --- COMPONENT 2: Detail List ---
 export const SustainabilityDimensionsDetails = ({ onBack }: { onBack: () => void }) => {
   const { counts, otherTexts } = useSustainabilityDimensionsData();
-
-  const questionHeader =
-    "Which dimensions of sustainability are actively considered in your organization's software development projects?";
-  const questionHeaderOther = columnDefinitions.find((c) => c.key === 'considerOther')?.header;
+  const { question, questionHeaderOther, descriptionDetails } =
+    graphDescriptions.SustainabilityDimensions;
 
   const wrapperQuestion = questionHeaderOther ?? '';
 
@@ -216,10 +213,10 @@ export const SustainabilityDimensionsDetails = ({ onBack }: { onBack: () => void
 
   return (
     <SurveyExploreList
-      title={questionHeader}
+      title={question}
       items={otherTexts}
       question={wrapperQuestion}
-      description="Lists the free-text dimensions supplied under the Other option."
+      description={descriptionDetails}
       numberOfResponses={otherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

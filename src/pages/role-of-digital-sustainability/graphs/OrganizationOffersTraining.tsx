@@ -5,10 +5,10 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const OrganizationOffersTraining = () => {
-  const questionHeader =
-    'Does your organization offer training or resources to employees on sustainable software development practices? ';
+  const { question, description } = graphDescriptions.OrganizationOffersTraining;
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const barColor = useThemeColor('--color-ireb-grey-02');
@@ -99,11 +99,6 @@ const OrganizationOffersTraining = () => {
 
   const total = counts.values.reduce((a, b) => a + b, 0);
   const responseRate = responses.length > 0 ? (total / responses.length) * 100 : 0;
-
-  const question =
-    questionHeader ?? 'Does your organization offer training on sustainable digital solutions?';
-  const description =
-    'Shows whether organizations offer training or resources on sustainable digital solutions.';
 
   return (
     <GraphWrapper

@@ -5,6 +5,7 @@ import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 // IMPORTIERE DIE NEUEN GENERISCHEN VIEWS
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // --- DATEN LOGIK (Hook) ---
 // Das bleibt lokal, da es spezifisch für DIESE Frage ist
@@ -116,7 +117,7 @@ export const DemographicApplicationDomain = ({
   );
 
   // Texte holen
-  const question = 'In which application domain do you currently primarily work? ';
+  const { question, description } = graphDescriptions.DemographicApplicationDomain;
 
   // Raten berechnen
   const numResp = stats.reduce((acc, curr) => acc + curr.count, 0);
@@ -127,7 +128,7 @@ export const DemographicApplicationDomain = ({
     <SurveyChart
       className={className}
       question={question}
-      description="Breaks down the primary application domains represented by respondents."
+      description={description}
       numberOfResponses={numResp}
       responseRate={rate}
       data={chartData}
@@ -143,8 +144,7 @@ export const DemographicApplicationDomainDetails = ({ onBack }: { onBack: () => 
   const { stats, otherTexts } = useApplicationDomainData();
 
   // Texte holen
-  const title = 'In which application domain do you currently primarily work? ';
-  const question = 'In which application domain do you currently primarily work?  [Other]';
+  const { title, question, description } = graphDescriptions.DemographicApplicationDomainDetails;
 
   // Raten für "Other" berechnen
   const numOther = otherTexts.length;
@@ -158,7 +158,7 @@ export const DemographicApplicationDomainDetails = ({ onBack }: { onBack: () => 
       title={title}
       items={otherTexts}
       question={question}
-      description="Lists the free-text application domains supplied under the Other option."
+      description={description}
       numberOfResponses={numOther}
       responseRate={rate}
       onBack={onBack}

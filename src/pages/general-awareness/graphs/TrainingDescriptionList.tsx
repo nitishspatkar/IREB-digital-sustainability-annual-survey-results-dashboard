@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -36,8 +37,8 @@ const TrainingDescriptionList = () => {
   const responseRate =
     eligibleParticipants > 0 ? (numberOfResponses / eligibleParticipants) * 100 : 0;
 
-  const question = questionHeader ?? 'Please describe the training programs you attended';
-  const description = 'Descriptions of training programs attended by respondents.';
+  const question = questionHeader ?? graphDescriptions.TrainingDescriptionList.question;
+  const description = graphDescriptions.TrainingDescriptionList.description;
 
   return (
     <GraphWrapper

@@ -4,6 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // --- SHARED DATA LOGIC ---
 const useTrainingReasonsData = () => {
@@ -170,10 +171,8 @@ export const TrainingReasonsNo = ({
     [tickColor]
   );
 
-  const question =
-    'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?';
-  const description =
-    "Reasons why respondents haven't participated in digital sustainability training.";
+  const question = graphDescriptions.TrainingReasonsNo.question;
+  const description = graphDescriptions.TrainingReasonsNo.description;
 
   return (
     <SurveyChart
@@ -194,11 +193,9 @@ export const TrainingReasonsNo = ({
 export const TrainingReasonsNoDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useTrainingReasonsData();
 
-  const questionHeaderOther =
-    'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [Other]';
+  const questionHeaderOther = graphDescriptions.TrainingReasonsNoDetails.question;
 
-  const mainQuestion =
-    'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?';
+  const mainQuestion = graphDescriptions.TrainingReasonsNo.question;
   const otherStat = stats.find((s) => s.key === 'trainingOtherReason');
   const numberOfOtherSelections = otherStat ? otherStat.count : 0;
 
@@ -210,7 +207,7 @@ export const TrainingReasonsNoDetails = ({ onBack }: { onBack: () => void }) => 
       title={mainQuestion}
       items={otherTexts}
       question={questionHeaderOther ?? mainQuestion}
-      description="Lists the free-text reasons supplied under the Other option."
+      description={graphDescriptions.TrainingReasonsNoDetails.description}
       numberOfResponses={otherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

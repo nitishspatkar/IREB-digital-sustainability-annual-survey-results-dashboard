@@ -5,6 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 interface OrganizationTypeStat {
   organizationType: string;
@@ -97,9 +98,7 @@ const DemographicOrganizationType = () => {
     [tickColor]
   );
 
-  const question = 'Which of the following organizational types best describes your organization? ';
-  const description =
-    'Visualizes how respondents classify their organizations across the provided types.';
+  const { question, description } = graphDescriptions.DemographicOrganizationType;
 
   return (
     <GraphWrapper

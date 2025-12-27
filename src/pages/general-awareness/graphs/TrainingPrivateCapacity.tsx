@@ -5,6 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 type CapacityStat = {
   label: string;
@@ -146,9 +147,8 @@ const TrainingPrivateCapacity = () => {
   const responseRate =
     eligibleParticipants > 0 ? (numberOfResponses / eligibleParticipants) * 100 : 0;
 
-  const question = questionHeader ?? 'Did you attend training in your private capacity?';
-  const description =
-    'Shows whether respondents attended training on their own or through their organization.';
+  const question = questionHeader ?? graphDescriptions.TrainingPrivateCapacity.question;
+  const description = graphDescriptions.TrainingPrivateCapacity.description;
 
   return (
     <GraphWrapper

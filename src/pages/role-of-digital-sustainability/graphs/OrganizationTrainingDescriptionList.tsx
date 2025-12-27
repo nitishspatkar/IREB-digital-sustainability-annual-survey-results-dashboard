@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const OrganizationTrainingDescriptionList = () => {
-  const questionHeader =
-    'Can you tell us a little about the training or resources your organization offers? ';
+  const { question, description } = graphDescriptions.OrganizationTrainingDescriptionList;
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');
 
@@ -31,10 +31,6 @@ const OrganizationTrainingDescriptionList = () => {
     (r) => normalize(r.raw.organizationOffersTraining ?? '').toLowerCase() === 'yes'
   ).length;
   const responseRate = filteredTotal > 0 ? (descriptions.length / filteredTotal) * 100 : 0;
-
-  const question = questionHeader ?? 'What training does your organization offer?';
-  const description =
-    'Open-text descriptions from organizations that offer training on sustainable digital solutions.';
 
   return (
     <GraphWrapper

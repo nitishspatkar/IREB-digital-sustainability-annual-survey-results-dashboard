@@ -5,12 +5,12 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const OrganizationDepartmentCoordination = () => {
-  const questionHeader =
-    'Do different departments in your organization coordinate on sustainability for software development projects? ';
+  const { question, description } = graphDescriptions.OrganizationDepartmentCoordination;
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const barColor = useThemeColor('--color-ireb-grey-02');
@@ -104,11 +104,6 @@ const OrganizationDepartmentCoordination = () => {
 
   const total = stats.values.reduce((a, b) => a + b, 0);
   const responseRate = stats.totalEligible > 0 ? (total / stats.totalEligible) * 100 : 0;
-
-  const question =
-    questionHeader ?? 'Is there coordination between departments on sustainability goals?';
-  const description =
-    'Shows whether organizations coordinate between departments on sustainability goals (filtered for organizations with goals).';
 
   return (
     <GraphWrapper

@@ -5,12 +5,12 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const OrganizationHasGoals = () => {
-  const questionHeader =
-    'Does your organization have specific digital sustainability goals or benchmarks for software development projects? ';
+  const { question, description } = graphDescriptions.OrganizationHasGoals;
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const barColor = useThemeColor('--color-ireb-grey-02');
@@ -97,10 +97,6 @@ const OrganizationHasGoals = () => {
 
   const total = stats.values.reduce((a, b) => a + b, 0);
   const responseRate = responses.length > 0 ? (total / responses.length) * 100 : 0;
-
-  const question =
-    questionHeader ?? 'Does your organization have specific digital sustainability goals?';
-  const description = 'Shows whether organizations have specific digital sustainability goals.';
 
   return (
     <GraphWrapper

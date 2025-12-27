@@ -6,6 +6,7 @@ import { useSurveyData } from '../../../data/SurveyContext';
 import type { AgeGroupStat } from '../demographicTypes';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -29,9 +30,7 @@ const DemographicAgeGroup = () => {
       .sort((a, b) => b.count - a.count);
   }, [surveyResponses]);
 
-  const question = 'Which age group do you belong to?';
-  const description =
-    'This chart shows the distribution of survey respondents across different age groups. The data helps us understand the demographic composition of the survey participants and identify which age groups are most represented in the responses.';
+  const { question, description } = graphDescriptions.DemographicAgeGroup;
   const numberOfResponses = ageGroupStats.reduce((sum, stat) => sum + stat.count, 0);
   const responseRate =
     surveyResponses.length > 0 ? (numberOfResponses / surveyResponses.length) * 100 : 0;
