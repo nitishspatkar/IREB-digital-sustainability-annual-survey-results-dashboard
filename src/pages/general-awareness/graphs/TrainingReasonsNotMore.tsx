@@ -4,6 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 const useTrainingReasonsNotMoreData = () => {
   const responses = useSurveyData();
@@ -169,10 +170,7 @@ export const TrainingReasonsNotMore = ({
     [tickColor]
   );
 
-  const question =
-    'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?';
-  const description =
-    "Reasons why respondents haven't participated in more digital sustainability training.";
+  const { question, description } = graphDescriptions.TrainingReasonsNotMore;
 
   return (
     <SurveyChart
@@ -191,12 +189,9 @@ export const TrainingReasonsNotMore = ({
 
 export const TrainingReasonsNotMoreDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useTrainingReasonsNotMoreData();
-
-  const questionHeaderOther =
-    'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [Other]';
-
-  const mainQuestion =
-    'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?';
+  const { question } = graphDescriptions.TrainingReasonsNotMore;
+  const { question: questionDetails, description: descriptionDetails } =
+    graphDescriptions.TrainingReasonsNotMoreDetails;
 
   const otherStat = stats.find((s) => s.key === 'notMoreTrainingOther');
   const numberOfOtherSelections = otherStat?.count ?? 0;
@@ -205,10 +200,10 @@ export const TrainingReasonsNotMoreDetails = ({ onBack }: { onBack: () => void }
 
   return (
     <SurveyExploreList
-      title={mainQuestion}
+      title={question}
       items={otherTexts}
-      question={questionHeaderOther ?? mainQuestion}
-      description="Lists the free-text reasons supplied under the Other option."
+      question={questionDetails}
+      description={descriptionDetails}
       numberOfResponses={otherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

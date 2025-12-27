@@ -4,6 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // --- SHARED DATA LOGIC ---
 const useSupportResourcesData = () => {
@@ -136,9 +137,7 @@ export const AdditionalSupportResources = ({
 }) => {
   const { stats, otherTexts, totalRespondentsWithAnswer, totalEligible, barColor, tickColor } =
     useSupportResourcesData();
-
-  const questionHeader =
-    'What additional support or resources would help you integrate digital sustainability into your work?';
+  const { question, description } = graphDescriptions.AdditionalSupportResources;
 
   const data = useMemo<Data[]>(
     () => [
@@ -194,8 +193,8 @@ export const AdditionalSupportResources = ({
   return (
     <SurveyChart
       className={className}
-      question={questionHeader}
-      description="Shows what additional support or resources respondents need to integrate digital sustainability."
+      question={question}
+      description={description}
       numberOfResponses={totalRespondentsWithAnswer}
       responseRate={responseRate}
       data={data}
@@ -209,13 +208,9 @@ export const AdditionalSupportResources = ({
 // --- COMPONENT 2: Detail List ---
 export const AdditionalSupportResourcesDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useSupportResourcesData();
-
-  const questionHeader =
-    'What additional support or resources would help you integrate digital sustainability into your work?';
-  const questionHeaderOther =
-    'What additional support or resources would help you integrate digital sustainability into your work?  [Other]';
-
-  const wrapperQuestion = questionHeaderOther ?? '';
+  const { question } = graphDescriptions.AdditionalSupportResources;
+  const { question: questionDetails, description: descriptionDetails } =
+    graphDescriptions.AdditionalSupportResourcesDetails;
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');
@@ -226,10 +221,10 @@ export const AdditionalSupportResourcesDetails = ({ onBack }: { onBack: () => vo
 
   return (
     <SurveyExploreList
-      title={questionHeader}
+      title={question}
       items={otherTexts}
-      question={wrapperQuestion}
-      description="Lists the free-text resources provided under the Other option."
+      question={questionDetails}
+      description={descriptionDetails}
       numberOfResponses={otherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 // Import der neuen generischen Views
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 import graphDescriptions from '../../../data/graphDescriptions.json';
@@ -166,14 +165,7 @@ export const DiscussionFrequency = ({
 export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) => {
   const { frequencyStats, otherFrequencyTexts } = useDiscussionFrequencyData();
 
-  const mainQuestionHeader =
-    'How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?  ';
-  const questionHeaderOther =
-    'How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?   [Other]';
-
-  // Title Logic
-  const mainQuestionTitle =
-    mainQuestionHeader ?? graphDescriptions.DiscussionFrequencyDetails.title;
+  const { title, question, description } = graphDescriptions.DiscussionFrequencyDetails;
 
   // Stats Logic for "Other"
   const numberOfResponsesOther = otherFrequencyTexts.length;
@@ -185,16 +177,12 @@ export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) =
   const otherResponseRate =
     numberOfResponsesOtherAll > 0 ? (numberOfResponsesOther / numberOfResponsesOtherAll) * 100 : 0;
 
-  const wrapperQuestion = questionHeaderOther ?? ''; // Original code had empty fallback or specific string?
-  // Note: Original code passed empty string if undefined for "Other" title in the list wrapper,
-  // but usually we want the "Other" question text there.
-
   return (
     <SurveyExploreList
-      title={mainQuestionTitle}
+      title={title}
       items={otherFrequencyTexts}
-      question={wrapperQuestion}
-      description={graphDescriptions.DiscussionFrequencyDetails.description}
+      question={question}
+      description={description}
       numberOfResponses={numberOfResponsesOther}
       responseRate={otherResponseRate}
       onBack={onBack}

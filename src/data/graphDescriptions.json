@@ -72,7 +72,7 @@
   },
   "TrainingReasonsNoDetails": {
     "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before? [Other]",
-    "description": "Lists the free-text reasons for not participating in training."
+    "description": "Lists the free-text reasons supplied under the Other option."
   },
   "TrainingReasonsNotMore": {
     "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?",
@@ -80,7 +80,7 @@
   },
   "TrainingReasonsNotMoreDetails": {
     "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability? [Other]",
-    "description": "Lists the free-text reasons for not participating in more training."
+    "description": "Lists the free-text reasons supplied under the Other option."
   },
   "TrainingSatisfaction": {
     "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
@@ -100,7 +100,7 @@
   },
   "NoTrainingReasonsDetails": {
     "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Other]",
-    "description": "Lists the free-text reasons for not offering training."
+    "description": "Lists the free-text reasons provided under the Other option."
   },
   "OrganizationDepartmentCoordination": {
     "question": "Do different departments in your organization coordinate on sustainability for software development projects?",
@@ -136,7 +136,7 @@
   },
   "SustainabilityDimensionsDetails": {
     "question": "Which dimensions of sustainability are actively considered in your organization's software development projects? [Other]",
-    "description": "Lists the free-text dimensions considered."
+    "description": "Lists the free-text dimensions supplied under the Other option."
   },
   "AdditionalSupportResources": {
     "question": "What additional support or resources would help you integrate digital sustainability into your work?",
@@ -144,7 +144,7 @@
   },
   "AdditionalSupportResourcesDetails": {
     "question": "What additional support or resources would help you integrate digital sustainability into your work? [Other]",
-    "description": "Lists the free-text support resources needed."
+    "description": "Lists the free-text resources provided under the Other option."
   },
   "DriversToIncorporateSustainability": {
     "question": "What drives you to incorporate digital sustainability in your role-related tasks?",
@@ -152,7 +152,7 @@
   },
   "DriversToIncorporateSustainabilityDetails": {
     "question": "What drives you to incorporate digital sustainability in your role-related tasks? [Other]",
-    "description": "Lists the free-text drivers."
+    "description": "Lists the free-text drivers supplied under the Other option."
   },
   "HindrancesToIncorporateSustainability": {
     "question": "What hinders you from incorporating sustainability in your role-specific tasks?",
@@ -160,7 +160,7 @@
   },
   "HindrancesToIncorporateSustainabilityDetails": {
     "question": "What hinders you from incorporating sustainability in your role-specific tasks? [Other]",
-    "description": "Lists the free-text hindrances."
+    "description": "Lists the free-text hindrances provided under the Other option."
   },
   "KnowledgeGapsByDimension": {
     "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?",
@@ -168,7 +168,7 @@
   },
   "KnowledgeGapsByDimensionDetails": {
     "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? [Other]",
-    "description": "Lists the free-text knowledge gaps."
+    "description": "Lists the free-text dimensions provided under the Other option."
   },
   "PersonIncorporatesSustainability": {
     "question": "Do you incorporate digital sustainability considerations in your role-specific tasks? ",
@@ -180,7 +180,7 @@
   },
   "SustainabilityDimensionsInTasksDetails": {
     "question": "Which sustainability dimensions do you consider in your role-specific tasks? [Other]",
-    "description": "Lists the free-text dimensions considered in tasks."
+    "description": "Lists the free-text dimensions provided under the Other option."
   },
   "ToolsDescriptionList": {
     "question": "Can you name the tools, software, and/or frameworks, and tell us how and for what you use them?",

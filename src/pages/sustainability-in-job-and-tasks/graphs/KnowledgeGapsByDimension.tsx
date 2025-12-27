@@ -4,6 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // --- SHARED DATA LOGIC ---
 const useKnowledgeGapsData = () => {
@@ -126,9 +127,7 @@ export const KnowledgeGapsByDimension = ({
 }) => {
   const { stats, otherTexts, totalRespondentsWithAnswer, totalEligible, barColor, tickColor } =
     useKnowledgeGapsData();
-
-  const questionHeader =
-    'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?';
+  const { question, description } = graphDescriptions.KnowledgeGapsByDimension;
 
   const data = useMemo<Data[]>(
     () => [
@@ -184,8 +183,8 @@ export const KnowledgeGapsByDimension = ({
   return (
     <SurveyChart
       className={className}
-      question={questionHeader}
-      description="Shows which sustainability dimensions respondents feel they lack knowledge or tools to address."
+      question={question}
+      description={description}
       numberOfResponses={totalRespondentsWithAnswer}
       responseRate={responseRate}
       data={data}
@@ -199,13 +198,9 @@ export const KnowledgeGapsByDimension = ({
 // --- COMPONENT 2: Detail List ---
 export const KnowledgeGapsByDimensionDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useKnowledgeGapsData();
-
-  const questionHeader =
-    'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?';
-  const questionHeaderOther =
-    'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Other]';
-
-  const wrapperQuestion = questionHeaderOther ?? '';
+  const { question } = graphDescriptions.KnowledgeGapsByDimension;
+  const { question: questionDetails, description: descriptionDetails } =
+    graphDescriptions.KnowledgeGapsByDimensionDetails;
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');
@@ -216,10 +211,10 @@ export const KnowledgeGapsByDimensionDetails = ({ onBack }: { onBack: () => void
 
   return (
     <SurveyExploreList
-      title={questionHeader}
+      title={question}
       items={otherTexts}
-      question={wrapperQuestion}
-      description="Lists the free-text dimensions provided under the Other option."
+      question={questionDetails}
+      description={descriptionDetails}
       numberOfResponses={otherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

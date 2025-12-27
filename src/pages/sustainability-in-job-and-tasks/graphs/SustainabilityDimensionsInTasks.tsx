@@ -4,6 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // --- SHARED DATA LOGIC ---
 const useSustainabilityDimensionsInTasksData = () => {
@@ -120,9 +121,7 @@ export const SustainabilityDimensionsInTasks = ({
 }) => {
   const { stats, roleOtherTexts, totalRespondentsWithAnswer, totalEligible, barColor, tickColor } =
     useSustainabilityDimensionsInTasksData();
-
-  const questionHeader =
-    'Which sustainability dimensions do you consider in your role-specific tasks?';
+  const { question, description } = graphDescriptions.SustainabilityDimensionsInTasks;
 
   const data = useMemo<Data[]>(
     () => [
@@ -178,8 +177,8 @@ export const SustainabilityDimensionsInTasks = ({
   return (
     <SurveyChart
       className={className}
-      question={questionHeader}
-      description="Shows which sustainability dimensions respondents consider in their role-specific tasks."
+      question={question}
+      description={description}
       numberOfResponses={totalRespondentsWithAnswer}
       responseRate={responseRate}
       data={data}
@@ -193,13 +192,9 @@ export const SustainabilityDimensionsInTasks = ({
 // --- COMPONENT 2: Detail List ---
 export const SustainabilityDimensionsInTasksDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, roleOtherTexts } = useSustainabilityDimensionsInTasksData();
-
-  const questionHeader =
-    'Which sustainability dimensions do you consider in your role-specific tasks?';
-  const questionHeaderOther =
-    'Which sustainability dimensions do you consider in your role-specific tasks?  [Other]';
-
-  const wrapperQuestion = questionHeaderOther ?? '';
+  const { question } = graphDescriptions.SustainabilityDimensionsInTasks;
+  const { question: questionDetails, description: descriptionDetails } =
+    graphDescriptions.SustainabilityDimensionsInTasksDetails;
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');
@@ -210,10 +205,10 @@ export const SustainabilityDimensionsInTasksDetails = ({ onBack }: { onBack: () 
 
   return (
     <SurveyExploreList
-      title={questionHeader}
+      title={question}
       items={roleOtherTexts}
-      question={wrapperQuestion}
-      description="Lists the free-text dimensions provided under the Other option."
+      question={questionDetails}
+      description={descriptionDetails}
       numberOfResponses={roleOtherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

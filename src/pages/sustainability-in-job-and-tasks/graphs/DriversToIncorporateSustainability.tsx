@@ -5,6 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // --- SHARED DATA LOGIC ---
 const useDriversData = () => {
@@ -130,9 +131,7 @@ export const DriversToIncorporateSustainability = ({
     barColor,
     tickColor,
   } = useDriversData();
-
-  const questionHeader =
-    'What drives you to incorporate digital sustainability in your role-related tasks?';
+  const { question, description } = graphDescriptions.DriversToIncorporateSustainability;
 
   const data = useMemo<Data[]>(
     () => [
@@ -189,8 +188,8 @@ export const DriversToIncorporateSustainability = ({
   return (
     <SurveyChart
       className={className}
-      question={questionHeader}
-      description="Shows which factors motivate respondents to integrate digital sustainability into their role-specific tasks."
+      question={question}
+      description={description}
       numberOfResponses={totalRespondentsWithAnswer}
       responseRate={responseRate}
       data={data}
@@ -204,14 +203,9 @@ export const DriversToIncorporateSustainability = ({
 // --- COMPONENT 2: Detail List ---
 export const DriversToIncorporateSustainabilityDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, driveOtherTexts } = useDriversData();
-
-  const questionHeader =
-    'What drives you to incorporate digital sustainability in your role-related tasks?';
-
-  const questionHeaderOther =
-    'What drives you to incorporate digital sustainability in your role-related tasks?  [Other]';
-
-  const wrapperQuestion = questionHeaderOther;
+  const { question } = graphDescriptions.DriversToIncorporateSustainability;
+  const { question: questionDetails, description: descriptionDetails } =
+    graphDescriptions.DriversToIncorporateSustainabilityDetails;
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');
@@ -222,10 +216,10 @@ export const DriversToIncorporateSustainabilityDetails = ({ onBack }: { onBack: 
 
   return (
     <SurveyExploreList
-      title={questionHeader}
+      title={question}
       items={driveOtherTexts}
-      question={wrapperQuestion}
-      description="Lists the free-text drivers supplied under the Other option."
+      question={questionDetails}
+      description={descriptionDetails}
       numberOfResponses={driveOtherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

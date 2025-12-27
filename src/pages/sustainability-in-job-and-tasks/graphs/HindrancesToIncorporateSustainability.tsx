@@ -4,6 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import graphDescriptions from '../../../data/graphDescriptions.json';
 
 // --- SHARED DATA LOGIC ---
 const useHindrancesData = () => {
@@ -154,9 +155,7 @@ export const HindrancesToIncorporateSustainability = ({
     barColor,
     tickColor,
   } = useHindrancesData();
-
-  const questionHeader =
-    'What hinders you from incorporating sustainability in your role-specific tasks?';
+  const { question, description } = graphDescriptions.HindrancesToIncorporateSustainability;
 
   const data = useMemo<Data[]>(
     () => [
@@ -212,8 +211,8 @@ export const HindrancesToIncorporateSustainability = ({
   return (
     <SurveyChart
       className={className}
-      question={questionHeader}
-      description="Shows barriers preventing respondents from incorporating sustainability in their tasks."
+      question={question}
+      description={description}
       numberOfResponses={totalRespondentsWithAnswer}
       responseRate={responseRate}
       data={data}
@@ -231,13 +230,9 @@ export const HindrancesToIncorporateSustainabilityDetails = ({
   onBack: () => void;
 }) => {
   const { stats, hindranceOtherTexts } = useHindrancesData();
-
-  const questionHeader =
-    'What hinders you from incorporating sustainability in your role-specific tasks?';
-  const questionHeaderOther =
-    'What hinders you from incorporating sustainability in your role-specific tasks?  [Other]';
-
-  const wrapperQuestion = questionHeaderOther ?? '';
+  const { question } = graphDescriptions.HindrancesToIncorporateSustainability;
+  const { question: questionDetails, description: descriptionDetails } =
+    graphDescriptions.HindrancesToIncorporateSustainabilityDetails;
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');
@@ -248,10 +243,10 @@ export const HindrancesToIncorporateSustainabilityDetails = ({
 
   return (
     <SurveyExploreList
-      title={questionHeader}
+      title={question}
       items={hindranceOtherTexts}
-      question={wrapperQuestion}
-      description="Lists the free-text hindrances provided under the Other option."
+      question={questionDetails}
+      description={descriptionDetails}
       numberOfResponses={hindranceOtherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

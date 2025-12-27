@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 import graphDescriptions from '../../../data/graphDescriptions.json';
 
@@ -196,9 +195,9 @@ export const NoTrainingReasons = ({
 // --- COMPONENT 2: Detail List ---
 export const NoTrainingReasonsDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useNoTrainingReasonsData();
-  const { question, questionHeaderOther, descriptionDetails } = graphDescriptions.NoTrainingReasons;
-
-  const wrapperQuestion = questionHeaderOther ?? '';
+  const { question } = graphDescriptions.NoTrainingReasons;
+  const { question: questionDetails, description: descriptionDetails } =
+    graphDescriptions.NoTrainingReasonsDetails;
 
   // Calculate rate relative to how many people selected "Other" checkbox
   const otherStat = stats.find((s) => s.label === 'Other');
@@ -211,7 +210,7 @@ export const NoTrainingReasonsDetails = ({ onBack }: { onBack: () => void }) => 
     <SurveyExploreList
       title={question}
       items={otherTexts}
-      question={wrapperQuestion}
+      question={questionDetails}
       description={descriptionDetails}
       numberOfResponses={otherTexts.length}
       responseRate={responseRate}

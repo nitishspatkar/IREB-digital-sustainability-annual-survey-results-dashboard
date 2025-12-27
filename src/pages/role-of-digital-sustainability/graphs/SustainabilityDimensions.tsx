@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 import graphDescriptions from '../../../data/graphDescriptions.json';
 
@@ -198,10 +197,9 @@ export const SustainabilityDimensions = ({
 // --- COMPONENT 2: Detail List ---
 export const SustainabilityDimensionsDetails = ({ onBack }: { onBack: () => void }) => {
   const { counts, otherTexts } = useSustainabilityDimensionsData();
-  const { question, questionHeaderOther, descriptionDetails } =
-    graphDescriptions.SustainabilityDimensions;
-
-  const wrapperQuestion = questionHeaderOther ?? '';
+  const { question } = graphDescriptions.SustainabilityDimensions;
+  const { question: questionDetails, description: descriptionDetails } =
+    graphDescriptions.SustainabilityDimensionsDetails;
 
   // Calculate relative rate: Count of "Other" texts / Count of "Other" category selections
   // Note: Finding the count for "Other" in the sorted counts object
@@ -215,7 +213,7 @@ export const SustainabilityDimensionsDetails = ({ onBack }: { onBack: () => void
     <SurveyExploreList
       title={question}
       items={otherTexts}
-      question={wrapperQuestion}
+      question={questionDetails}
       description={descriptionDetails}
       numberOfResponses={otherTexts.length}
       responseRate={responseRate}
