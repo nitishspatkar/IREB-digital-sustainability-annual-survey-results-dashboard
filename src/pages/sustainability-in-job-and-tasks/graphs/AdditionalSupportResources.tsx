@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 
 // --- SHARED DATA LOGIC ---
@@ -213,7 +212,8 @@ export const AdditionalSupportResourcesDetails = ({ onBack }: { onBack: () => vo
 
   const questionHeader =
     'What additional support or resources would help you integrate digital sustainability into your work?';
-  const questionHeaderOther = columnDefinitions.find((c) => c.key === 'supportNeedOther')?.header;
+  const questionHeaderOther =
+    'What additional support or resources would help you integrate digital sustainability into your work?  [Other]';
 
   const wrapperQuestion = questionHeaderOther ?? '';
 

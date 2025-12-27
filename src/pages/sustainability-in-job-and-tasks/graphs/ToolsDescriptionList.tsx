@@ -3,13 +3,13 @@ import { useMemo } from 'react';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 
 // Helper to clean strings
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const ToolsDescriptionList = () => {
-  const questionHeader = columnDefinitions.find((c) => c.key === 'toolsDescription')?.header;
+  const questionHeader =
+    'Can you name the tools, software, and/or frameworks, and tell us how and for what you use them?';
 
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');

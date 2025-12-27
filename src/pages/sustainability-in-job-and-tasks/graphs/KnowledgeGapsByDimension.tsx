@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 
 // --- SHARED DATA LOGIC ---
@@ -203,7 +202,8 @@ export const KnowledgeGapsByDimensionDetails = ({ onBack }: { onBack: () => void
 
   const questionHeader =
     'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?';
-  const questionHeaderOther = columnDefinitions.find((c) => c.key === 'lackKnowledgeOther')?.header;
+  const questionHeaderOther =
+    'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Other]';
 
   const wrapperQuestion = questionHeaderOther ?? '';
 

@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 
 // --- SHARED DATA LOGIC ---
@@ -235,7 +234,8 @@ export const HindrancesToIncorporateSustainabilityDetails = ({
 
   const questionHeader =
     'What hinders you from incorporating sustainability in your role-specific tasks?';
-  const questionHeaderOther = columnDefinitions.find((c) => c.key === 'hindranceOther')?.header;
+  const questionHeaderOther =
+    'What hinders you from incorporating sustainability in your role-specific tasks?  [Other]';
 
   const wrapperQuestion = questionHeaderOther ?? '';
 

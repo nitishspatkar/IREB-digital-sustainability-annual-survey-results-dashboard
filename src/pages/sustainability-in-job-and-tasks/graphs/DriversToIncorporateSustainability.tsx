@@ -4,7 +4,6 @@ import type { Data, Layout } from 'plotly.js';
 // Make sure these paths are correct in your project
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 
 // --- SHARED DATA LOGIC ---
@@ -209,9 +208,8 @@ export const DriversToIncorporateSustainabilityDetails = ({ onBack }: { onBack: 
   const questionHeader =
     'What drives you to incorporate digital sustainability in your role-related tasks?';
 
-  // Safety check in case columnDefinitions is missing the key
   const questionHeaderOther =
-    columnDefinitions.find((c) => c.key === 'driveOther')?.header ?? 'Other Comments';
+    'What drives you to incorporate digital sustainability in your role-related tasks?  [Other]';
 
   const wrapperQuestion = questionHeaderOther;
 

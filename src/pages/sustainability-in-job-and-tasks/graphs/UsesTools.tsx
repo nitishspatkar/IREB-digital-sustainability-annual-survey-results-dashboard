@@ -5,12 +5,12 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const UsesTools = () => {
-  const questionHeader = columnDefinitions.find((c) => c.key === 'usesTools')?.header;
+  const questionHeader =
+    'Are there specific tools, software, or frameworks that help you incorporate sustainability into your tasks? (E.g., gathering and managing requirements, writing sustainability-focused tests, optimizing code for less energy consumption.)';
 
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
