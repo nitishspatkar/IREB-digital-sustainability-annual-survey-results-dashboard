@@ -5,7 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // --- SHARED DATA LOGIC ---
 const useDriversData = () => {
@@ -131,7 +131,7 @@ export const DriversToIncorporateSustainability = ({
     barColor,
     tickColor,
   } = useDriversData();
-  const { question, description } = graphDescriptions.DriversToIncorporateSustainability;
+  const { question, description } = useGraphDescription('DriversToIncorporateSustainability');
 
   const data = useMemo<Data[]>(
     () => [
@@ -203,9 +203,10 @@ export const DriversToIncorporateSustainability = ({
 // --- COMPONENT 2: Detail List ---
 export const DriversToIncorporateSustainabilityDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, driveOtherTexts } = useDriversData();
-  const { question } = graphDescriptions.DriversToIncorporateSustainability;
-  const { question: questionDetails, description: descriptionDetails } =
-    graphDescriptions.DriversToIncorporateSustainabilityDetails;
+  const { question } = useGraphDescription('DriversToIncorporateSustainability');
+  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
+    'DriversToIncorporateSustainabilityDetails'
+  );
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');

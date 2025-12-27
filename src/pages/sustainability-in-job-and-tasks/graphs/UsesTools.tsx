@@ -5,12 +5,12 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const UsesTools = () => {
-  const { question, description } = graphDescriptions.UsesTools;
+  const { question, description } = useGraphDescription('UsesTools');
 
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');

@@ -6,7 +6,7 @@ import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import type { RespondentStat } from '../demographicTypes';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 type DemographicChoroplethProps = {
   respondentStats: RespondentStat[];
@@ -75,7 +75,7 @@ const DemographicChoropleth = ({ respondentStats }: DemographicChoroplethProps) 
   const totalResponses = surveyResponses.length;
   const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
 
-  const { question, description } = graphDescriptions.DemographicChoropleth;
+  const { question, description } = useGraphDescription('DemographicChoropleth');
 
   return (
     <GraphWrapper

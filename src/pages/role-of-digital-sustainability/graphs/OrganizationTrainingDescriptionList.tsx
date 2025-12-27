@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const OrganizationTrainingDescriptionList = () => {
-  const { question, description } = graphDescriptions.OrganizationTrainingDescriptionList;
+  const { question, description } = useGraphDescription('OrganizationTrainingDescriptionList');
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');
 

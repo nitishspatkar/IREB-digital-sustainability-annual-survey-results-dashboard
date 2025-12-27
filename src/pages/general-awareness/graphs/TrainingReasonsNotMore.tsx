@@ -4,7 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 const useTrainingReasonsNotMoreData = () => {
   const responses = useSurveyData();
@@ -170,7 +170,7 @@ export const TrainingReasonsNotMore = ({
     [tickColor]
   );
 
-  const { question, description } = graphDescriptions.TrainingReasonsNotMore;
+  const { question, description } = useGraphDescription('TrainingReasonsNotMore');
 
   return (
     <SurveyChart
@@ -189,9 +189,10 @@ export const TrainingReasonsNotMore = ({
 
 export const TrainingReasonsNotMoreDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useTrainingReasonsNotMoreData();
-  const { question } = graphDescriptions.TrainingReasonsNotMore;
-  const { question: questionDetails, description: descriptionDetails } =
-    graphDescriptions.TrainingReasonsNotMoreDetails;
+  const { question } = useGraphDescription('TrainingReasonsNotMore');
+  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
+    'TrainingReasonsNotMoreDetails'
+  );
 
   const otherStat = stats.find((s) => s.key === 'notMoreTrainingOther');
   const numberOfOtherSelections = otherStat?.count ?? 0;

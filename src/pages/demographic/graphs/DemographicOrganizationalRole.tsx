@@ -5,7 +5,7 @@ import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 interface RoleStat {
   role: string;
@@ -110,12 +110,14 @@ export const DemographicOrganizationalRole = ({
     [tickColor]
   );
 
+  const { question, description } = useGraphDescription('DemographicOrganizationalRole');
+
   // Render Generic Chart Component
   return (
     <SurveyChart
       className={className}
-      question={questionHeader ?? graphDescriptions.DemographicOrganizationalRole.question}
-      description={graphDescriptions.DemographicOrganizationalRole.description}
+      question={questionHeader ?? question}
+      description={description}
       numberOfResponses={numberOfResponses}
       responseRate={responseRate}
       data={chartData}
@@ -134,6 +136,10 @@ export const DemographicOrganizationalRoleDetails = ({ onBack }: { onBack: () =>
   const mainQuestionHeader = columnDefinitions.find((c) => c.key === 'role')?.header;
   const questionHeaderOther = columnDefinitions.find((c) => c.key === 'roleOther')?.header;
 
+  const { title, question, description } = useGraphDescription(
+    'DemographicOrganizationalRoleDetails'
+  );
+
   const numberOfResponsesOther = otherRoleTexts.length;
   const numberOfResponsesOtherAll = useMemo(() => {
     const otherStat = roleStats.find((s) => s.role.toLowerCase().includes('other'));
@@ -145,12 +151,10 @@ export const DemographicOrganizationalRoleDetails = ({ onBack }: { onBack: () =>
 
   return (
     <SurveyExploreList
-      title={mainQuestionHeader ?? graphDescriptions.DemographicOrganizationalRoleDetails.title}
+      title={mainQuestionHeader ?? title}
       items={otherRoleTexts}
-      question={
-        questionHeaderOther ?? graphDescriptions.DemographicOrganizationalRoleDetails.question
-      }
-      description={graphDescriptions.DemographicOrganizationalRoleDetails.description}
+      question={questionHeaderOther ?? question}
+      description={description}
       numberOfResponses={numberOfResponsesOther}
       responseRate={otherResponseRate}
       onBack={onBack}

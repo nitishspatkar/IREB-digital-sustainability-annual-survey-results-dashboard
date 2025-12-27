@@ -3,13 +3,13 @@ import { useMemo } from 'react';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // Helper to clean strings
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const ToolsDescriptionList = () => {
-  const { question, description } = graphDescriptions.ToolsDescriptionList;
+  const { question, description } = useGraphDescription('ToolsDescriptionList');
 
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');

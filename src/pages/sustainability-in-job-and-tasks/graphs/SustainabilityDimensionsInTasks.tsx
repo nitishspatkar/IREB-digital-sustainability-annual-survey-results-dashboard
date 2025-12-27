@@ -4,7 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // --- SHARED DATA LOGIC ---
 const useSustainabilityDimensionsInTasksData = () => {
@@ -121,7 +121,7 @@ export const SustainabilityDimensionsInTasks = ({
 }) => {
   const { stats, roleOtherTexts, totalRespondentsWithAnswer, totalEligible, barColor, tickColor } =
     useSustainabilityDimensionsInTasksData();
-  const { question, description } = graphDescriptions.SustainabilityDimensionsInTasks;
+  const { question, description } = useGraphDescription('SustainabilityDimensionsInTasks');
 
   const data = useMemo<Data[]>(
     () => [
@@ -192,9 +192,10 @@ export const SustainabilityDimensionsInTasks = ({
 // --- COMPONENT 2: Detail List ---
 export const SustainabilityDimensionsInTasksDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, roleOtherTexts } = useSustainabilityDimensionsInTasksData();
-  const { question } = graphDescriptions.SustainabilityDimensionsInTasks;
-  const { question: questionDetails, description: descriptionDetails } =
-    graphDescriptions.SustainabilityDimensionsInTasksDetails;
+  const { question } = useGraphDescription('SustainabilityDimensionsInTasks');
+  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
+    'SustainabilityDimensionsInTasksDetails'
+  );
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');

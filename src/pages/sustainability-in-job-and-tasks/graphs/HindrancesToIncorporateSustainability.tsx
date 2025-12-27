@@ -4,7 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // --- SHARED DATA LOGIC ---
 const useHindrancesData = () => {
@@ -155,7 +155,7 @@ export const HindrancesToIncorporateSustainability = ({
     barColor,
     tickColor,
   } = useHindrancesData();
-  const { question, description } = graphDescriptions.HindrancesToIncorporateSustainability;
+  const { question, description } = useGraphDescription('HindrancesToIncorporateSustainability');
 
   const data = useMemo<Data[]>(
     () => [
@@ -230,9 +230,10 @@ export const HindrancesToIncorporateSustainabilityDetails = ({
   onBack: () => void;
 }) => {
   const { stats, hindranceOtherTexts } = useHindrancesData();
-  const { question } = graphDescriptions.HindrancesToIncorporateSustainability;
-  const { question: questionDetails, description: descriptionDetails } =
-    graphDescriptions.HindrancesToIncorporateSustainabilityDetails;
+  const { question } = useGraphDescription('HindrancesToIncorporateSustainability');
+  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
+    'HindrancesToIncorporateSustainabilityDetails'
+  );
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');

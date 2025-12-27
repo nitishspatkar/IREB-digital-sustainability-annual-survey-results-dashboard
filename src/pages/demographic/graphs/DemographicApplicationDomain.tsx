@@ -5,7 +5,7 @@ import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 // IMPORTIERE DIE NEUEN GENERISCHEN VIEWS
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // --- DATEN LOGIK (Hook) ---
 // Das bleibt lokal, da es spezifisch für DIESE Frage ist
@@ -58,6 +58,9 @@ export const DemographicApplicationDomain = ({
 }) => {
   const { stats, otherTexts, chartBarColor, tickColor, surveyResponses } =
     useApplicationDomainData();
+
+  // Texte holen
+  const { question, description } = useGraphDescription('DemographicApplicationDomain');
 
   // Plotly Daten konfigurieren
   const chartData: Data[] = useMemo(
@@ -116,9 +119,6 @@ export const DemographicApplicationDomain = ({
     [tickColor]
   );
 
-  // Texte holen
-  const { question, description } = graphDescriptions.DemographicApplicationDomain;
-
   // Raten berechnen
   const numResp = stats.reduce((acc, curr) => acc + curr.count, 0);
   const rate = surveyResponses.length > 0 ? (numResp / surveyResponses.length) * 100 : 0;
@@ -144,7 +144,9 @@ export const DemographicApplicationDomainDetails = ({ onBack }: { onBack: () => 
   const { stats, otherTexts } = useApplicationDomainData();
 
   // Texte holen
-  const { title, question, description } = graphDescriptions.DemographicApplicationDomainDetails;
+  const { title, question, description } = useGraphDescription(
+    'DemographicApplicationDomainDetails'
+  );
 
   // Raten für "Other" berechnen
   const numOther = otherTexts.length;

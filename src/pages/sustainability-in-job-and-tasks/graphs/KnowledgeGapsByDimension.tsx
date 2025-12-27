@@ -4,7 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // --- SHARED DATA LOGIC ---
 const useKnowledgeGapsData = () => {
@@ -127,7 +127,7 @@ export const KnowledgeGapsByDimension = ({
 }) => {
   const { stats, otherTexts, totalRespondentsWithAnswer, totalEligible, barColor, tickColor } =
     useKnowledgeGapsData();
-  const { question, description } = graphDescriptions.KnowledgeGapsByDimension;
+  const { question, description } = useGraphDescription('KnowledgeGapsByDimension');
 
   const data = useMemo<Data[]>(
     () => [
@@ -198,9 +198,10 @@ export const KnowledgeGapsByDimension = ({
 // --- COMPONENT 2: Detail List ---
 export const KnowledgeGapsByDimensionDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useKnowledgeGapsData();
-  const { question } = graphDescriptions.KnowledgeGapsByDimension;
-  const { question: questionDetails, description: descriptionDetails } =
-    graphDescriptions.KnowledgeGapsByDimensionDetails;
+  const { question } = useGraphDescription('KnowledgeGapsByDimension');
+  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
+    'KnowledgeGapsByDimensionDetails'
+  );
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');

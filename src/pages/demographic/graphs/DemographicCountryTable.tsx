@@ -6,7 +6,7 @@ import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import type { RespondentStat } from '../demographicTypes';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 type DemographicCountryTableProps = {
   respondentStats: RespondentStat[];
@@ -80,7 +80,7 @@ const DemographicCountryTable = ({ respondentStats }: DemographicCountryTablePro
   const totalResponses = surveyResponses.length;
   const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
 
-  const { question, description } = graphDescriptions.DemographicCountryTable;
+  const { question, description } = useGraphDescription('DemographicCountryTable');
 
   return (
     <GraphWrapper

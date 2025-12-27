@@ -5,7 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 interface OrganizationTypeStat {
   organizationType: string;
@@ -98,7 +98,7 @@ const DemographicOrganizationType = () => {
     [tickColor]
   );
 
-  const { question, description } = graphDescriptions.DemographicOrganizationType;
+  const { question, description } = useGraphDescription('DemographicOrganizationType');
 
   return (
     <GraphWrapper

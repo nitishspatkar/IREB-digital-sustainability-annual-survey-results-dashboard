@@ -5,7 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 type SatisfactionStat = {
   label: string;
@@ -15,7 +15,7 @@ type SatisfactionStat = {
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingSatisfaction = () => {
-  const { question, description } = graphDescriptions.TrainingSatisfaction;
+  const { question, description } = useGraphDescription('TrainingSatisfaction');
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const titleColor = useThemeColor('--color-ireb-grey-01');

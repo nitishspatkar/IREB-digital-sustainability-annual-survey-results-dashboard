@@ -5,7 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 type ParticipationStat = {
   label: string;
@@ -108,8 +108,8 @@ const TrainingParticipation = () => {
   const totalResponses = responses.length;
   const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
 
-  const question = questionHeader ?? graphDescriptions.TrainingParticipation.question;
-  const description = graphDescriptions.TrainingParticipation.description;
+  const { question: graphQuestion, description } = useGraphDescription('TrainingParticipation');
+  const question = questionHeader ?? graphQuestion;
 
   return (
     <GraphWrapper

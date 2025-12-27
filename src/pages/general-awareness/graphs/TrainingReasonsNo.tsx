@@ -4,7 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // --- SHARED DATA LOGIC ---
 const useTrainingReasonsData = () => {
@@ -171,8 +171,8 @@ export const TrainingReasonsNo = ({
     [tickColor]
   );
 
-  const question = graphDescriptions.TrainingReasonsNo.question;
-  const description = graphDescriptions.TrainingReasonsNo.description;
+  const question = useGraphDescription('TrainingReasonsNo').question;
+  const description = useGraphDescription('TrainingReasonsNo').description;
 
   return (
     <SurveyChart
@@ -193,9 +193,9 @@ export const TrainingReasonsNo = ({
 export const TrainingReasonsNoDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useTrainingReasonsData();
 
-  const questionHeaderOther = graphDescriptions.TrainingReasonsNoDetails.question;
+  const questionHeaderOther = useGraphDescription('TrainingReasonsNoDetails').question;
 
-  const mainQuestion = graphDescriptions.TrainingReasonsNo.question;
+  const mainQuestion = useGraphDescription('TrainingReasonsNo').question;
   const otherStat = stats.find((s) => s.key === 'trainingOtherReason');
   const numberOfOtherSelections = otherStat ? otherStat.count : 0;
 
@@ -207,7 +207,7 @@ export const TrainingReasonsNoDetails = ({ onBack }: { onBack: () => void }) => 
       title={mainQuestion}
       items={otherTexts}
       question={questionHeaderOther ?? mainQuestion}
-      description={graphDescriptions.TrainingReasonsNoDetails.description}
+      description={useGraphDescription('TrainingReasonsNoDetails').description}
       numberOfResponses={otherTexts.length}
       responseRate={responseRate}
       onBack={onBack}

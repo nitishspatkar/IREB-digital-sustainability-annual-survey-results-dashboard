@@ -5,7 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 export function DemographicProfessionalExperience() {
   const surveyResponses = useSurveyData();
@@ -107,7 +107,7 @@ export function DemographicProfessionalExperience() {
     [tickColor]
   );
 
-  const { question, description } = graphDescriptions.DemographicProfessionalExperience;
+  const { question, description } = useGraphDescription('DemographicProfessionalExperience');
 
   return (
     <GraphWrapper

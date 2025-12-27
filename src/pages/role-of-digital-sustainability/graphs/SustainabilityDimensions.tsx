@@ -4,7 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // --- SHARED DATA LOGIC ---
 const useSustainabilityDimensionsData = () => {
@@ -123,7 +123,7 @@ export const SustainabilityDimensions = ({
   className?: string;
 }) => {
   const { counts, otherTexts, barColor, tickColor } = useSustainabilityDimensionsData();
-  const { question, description } = graphDescriptions.SustainabilityDimensions;
+  const { question, description } = useGraphDescription('SustainabilityDimensions');
 
   // Chart Logic
   const data = useMemo<Data[]>(
@@ -197,9 +197,10 @@ export const SustainabilityDimensions = ({
 // --- COMPONENT 2: Detail List ---
 export const SustainabilityDimensionsDetails = ({ onBack }: { onBack: () => void }) => {
   const { counts, otherTexts } = useSustainabilityDimensionsData();
-  const { question } = graphDescriptions.SustainabilityDimensions;
-  const { question: questionDetails, description: descriptionDetails } =
-    graphDescriptions.SustainabilityDimensionsDetails;
+  const { question } = useGraphDescription('SustainabilityDimensions');
+  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
+    'SustainabilityDimensionsDetails'
+  );
 
   // Calculate relative rate: Count of "Other" texts / Count of "Other" category selections
   // Note: Finding the count for "Other" in the sorted counts object

@@ -4,7 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // --- SHARED DATA LOGIC ---
 const useNoTrainingReasonsData = () => {
@@ -123,7 +123,7 @@ export const NoTrainingReasons = ({
 }) => {
   const { stats, otherTexts, eligibleResponses, totalRespondentsWithAnswer, barColor, tickColor } =
     useNoTrainingReasonsData();
-  const { question, description } = graphDescriptions.NoTrainingReasons;
+  const { question, description } = useGraphDescription('NoTrainingReasons');
 
   const data = useMemo<Data[]>(
     () => [
@@ -195,9 +195,10 @@ export const NoTrainingReasons = ({
 // --- COMPONENT 2: Detail List ---
 export const NoTrainingReasonsDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useNoTrainingReasonsData();
-  const { question } = graphDescriptions.NoTrainingReasons;
-  const { question: questionDetails, description: descriptionDetails } =
-    graphDescriptions.NoTrainingReasonsDetails;
+  const { question } = useGraphDescription('NoTrainingReasons');
+  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
+    'NoTrainingReasonsDetails'
+  );
 
   // Calculate rate relative to how many people selected "Other" checkbox
   const otherStat = stats.find((s) => s.label === 'Other');

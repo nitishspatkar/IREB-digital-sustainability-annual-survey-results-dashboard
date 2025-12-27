@@ -6,7 +6,7 @@ import { useSurveyData } from '../../../data/SurveyContext';
 import type { AgeGroupStat } from '../demographicTypes';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -30,7 +30,7 @@ const DemographicAgeGroup = () => {
       .sort((a, b) => b.count - a.count);
   }, [surveyResponses]);
 
-  const { question, description } = graphDescriptions.DemographicAgeGroup;
+  const { question, description } = useGraphDescription('DemographicAgeGroup');
   const numberOfResponses = ageGroupStats.reduce((sum, stat) => sum + stat.count, 0);
   const responseRate =
     surveyResponses.length > 0 ? (numberOfResponses / surveyResponses.length) * 100 : 0;

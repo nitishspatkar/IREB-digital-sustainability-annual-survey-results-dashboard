@@ -4,7 +4,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 // --- SHARED DATA LOGIC ---
 const useSupportResourcesData = () => {
@@ -137,7 +137,7 @@ export const AdditionalSupportResources = ({
 }) => {
   const { stats, otherTexts, totalRespondentsWithAnswer, totalEligible, barColor, tickColor } =
     useSupportResourcesData();
-  const { question, description } = graphDescriptions.AdditionalSupportResources;
+  const { question, description } = useGraphDescription('AdditionalSupportResources');
 
   const data = useMemo<Data[]>(
     () => [
@@ -208,9 +208,10 @@ export const AdditionalSupportResources = ({
 // --- COMPONENT 2: Detail List ---
 export const AdditionalSupportResourcesDetails = ({ onBack }: { onBack: () => void }) => {
   const { stats, otherTexts } = useSupportResourcesData();
-  const { question } = graphDescriptions.AdditionalSupportResources;
-  const { question: questionDetails, description: descriptionDetails } =
-    graphDescriptions.AdditionalSupportResourcesDetails;
+  const { question } = useGraphDescription('AdditionalSupportResources');
+  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
+    'AdditionalSupportResourcesDetails'
+  );
 
   // Calculate rate relative to "Other" checkbox selection
   const otherStat = stats.find((s) => s.label === 'Other');

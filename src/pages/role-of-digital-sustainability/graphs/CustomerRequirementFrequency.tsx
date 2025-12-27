@@ -5,7 +5,7 @@ import type { Data, Layout } from 'plotly.js';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 type FrequencyStat = {
   label: string;
@@ -24,7 +24,7 @@ const frequencyOrder = [
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const CustomerRequirementFrequency = () => {
-  const { question, description } = graphDescriptions.CustomerRequirementFrequency;
+  const { question, description } = useGraphDescription('CustomerRequirementFrequency');
   const barColor = useThemeColor('--color-ireb-berry');
   const tickColor = useThemeColor('--color-ireb-grey-01');
 

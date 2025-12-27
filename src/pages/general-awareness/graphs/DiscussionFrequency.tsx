@@ -5,7 +5,7 @@ import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 // Import der neuen generischen Views
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import graphDescriptions from '../../../data/graphDescriptions.json';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 type DiscussionFrequencyStat = {
   frequency: string;
@@ -143,8 +143,9 @@ export const DiscussionFrequency = ({
     [titleColor, tickColor]
   );
 
-  const question = questionHeader ?? graphDescriptions.DiscussionFrequency.question;
-  const description = graphDescriptions.DiscussionFrequency.description;
+  const graphDesc = useGraphDescription('DiscussionFrequency');
+  const question = questionHeader ?? graphDesc.question;
+  const description = graphDesc.description;
 
   return (
     <SurveyChart
@@ -165,7 +166,7 @@ export const DiscussionFrequency = ({
 export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) => {
   const { frequencyStats, otherFrequencyTexts } = useDiscussionFrequencyData();
 
-  const { title, question, description } = graphDescriptions.DiscussionFrequencyDetails;
+  const { title, question, description } = useGraphDescription('DiscussionFrequencyDetails');
 
   // Stats Logic for "Other"
   const numberOfResponsesOther = otherFrequencyTexts.length;
