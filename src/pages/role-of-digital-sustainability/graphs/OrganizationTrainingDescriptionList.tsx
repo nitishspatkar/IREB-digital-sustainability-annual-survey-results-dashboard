@@ -1,49 +1,42 @@
-import { useMemo } from "react";
-import { useSurveyData } from "../../../data/SurveyContext";
-import useThemeColor from "../../../hooks/useThemeColor";
-import { columnDefinitions } from "../../../data/SurveyColumnDefinitions.ts";
-import GraphWrapper from "../../../components/GraphWrapper";
+import { useMemo } from 'react';
+import { useSurveyData } from '../../../data/SurveyContext';
+import useThemeColor from '../../../hooks/useThemeColor';
+import { columnDefinitions } from '../../../data/SurveyColumnDefinitions.ts';
+import GraphWrapper from '../../../components/GraphWrapper';
 
-const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
+const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const OrganizationTrainingDescriptionList = () => {
   const questionHeader = columnDefinitions.find(
-    (c) => c.key === "organizationTrainingDescription"
+    (c) => c.key === 'organizationTrainingDescription'
   )?.header;
-  const tickColor = useThemeColor("--color-ireb-grey-01");
-  const borderColor = useThemeColor("--color-ireb-grey-01");
+  const tickColor = useThemeColor('--color-ireb-grey-01');
+  const borderColor = useThemeColor('--color-ireb-grey-01');
 
   const responses = useSurveyData();
 
   const descriptions = useMemo<string[]>(() => {
     // --- Precondition: Q23 = Yes ---
     const filteredResponses = responses.filter(
-      (r) =>
-        normalize(r.raw.organizationOffersTraining ?? "").toLowerCase() ===
-        "yes"
+      (r) => normalize(r.raw.organizationOffersTraining ?? '').toLowerCase() === 'yes'
     );
 
     // 2. Get their descriptions from Q24
     return filteredResponses
-      .map((r) => normalize(r.raw.organizationTrainingDescription ?? ""))
+      .map((r) => normalize(r.raw.organizationTrainingDescription ?? ''))
       .filter(
-        (desc) => desc.length > 0 && desc.toLowerCase() !== "n/a" // Remove empty/n.a.
+        (desc) => desc.length > 0 && desc.toLowerCase() !== 'n/a' // Remove empty/n.a.
       );
   }, [responses]);
 
   const filteredTotal = responses.filter(
-    (r) =>
-      normalize(r.raw.organizationOffersTraining ?? "").toLowerCase() === "yes"
+    (r) => normalize(r.raw.organizationOffersTraining ?? '').toLowerCase() === 'yes'
   ).length;
-  const responseRate =
-    filteredTotal > 0
-      ? (descriptions.length / filteredTotal) * 100
-      : 0;
+  const responseRate = filteredTotal > 0 ? (descriptions.length / filteredTotal) * 100 : 0;
 
-  const question =
-    questionHeader ?? "What training does your organization offer?";
+  const question = questionHeader ?? 'What training does your organization offer?';
   const description =
-    "Open-text descriptions from organizations that offer training on sustainable digital solutions.";
+    'Open-text descriptions from organizations that offer training on sustainable digital solutions.';
 
   return (
     <GraphWrapper
@@ -54,10 +47,7 @@ const OrganizationTrainingDescriptionList = () => {
     >
       <div className="h-[520px]">
         {descriptions.length === 0 ? (
-          <div
-            className="flex h-full items-center justify-center"
-            style={{ color: tickColor }}
-          >
+          <div className="flex h-full items-center justify-center" style={{ color: tickColor }}>
             No descriptions provided.
           </div>
         ) : (

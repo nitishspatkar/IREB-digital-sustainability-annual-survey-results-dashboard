@@ -4,487 +4,480 @@ export type ColumnDefinition<K extends string> = {
 };
 
 export const columnDefinitions = [
-  { key: "responseId", header: "Response ID" },
-  { key: "dateSubmitted", header: "Date submitted" },
-  { key: "lastPage", header: "Last page" },
-  { key: "startLanguage", header: "Start language" },
-  { key: "seed", header: "Seed" },
+  { key: 'responseId', header: 'Response ID' },
+  { key: 'dateSubmitted', header: 'Date submitted' },
+  { key: 'lastPage', header: 'Last page' },
+  { key: 'startLanguage', header: 'Start language' },
+  { key: 'seed', header: 'Seed' },
   {
-    key: "ageGroup",
-    header: "Which age group do you belong to?",
+    key: 'ageGroup',
+    header: 'Which age group do you belong to?',
   },
   {
-    key: "professionalExperienceYears",
+    key: 'professionalExperienceYears',
+    header: 'How many years of professional experience do you have in IT/software engineering? ',
+  },
+  {
+    key: 'continent',
+    header: 'Which continent do you live on? ',
+  },
+  {
+    key: 'countryOfResidence',
+    header: 'What is your current country of residence? ',
+  },
+  {
+    key: 'countryOfResidenceAlt1',
+    header: 'What is your current country of residence?',
+  },
+  {
+    key: 'countryOfResidenceAlt2',
+    header: 'What is your current country of residence?',
+  },
+  {
+    key: 'countryOfResidenceAlt3',
+    header: 'What is your current country of residence?',
+  },
+  {
+    key: 'countryOfResidenceAlt4',
+    header: 'What is your current country of residence?',
+  },
+  {
+    key: 'role',
+    header: 'Which of the following best describes your current role in the organization? ',
+  },
+  {
+    key: 'roleOther',
+    header: 'Which of the following best describes your current role in the organization?  [Other]',
+  },
+  {
+    key: 'organizationType',
+    header: 'Which of the following organizational types best describes your organization? ',
+  },
+  {
+    key: 'primaryApplicationDomain',
+    header: 'In which application domain do you currently primarily work? ',
+  },
+  {
+    key: 'primaryApplicationDomainOther',
+    header: 'In which application domain do you currently primarily work?  [Other]',
+  },
+  {
+    key: 'heardOfDigitalSustainabilityDefinition',
     header:
-      "How many years of professional experience do you have in IT/software engineering? ",
+      'We consider Digital Sustainability an umbrella term for two aspects: Sustainable Software and Sustainable by Software.  Sustainable Software concerns the sustainability of digital solutions in terms of their impact on environmental, economic, technical, social, and individual dimensions, including carbon footprint (Green IT) and process resources.  Sustainable by Software describes digital solutions designed to achieve positive sustainability impacts to help individuals and organizations reach sustainability goals, such as such as the United Nations Sustainable Development Goals (SDGs) more effectively.  Have you heard of this or a similar definition of digital sustainability before?  ',
   },
   {
-    key: "continent",
-    header: "Which continent do you live on? ",
-  },
-  {
-    key: "countryOfResidence",
-    header: "What is your current country of residence? ",
-  },
-  {
-    key: "countryOfResidenceAlt1",
-    header: "What is your current country of residence?",
-  },
-  {
-    key: "countryOfResidenceAlt2",
-    header: "What is your current country of residence?",
-  },
-  {
-    key: "countryOfResidenceAlt3",
-    header: "What is your current country of residence?",
-  },
-  {
-    key: "countryOfResidenceAlt4",
-    header: "What is your current country of residence?",
-  },
-  {
-    key: "role",
+    key: 'discussionFrequency',
     header:
-      "Which of the following best describes your current role in the organization? ",
+      'How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?  ',
   },
   {
-    key: "roleOther",
+    key: 'discussionFrequencyOther',
     header:
-      "Which of the following best describes your current role in the organization?  [Other]",
+      'How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?   [Other]',
   },
   {
-    key: "organizationType",
+    key: 'participatedInTraining',
     header:
-      "Which of the following organizational types best describes your organization? ",
+      'Have you participated in one or more training or educational programs on digital sustainability? ',
   },
   {
-    key: "primaryApplicationDomain",
-    header: "In which application domain do you currently primarily work? ",
-  },
-  {
-    key: "primaryApplicationDomainOther",
+    key: 'trainingNotAware',
     header:
-      "In which application domain do you currently primarily work?  [Other]",
+      'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [I was not aware such programs existed]',
   },
   {
-    key: "heardOfDigitalSustainabilityDefinition",
+    key: 'trainingNoOrganizationOffer',
     header:
-      "We consider Digital Sustainability an umbrella term for two aspects: Sustainable Software and Sustainable by Software.  Sustainable Software concerns the sustainability of digital solutions in terms of their impact on environmental, economic, technical, social, and individual dimensions, including carbon footprint (Green IT) and process resources.  Sustainable by Software describes digital solutions designed to achieve positive sustainability impacts to help individuals and organizations reach sustainability goals, such as such as the United Nations Sustainable Development Goals (SDGs) more effectively.  Have you heard of this or a similar definition of digital sustainability before?  ",
+      'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [My organization does not offer such programs]',
   },
   {
-    key: "discussionFrequency",
+    key: 'trainingNoOpportunity',
     header:
-      "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?  ",
+      'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [I have not had the opportunity to attend]',
   },
   {
-    key: "discussionFrequencyOther",
+    key: 'trainingNoNeed',
     header:
-      "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?   [Other]",
+      'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [I don’t see the need for such training]',
   },
   {
-    key: "participatedInTraining",
+    key: 'trainingTooExpensive',
     header:
-      "Have you participated in one or more training or educational programs on digital sustainability? ",
+      'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [The cost is too high]',
   },
   {
-    key: "trainingNotAware",
+    key: 'trainingOtherReason',
     header:
-      "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [I was not aware such programs existed]",
+      'What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [Other]',
   },
   {
-    key: "trainingNoOrganizationOffer",
+    key: 'trainingCount',
     header:
-      "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [My organization does not offer such programs]",
+      'How many times training(s) or educational program(s) on digital sustainability did you participate in?  ',
   },
   {
-    key: "trainingNoOpportunity",
+    key: 'trainingPrivateCapacity',
     header:
-      "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [I have not had the opportunity to attend]",
+      'Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)? ',
   },
   {
-    key: "trainingNoNeed",
+    key: 'trainingDescription',
     header:
-      "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [I don’t see the need for such training]",
+      'Please tell us a little about the training or educational programs on digital sustainability you participated in. ',
   },
   {
-    key: "trainingTooExpensive",
+    key: 'trainingSatisfaction',
     header:
-      "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [The cost is too high]",
+      'Are you satisfied with the number of trainings or educational programs you participated in?  ',
   },
   {
-    key: "trainingOtherReason",
+    key: 'notMoreTrainingNotAware',
     header:
-      "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?  [Other]",
+      'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [ I was not aware such programs existed]',
   },
   {
-    key: "trainingCount",
+    key: 'notMoreTrainingNoOrganization',
     header:
-      "How many times training(s) or educational program(s) on digital sustainability did you participate in?  ",
+      'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [My organization does not offer such programs]',
   },
   {
-    key: "trainingPrivateCapacity",
+    key: 'notMoreTrainingNoOpportunity',
     header:
-      "Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)? ",
+      'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [I have not had the opportunity to attend]',
   },
   {
-    key: "trainingDescription",
+    key: 'notMoreTrainingNoNeed',
     header:
-      "Please tell us a little about the training or educational programs on digital sustainability you participated in. ",
+      'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [I don’t see the need for such training]',
   },
   {
-    key: "trainingSatisfaction",
+    key: 'notMoreTrainingTooExpensive',
     header:
-      "Are you satisfied with the number of trainings or educational programs you participated in?  ",
+      'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [The cost is too high]',
   },
   {
-    key: "notMoreTrainingNotAware",
+    key: 'notMoreTrainingOther',
     header:
-      "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [ I was not aware such programs existed]",
+      'What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [Other]',
   },
   {
-    key: "notMoreTrainingNoOrganization",
+    key: 'organizationHasDigitalSustainabilityGoals',
     header:
-      "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [My organization does not offer such programs]",
+      'Does your organization have specific digital sustainability goals or benchmarks for software development projects? ',
   },
   {
-    key: "notMoreTrainingNoOpportunity",
+    key: 'organizationHasSustainabilityTeam',
     header:
-      "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [I have not had the opportunity to attend]",
+      'Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department? ',
   },
   {
-    key: "notMoreTrainingNoNeed",
+    key: 'organizationIncorporatesSustainablePractices',
+    header: 'Does your organization incorporate sustainable development practices? ',
+  },
+  {
+    key: 'organizationDepartmentCoordination',
     header:
-      "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [I don’t see the need for such training]",
+      'Do different departments in your organization coordinate on sustainability for software development projects? ',
   },
   {
-    key: "notMoreTrainingTooExpensive",
-    header:
-      "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [The cost is too high]",
-  },
-  {
-    key: "notMoreTrainingOther",
-    header:
-      "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?   [Other]",
-  },
-  {
-    key: "organizationHasDigitalSustainabilityGoals",
-    header:
-      "Does your organization have specific digital sustainability goals or benchmarks for software development projects? ",
-  },
-  {
-    key: "organizationHasSustainabilityTeam",
-    header:
-      "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department? ",
-  },
-  {
-    key: "organizationIncorporatesSustainablePractices",
-    header:
-      "Does your organization incorporate sustainable development practices? ",
-  },
-  {
-    key: "organizationDepartmentCoordination",
-    header:
-      "Do different departments in your organization coordinate on sustainability for software development projects? ",
-  },
-  {
-    key: "considerEnvironmental",
+    key: 'considerEnvironmental',
     header:
       "Which dimensions of sustainability are actively considered in your organization's software development projects?  [Environmental sustainability (e.g., resource efficiency of energy/water/..., carbon footprint)]",
   },
   {
-    key: "considerSocial",
+    key: 'considerSocial',
     header:
       "Which dimensions of sustainability are actively considered in your organization's software development projects?  [Social sustainability (e.g., role of community, shared values, working conditions, and well-being)]",
   },
   {
-    key: "considerIndividual",
+    key: 'considerIndividual',
     header:
       "Which dimensions of sustainability are actively considered in your organization's software development projects?  [Individual sustainability (e.g., health, competence, access to services)]",
   },
   {
-    key: "considerEconomic",
+    key: 'considerEconomic',
     header:
       "Which dimensions of sustainability are actively considered in your organization's software development projects?  [Economic sustainability (e.g., cost efficiency, economic viability)]",
   },
   {
-    key: "considerTechnical",
+    key: 'considerTechnical',
     header:
       "Which dimensions of sustainability are actively considered in your organization's software development projects?  [Technical sustainability (e.g., maintainability, scalability)]",
   },
   {
-    key: "considerOther",
+    key: 'considerOther',
     header:
       "Which dimensions of sustainability are actively considered in your organization's software development projects?  [Other]",
   },
   {
-    key: "considerNotSure",
+    key: 'considerNotSure',
     header:
       "Which dimensions of sustainability are actively considered in your organization's software development projects?  [Not sure]",
   },
   {
-    key: "organizationReportsOnSustainability",
-    header: "Does your organization report on sustainability practices?  ",
+    key: 'organizationReportsOnSustainability',
+    header: 'Does your organization report on sustainability practices?  ',
   },
   {
-    key: "organizationOffersTraining",
+    key: 'organizationOffersTraining',
     header:
-      "Does your organization offer training or resources to employees on sustainable software development practices? ",
+      'Does your organization offer training or resources to employees on sustainable software development practices? ',
   },
   {
-    key: "organizationTrainingDescription",
+    key: 'organizationTrainingDescription',
+    header: 'Can you tell us a little about the training or resources your organization offers?  ',
+  },
+  {
+    key: 'orgNoTrainingLackAwareness',
     header:
-      "Can you tell us a little about the training or resources your organization offers?  ",
+      'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Lack of awareness about the availability of such training]',
   },
   {
-    key: "orgNoTrainingLackAwareness",
+    key: 'orgNoTrainingLackUnderstanding',
     header:
-      "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Lack of awareness about the availability of such training]",
+      'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Lack of understanding about the need for such training]',
   },
   {
-    key: "orgNoTrainingLackUnderstanding",
+    key: 'orgNoTrainingNoDemand',
     header:
-      "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Lack of understanding about the need for such training]",
+      'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [No demand or interest from employees]',
   },
   {
-    key: "orgNoTrainingNoDemand",
+    key: 'orgNoTrainingLimitedBudget',
     header:
-      "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [No demand or interest from employees]",
+      'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Limited budget or resources for training programs]',
   },
   {
-    key: "orgNoTrainingLimitedBudget",
+    key: 'orgNoTrainingNotPriority',
     header:
-      "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Limited budget or resources for training programs]",
+      'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Sustainability is (perhaps) not a priority for the organization]',
   },
   {
-    key: "orgNoTrainingNotPriority",
+    key: 'orgNoTrainingNotSure',
     header:
-      "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Sustainability is (perhaps) not a priority for the organization]",
+      'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Not sure]',
   },
   {
-    key: "orgNoTrainingNotSure",
+    key: 'orgNoTrainingOther',
     header:
-      "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Not sure]",
+      'What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Other]',
   },
   {
-    key: "orgNoTrainingOther",
+    key: 'customerRequirementFrequency',
     header:
-      "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?  [Other]",
+      'How often is the sustainability of your digital solutions an explicit requirement of the customer or the users? ',
   },
   {
-    key: "customerRequirementFrequency",
+    key: 'customerNotRequestingReasons',
     header:
-      "How often is the sustainability of your digital solutions an explicit requirement of the customer or the users? ",
+      'Why do you think that your customers and users have not asked explicitly to build sustainable digital solutions? ',
   },
   {
-    key: "customerNotRequestingReasons",
+    key: 'personIncorporatesSustainability',
     header:
-      "Why do you think that your customers and users have not asked explicitly to build sustainable digital solutions? ",
+      'Do you incorporate digital sustainability considerations in your role-specific tasks?  ',
   },
   {
-    key: "personIncorporatesSustainability",
+    key: 'driveOrganizationalPolicies',
     header:
-      "Do you incorporate digital sustainability considerations in your role-specific tasks?  ",
+      'What drives you to incorporate digital sustainability in your role-related tasks?  [Organizational policies ]',
   },
   {
-    key: "driveOrganizationalPolicies",
+    key: 'drivePersonalBeliefs',
     header:
-      "What drives you to incorporate digital sustainability in your role-related tasks?  [Organizational policies ]",
+      'What drives you to incorporate digital sustainability in your role-related tasks?  [Personal beliefs ]',
   },
   {
-    key: "drivePersonalBeliefs",
+    key: 'driveClientRequirements',
     header:
-      "What drives you to incorporate digital sustainability in your role-related tasks?  [Personal beliefs ]",
+      'What drives you to incorporate digital sustainability in your role-related tasks?  [Client requirements ]',
   },
   {
-    key: "driveClientRequirements",
+    key: 'driveUserRequirements',
     header:
-      "What drives you to incorporate digital sustainability in your role-related tasks?  [Client requirements ]",
+      'What drives you to incorporate digital sustainability in your role-related tasks?  [User requirements]',
   },
   {
-    key: "driveUserRequirements",
+    key: 'driveLegalRequirements',
     header:
-      "What drives you to incorporate digital sustainability in your role-related tasks?  [User requirements]",
+      'What drives you to incorporate digital sustainability in your role-related tasks?  [Legal requirements ]',
   },
   {
-    key: "driveLegalRequirements",
+    key: 'driveOther',
     header:
-      "What drives you to incorporate digital sustainability in your role-related tasks?  [Legal requirements ]",
+      'What drives you to incorporate digital sustainability in your role-related tasks?  [Other]',
   },
   {
-    key: "driveOther",
+    key: 'roleConsiderEnvironmental',
     header:
-      "What drives you to incorporate digital sustainability in your role-related tasks?  [Other]",
+      'Which sustainability dimensions do you consider in your role-specific tasks?   [Environmental sustainability (e.g., resource efficiency of energy/water/…, carbon footprint)]',
   },
   {
-    key: "roleConsiderEnvironmental",
+    key: 'roleConsiderSocial',
     header:
-      "Which sustainability dimensions do you consider in your role-specific tasks?   [Environmental sustainability (e.g., resource efficiency of energy/water/…, carbon footprint)]",
+      'Which sustainability dimensions do you consider in your role-specific tasks?   [Social sustainability (e.g., the role of community, shared values, working conditions, and well-being)  ]',
   },
   {
-    key: "roleConsiderSocial",
+    key: 'roleConsiderIndividual',
     header:
-      "Which sustainability dimensions do you consider in your role-specific tasks?   [Social sustainability (e.g., the role of community, shared values, working conditions, and well-being)  ]",
+      'Which sustainability dimensions do you consider in your role-specific tasks?   [Individual sustainability (e.g., health, competence, access to services)]',
   },
   {
-    key: "roleConsiderIndividual",
+    key: 'roleConsiderEconomic',
     header:
-      "Which sustainability dimensions do you consider in your role-specific tasks?   [Individual sustainability (e.g., health, competence, access to services)]",
+      'Which sustainability dimensions do you consider in your role-specific tasks?   [Economic sustainability (e.g., cost efficiency, economic viability)]',
   },
   {
-    key: "roleConsiderEconomic",
+    key: 'roleConsiderTechnical',
     header:
-      "Which sustainability dimensions do you consider in your role-specific tasks?   [Economic sustainability (e.g., cost efficiency, economic viability)]",
+      'Which sustainability dimensions do you consider in your role-specific tasks?   [Technical sustainability (e.g., maintainability, scalability)]',
   },
   {
-    key: "roleConsiderTechnical",
+    key: 'roleConsiderOther',
     header:
-      "Which sustainability dimensions do you consider in your role-specific tasks?   [Technical sustainability (e.g., maintainability, scalability)]",
+      'Which sustainability dimensions do you consider in your role-specific tasks?   [Other]',
   },
   {
-    key: "roleConsiderOther",
+    key: 'usesTools',
     header:
-      "Which sustainability dimensions do you consider in your role-specific tasks?   [Other]",
+      'Are there specific tools, software, or frameworks that help you incorporate sustainability into your tasks? (E.g., gathering and managing requirements, writing sustainability-focused tests, optimizing code for less energy consumption.) ',
   },
   {
-    key: "usesTools",
+    key: 'toolsDescription',
     header:
-      "Are there specific tools, software, or frameworks that help you incorporate sustainability into your tasks? (E.g., gathering and managing requirements, writing sustainability-focused tests, optimizing code for less energy consumption.) ",
+      'Can you name the tools, software, and/or frameworks, and tell us how and for what you use them?  ',
   },
   {
-    key: "toolsDescription",
+    key: 'hindranceLackInterest',
     header:
-      "Can you name the tools, software, and/or frameworks, and tell us how and for what you use them?  ",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Lack of personal interest (e.g., no incentive to make the effort to consider sustainability)]',
   },
   {
-    key: "hindranceLackInterest",
+    key: 'hindranceLackKnowledge',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Lack of personal interest (e.g., no incentive to make the effort to consider sustainability)]",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Lack of knowledge or awareness (e.g., not knowing enough about sustainability impact or best practices)]',
   },
   {
-    key: "hindranceLackKnowledge",
+    key: 'hindranceLimitedResources',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Lack of knowledge or awareness (e.g., not knowing enough about sustainability impact or best practices)]",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Limited resources or budget (e.g., financial constraints, insufficient tools or technology)]',
   },
   {
-    key: "hindranceLimitedResources",
+    key: 'hindranceFinancialConstraints',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Limited resources or budget (e.g., financial constraints, insufficient tools or technology)]",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Financial constraints (e.g., limited budget)]',
   },
   {
-    key: "hindranceFinancialConstraints",
+    key: 'hindranceInsufficientTime',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Financial constraints (e.g., limited budget)]",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Insufficient time or competing priorities (e.g., pressing deadlines, other projects taking precedence)]',
   },
   {
-    key: "hindranceInsufficientTime",
+    key: 'hindranceLackSupport',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Insufficient time or competing priorities (e.g., pressing deadlines, other projects taking precedence)]",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Lack of organizational or leadership support (e.g., limited buy-in from management, inadequate policy frameworks)]',
   },
   {
-    key: "hindranceLackSupport",
+    key: 'hindranceComplexity',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Lack of organizational or leadership support (e.g., limited buy-in from management, inadequate policy frameworks)]",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Complexity or uncertainty of sustainability solutions (e.g., difficulty measuring impact or navigating standards)]',
   },
   {
-    key: "hindranceComplexity",
+    key: 'hindranceCulturalBarriers',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Complexity or uncertainty of sustainability solutions (e.g., difficulty measuring impact or navigating standards)]",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Cultural or social barriers (e.g., resistance to change, misalignment with organizational culture)]',
   },
   {
-    key: "hindranceCulturalBarriers",
+    key: 'hindranceStakeholderResistance',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Cultural or social barriers (e.g., resistance to change, misalignment with organizational culture)]",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Resistance from the stakeholders, such as clients and customers]',
   },
   {
-    key: "hindranceStakeholderResistance",
+    key: 'hindranceOther',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Resistance from the stakeholders, such as clients and customers]",
+      'What hinders you from incorporating sustainability in your role-specific tasks?   [Other]',
   },
   {
-    key: "hindranceOther",
+    key: 'lackKnowledgeEnvironmental',
     header:
-      "What hinders you from incorporating sustainability in your role-specific tasks?   [Other]",
+      'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Environmental sustainability (e.g., resource efficiency of energy/water/…, carbon footprint)]',
   },
   {
-    key: "lackKnowledgeEnvironmental",
+    key: 'lackKnowledgeSocial',
     header:
-      "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Environmental sustainability (e.g., resource efficiency of energy/water/…, carbon footprint)]",
+      'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Social sustainability (e.g., role of community, shared values)]',
   },
   {
-    key: "lackKnowledgeSocial",
+    key: 'lackKnowledgeIndividual',
     header:
-      "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Social sustainability (e.g., role of community, shared values)]",
+      'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Individual sustainability (e.g., health, competence, access to services)]',
   },
   {
-    key: "lackKnowledgeIndividual",
+    key: 'lackKnowledgeEconomic',
     header:
-      "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Individual sustainability (e.g., health, competence, access to services)]",
+      'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Economic sustainability (e.g., cost efficiency, economic viability)]',
   },
   {
-    key: "lackKnowledgeEconomic",
+    key: 'lackKnowledgeTechnical',
     header:
-      "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Economic sustainability (e.g., cost efficiency, economic viability)]",
+      'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Technical sustainability (e.g., maintainability, scalability)]',
   },
   {
-    key: "lackKnowledgeTechnical",
+    key: 'lackKnowledgeNone',
     header:
-      "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Technical sustainability (e.g., maintainability, scalability)]",
+      'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [I have sufficient knowledge and tools to effectively address all five sustainability dimensions]',
   },
   {
-    key: "lackKnowledgeNone",
+    key: 'lackKnowledgeOther',
     header:
-      "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [I have sufficient knowledge and tools to effectively address all five sustainability dimensions]",
+      'Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Other]',
   },
   {
-    key: "lackKnowledgeOther",
+    key: 'supportNeedTheoretical',
     header:
-      "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?  [Other]",
+      'What additional support or resources would help you integrate digital sustainability into your work?  [Theoretical knowledge (self-study learning material)]',
   },
   {
-    key: "supportNeedTheoretical",
+    key: 'supportNeedTutorials',
     header:
-      "What additional support or resources would help you integrate digital sustainability into your work?  [Theoretical knowledge (self-study learning material)]",
+      'What additional support or resources would help you integrate digital sustainability into your work?  [Tutorials (co-present or online training)]',
   },
   {
-    key: "supportNeedTutorials",
+    key: 'supportNeedCurricula',
     header:
-      "What additional support or resources would help you integrate digital sustainability into your work?  [Tutorials (co-present or online training)]",
+      'What additional support or resources would help you integrate digital sustainability into your work?  [Curricula (educational programs)]',
   },
   {
-    key: "supportNeedCurricula",
-    header:
-      "What additional support or resources would help you integrate digital sustainability into your work?  [Curricula (educational programs)]",
-  },
-  {
-    key: "supportNeedPractical",
+    key: 'supportNeedPractical',
     header:
       "What additional support or resources would help you integrate digital sustainability into your work?  [Practical knowledge (how-to's)]",
   },
   {
-    key: "supportNeedCaseStudies",
+    key: 'supportNeedCaseStudies',
     header:
-      "What additional support or resources would help you integrate digital sustainability into your work?  [Positive case studies (real-world examples demonstrating benefits, including financial value)]",
+      'What additional support or resources would help you integrate digital sustainability into your work?  [Positive case studies (real-world examples demonstrating benefits, including financial value)]',
   },
   {
-    key: "supportNeedStructures",
+    key: 'supportNeedStructures',
     header:
-      "What additional support or resources would help you integrate digital sustainability into your work?  [Structures (frameworks, definitions, standards)]",
+      'What additional support or resources would help you integrate digital sustainability into your work?  [Structures (frameworks, definitions, standards)]',
   },
   {
-    key: "supportNeedTools",
+    key: 'supportNeedTools',
     header:
-      "What additional support or resources would help you integrate digital sustainability into your work?  [Tools (assessment checklists, creativity methods)]",
+      'What additional support or resources would help you integrate digital sustainability into your work?  [Tools (assessment checklists, creativity methods)]',
   },
   {
-    key: "supportNeedNone",
+    key: 'supportNeedNone',
     header:
-      "What additional support or resources would help you integrate digital sustainability into your work?  [I do not want to integrate more digital sustainability into my work]",
+      'What additional support or resources would help you integrate digital sustainability into your work?  [I do not want to integrate more digital sustainability into my work]',
   },
   {
-    key: "supportNeedOther",
+    key: 'supportNeedOther',
     header:
-      "What additional support or resources would help you integrate digital sustainability into your work?  [Other]",
+      'What additional support or resources would help you integrate digital sustainability into your work?  [Other]',
   },
 ] as const satisfies ReadonlyArray<ColumnDefinition<string>>;
 
-export type SurveyColumnKey = (typeof columnDefinitions)[number]["key"];
+export type SurveyColumnKey = (typeof columnDefinitions)[number]['key'];

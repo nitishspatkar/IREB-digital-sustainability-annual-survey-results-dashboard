@@ -1,29 +1,27 @@
-import { useMemo } from "react";
-import Plot from "react-plotly.js";
-import type { Data, Layout } from "plotly.js";
+import { useMemo } from 'react';
+import Plot from 'react-plotly.js';
+import type { Data, Layout } from 'plotly.js';
 
-import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
-import { useSurveyData } from "../../../data/SurveyContext";
-import type { AgeGroupStat } from "../demographicTypes";
-import useThemeColor from "../../../hooks/useThemeColor";
-import GraphWrapper from "../../../components/GraphWrapper";
+import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
+import { useSurveyData } from '../../../data/SurveyContext';
+import type { AgeGroupStat } from '../demographicTypes';
+import useThemeColor from '../../../hooks/useThemeColor';
+import GraphWrapper from '../../../components/GraphWrapper';
 
-const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, " ").trim();
+const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const DemographicAgeGroup = () => {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === "ageGroup"
-  )?.header;
-  const chartBarColor = useThemeColor("--color-ireb-berry");
-  const tickColor = useThemeColor("--color-ireb-grey-01");
+  const questionHeader = columnDefinitions.find((c) => c.key === 'ageGroup')?.header;
+  const chartBarColor = useThemeColor('--color-ireb-berry');
+  const tickColor = useThemeColor('--color-ireb-grey-01');
   const surveyResponses = useSurveyData();
 
   const ageGroupStats = useMemo<AgeGroupStat[]>(() => {
     const counts = new Map<string, number>();
 
     surveyResponses.forEach((response) => {
-      const ageGroup = normalizeAgeGroup(response.raw.ageGroup ?? "");
-      if (ageGroup.length > 0 && ageGroup.toLowerCase() !== "n/a") {
+      const ageGroup = normalizeAgeGroup(response.raw.ageGroup ?? '');
+      if (ageGroup.length > 0 && ageGroup.toLowerCase() !== 'n/a') {
         counts.set(ageGroup, (counts.get(ageGroup) ?? 0) + 1);
       }
     });
@@ -33,17 +31,12 @@ const DemographicAgeGroup = () => {
       .sort((a, b) => b.count - a.count);
   }, [surveyResponses]);
 
-  const question = questionHeader ?? "Which age group do you belong to?";
+  const question = questionHeader ?? 'Which age group do you belong to?';
   const description =
-    "This chart shows the distribution of survey respondents across different age groups. The data helps us understand the demographic composition of the survey participants and identify which age groups are most represented in the responses.";
-  const numberOfResponses = ageGroupStats.reduce(
-    (sum, stat) => sum + stat.count,
-    0
-  );
+    'This chart shows the distribution of survey respondents across different age groups. The data helps us understand the demographic composition of the survey participants and identify which age groups are most represented in the responses.';
+  const numberOfResponses = ageGroupStats.reduce((sum, stat) => sum + stat.count, 0);
   const responseRate =
-    surveyResponses.length > 0
-      ? (numberOfResponses / surveyResponses.length) * 100
-      : 0;
+    surveyResponses.length > 0 ? (numberOfResponses / surveyResponses.length) * 100 : 0;
 
   const chartData = useMemo<Data[]>(() => {
     const sortedStats = [...ageGroupStats].sort((a, b) => {
@@ -61,21 +54,21 @@ const DemographicAgeGroup = () => {
       {
         x: sortedStats.map((item) => item.ageGroup),
         y: sortedStats.map((item) => item.count),
-        type: "bar",
+        type: 'bar',
         marker: {
           color: chartBarColor,
         },
         // --- ADDED TEXT LABELS ---
         text: sortedStats.map((item) => item.count.toString()),
-        textposition: "outside",
+        textposition: 'outside',
         textfont: {
-          family: "PP Mori, sans-serif",
+          family: 'PP Mori, sans-serif',
           size: 12,
           color: tickColor,
         },
         cliponaxis: false,
         // --- END OF CHANGES ---
-        hoverinfo: "none",
+        hoverinfo: 'none',
       },
     ];
   }, [ageGroupStats, chartBarColor, tickColor]); // Added tickColor
@@ -83,12 +76,12 @@ const DemographicAgeGroup = () => {
   const layout = useMemo<Partial<Layout>>(
     () => ({
       margin: { t: 50, r: 0, b: 60, l: 40 }, // Adjusted top/bottom margins
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
       xaxis: {
         // --- REMOVED tickangle: -45 ---
         tickfont: {
-          family: "PP Mori, sans-serif",
+          family: 'PP Mori, sans-serif',
           size: 12,
           color: tickColor,
         },
@@ -96,15 +89,15 @@ const DemographicAgeGroup = () => {
       yaxis: {
         // --- ADDED Y-AXIS TITLE ---
         title: {
-          text: "Number of Respondents",
+          text: 'Number of Respondents',
           font: {
-            family: "PP Mori, sans-serif",
+            family: 'PP Mori, sans-serif',
             size: 12,
             color: tickColor,
           },
         },
         tickfont: {
-          family: "PP Mori, sans-serif",
+          family: 'PP Mori, sans-serif',
           size: 12,
           color: tickColor,
         },
@@ -126,7 +119,7 @@ const DemographicAgeGroup = () => {
           layout={layout}
           config={{ displayModeBar: false, responsive: true }}
           useResizeHandler
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: '100%', height: '100%' }}
         />
       </div>
     </GraphWrapper>

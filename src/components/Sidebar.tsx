@@ -1,15 +1,13 @@
-import { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
-import { navigationSections } from "../constants/navigation";
-import irebLogo from "../assets/IREB_RGB.png";
+import { useState } from 'react';
+import { NavLink, Link } from 'react-router-dom';
+import { navigationSections } from '../constants/navigation';
+import irebLogo from '../assets/IREB_RGB.png';
 
 type SidebarProps = {
   activeYear: string;
 };
 
-function Sidebar({
-  activeYear,
-}: SidebarProps) {
+function Sidebar({ activeYear }: SidebarProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   return (
     <>
@@ -48,7 +46,7 @@ function Sidebar({
         font-pressura fixed top-0 left-0 z-50 flex h-screen w-100 shrink-0 flex-col gap-6 overflow-y-auto 
         border-r border-ireb-light-berry/60 md:border-r-0 bg-white px-8 py-8
         transition-transform duration-300 ease-in-out
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         md:sticky md:translate-x-0
       `}
       >
@@ -66,11 +64,7 @@ function Sidebar({
             stroke="currentColor"
             className="h-6 w-6"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
         <Link
@@ -101,8 +95,8 @@ function Sidebar({
                       flex w-full items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50
                       ${
                         isActive
-                          ? "bg-ireb-berry text-white border-ireb-berry shadow-card"
-                          : "bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
+                          ? 'bg-ireb-berry text-white border-ireb-berry shadow-card'
+                          : 'bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry'
                       }
                     `}
                   >

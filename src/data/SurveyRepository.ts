@@ -1,20 +1,20 @@
-import { SurveyCsvParser } from "./SurveyCsvParser";
-import { SurveyResponse } from "./SurveyResponse";
+import { SurveyCsvParser } from './SurveyCsvParser';
+import { SurveyResponse } from './SurveyResponse';
 
 /**
  * Repository for managing survey data.
  * Uses SurveyCsvParser to load CSV data and wraps it in SurveyResponse objects.
  */
 export class SurveyRepository {
-  private static surveyModules = import.meta.glob<string>("./*.csv", {
-    as: "raw",
+  private static surveyModules = import.meta.glob<string>('./*.csv', {
+    as: 'raw',
     eager: true,
   });
   private static cachedSurveys: Map<string, SurveyResponse[]> = new Map();
 
   private static getYearFromPath(path: string): string {
-    const fileName = path.split("/").pop();
-    return fileName ? fileName.replace(".csv", "") : "";
+    const fileName = path.split('/').pop();
+    return fileName ? fileName.replace('.csv', '') : '';
   }
 
   static getAvailableYears(): readonly string[] {
@@ -40,9 +40,7 @@ export class SurveyRepository {
       const rawRecords = parser.getAll();
 
       // Wrap each raw record in a SurveyResponse
-      const responses = rawRecords.map(
-        (record) => new SurveyResponse(record, year)
-      );
+      const responses = rawRecords.map((record) => new SurveyResponse(record, year));
 
       this.cachedSurveys.set(year, responses);
     }

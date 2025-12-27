@@ -1,7 +1,4 @@
-import {
-  columnDefinitions,
-  type SurveyColumnKey,
-} from "./SurveyColumnDefinitions";
+import { columnDefinitions, type SurveyColumnKey } from './SurveyColumnDefinitions';
 
 export type SurveyRecord = {
   [K in SurveyColumnKey]: string;
@@ -10,7 +7,7 @@ export type SurveyRecord = {
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
   let currentRow: string[] = [];
-  let currentValue = "";
+  let currentValue = '';
   let inQuotes = false;
 
   for (let i = 0; i < text.length; i += 1) {
@@ -27,15 +24,15 @@ function parseCsv(text: string): string[][] {
       } else {
         inQuotes = true;
       }
-    } else if (char === "," && !inQuotes) {
+    } else if (char === ',' && !inQuotes) {
       currentRow.push(currentValue);
-      currentValue = "";
-    } else if (char === "\n" && !inQuotes) {
+      currentValue = '';
+    } else if (char === '\n' && !inQuotes) {
       currentRow.push(currentValue);
       rows.push(currentRow);
       currentRow = [];
-      currentValue = "";
-    } else if (char === "\r") {
+      currentValue = '';
+    } else if (char === '\r') {
       // ignore carriage returns
       continue;
     } else {
@@ -47,7 +44,7 @@ function parseCsv(text: string): string[][] {
   rows.push(currentRow);
 
   // Remove trailing empty row caused by newline at EOF
-  if (rows.length > 0 && rows[rows.length - 1].every((value) => value === "")) {
+  if (rows.length > 0 && rows[rows.length - 1].every((value) => value === '')) {
     rows.pop();
   }
 
@@ -62,10 +59,10 @@ function parseCsv(text: string): string[][] {
  */
 function normalizeCell(value: string | undefined): string {
   if (!value) {
-    return "";
+    return '';
   }
 
-  return value.replace(/\u00a0/g, " ").trim();
+  return value.replace(/\u00a0/g, ' ').trim();
 }
 
 export class SurveyCsvParser {
@@ -80,7 +77,7 @@ export class SurveyCsvParser {
     const [headerRow, ...dataRows] = rows;
 
     if (!headerRow) {
-      throw new Error("CSV is missing a header row.");
+      throw new Error('CSV is missing a header row.');
     }
 
     const normalizedCsvHeaders = headerRow.map(normalizeCell);
@@ -90,7 +87,7 @@ export class SurveyCsvParser {
 
     columnDefinitions.forEach((definition) => {
       const expectedHeader = normalizeCell(definition.header);
-      
+
       // Search for the next available column that matches the header.
       let searchFromIndex = 0;
       let foundIndex = -1;
@@ -109,7 +106,7 @@ export class SurveyCsvParser {
     });
 
     const records: SurveyRecord[] = dataRows
-      .filter((row) => row.some((cell) => normalizeCell(cell) !== ""))
+      .filter((row) => row.some((cell) => normalizeCell(cell) !== ''))
       .map((row) => {
         const entry: Partial<SurveyRecord> = {};
 
@@ -118,7 +115,7 @@ export class SurveyCsvParser {
           if (index !== undefined && index < row.length) {
             entry[definition.key] = normalizeCell(row[index]);
           } else {
-            entry[definition.key] = "";
+            entry[definition.key] = '';
           }
         });
 

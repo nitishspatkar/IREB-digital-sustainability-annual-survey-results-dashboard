@@ -1,12 +1,12 @@
-import type { SurveyRecord } from "./SurveyCsvParser";
-import type { SurveyColumnKey } from "./SurveyColumnDefinitions";
+import type { SurveyRecord } from './SurveyCsvParser';
+import type { SurveyColumnKey } from './SurveyColumnDefinitions';
 
 const countryOfResidenceColumns = [
-  "countryOfResidence",
-  "countryOfResidenceAlt1",
-  "countryOfResidenceAlt2",
-  "countryOfResidenceAlt3",
-  "countryOfResidenceAlt4",
+  'countryOfResidence',
+  'countryOfResidenceAlt1',
+  'countryOfResidenceAlt2',
+  'countryOfResidenceAlt3',
+  'countryOfResidenceAlt4',
 ] as const satisfies readonly SurveyColumnKey[];
 
 /**
@@ -43,10 +43,10 @@ export class SurveyResponse {
   getCountryOfResidence(): string {
     for (const column of countryOfResidenceColumns) {
       const value = this.data[column];
-      if (value && value !== "") {
+      if (value && value !== '') {
         return value;
       }
     }
-    return "";
+    return '';
   }
 }

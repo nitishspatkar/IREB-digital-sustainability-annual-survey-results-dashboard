@@ -1,25 +1,25 @@
-import { useMemo } from "react";
-import Plot from "react-plotly.js";
-import type { Data, Layout } from "plotly.js";
+import { useMemo } from 'react';
+import Plot from 'react-plotly.js';
+import type { Data, Layout } from 'plotly.js';
 
-import { useSurveyData } from "../../../data/SurveyContext";
-import useThemeColor from "../../../hooks/useThemeColor";
-import { columnDefinitions } from "../../../data/SurveyColumnDefinitions.ts";
-import GraphWrapper from "../../../components/GraphWrapper";
+import { useSurveyData } from '../../../data/SurveyContext';
+import useThemeColor from '../../../hooks/useThemeColor';
+import { columnDefinitions } from '../../../data/SurveyColumnDefinitions.ts';
+import GraphWrapper from '../../../components/GraphWrapper';
 
 const OrganizationOffersTraining = () => {
   const questionHeader = columnDefinitions.find(
-    (c) => c.key === "organizationOffersTraining"
+    (c) => c.key === 'organizationOffersTraining'
   )?.header;
-  const yesColor = useThemeColor("--color-ireb-spring");
-  const noColor = useThemeColor("--color-ireb-mandarin");
-  const barColor = useThemeColor("--color-ireb-grey-02");
-  const tickColor = useThemeColor("--color-ireb-grey-01");
+  const yesColor = useThemeColor('--color-ireb-spring');
+  const noColor = useThemeColor('--color-ireb-mandarin');
+  const barColor = useThemeColor('--color-ireb-grey-02');
+  const tickColor = useThemeColor('--color-ireb-grey-01');
 
   const responses = useSurveyData();
 
   const counts = useMemo(() => {
-    const norm = (v: string) => (v ?? "").trim().toLowerCase();
+    const norm = (v: string) => (v ?? '').trim().toLowerCase();
 
     let yes = 0;
     let no = 0;
@@ -28,20 +28,20 @@ const OrganizationOffersTraining = () => {
 
     responses.forEach((r) => {
       const v = norm(r.raw.organizationOffersTraining as unknown as string);
-      if (v === "yes") yes += 1;
-      else if (v === "no") no += 1;
-      else if (v === "not sure") notSure += 1;
-      else if (v === "") {
+      if (v === 'yes') yes += 1;
+      else if (v === 'no') no += 1;
+      else if (v === 'not sure') notSure += 1;
+      else if (v === '') {
         return;
-      } else if (v !== "n/a") {
+      } else if (v !== 'n/a') {
         unknown += 1;
       }
     });
 
-    const labels: string[] = ["Yes", "No", "Not sure"];
+    const labels: string[] = ['Yes', 'No', 'Not sure'];
     const values: number[] = [yes, no, notSure];
     if (unknown > 0) {
-      labels.push("Unknown");
+      labels.push('Unknown');
       values.push(unknown);
     }
     return { labels, values } as const;
@@ -52,28 +52,28 @@ const OrganizationOffersTraining = () => {
       {
         x: counts.labels,
         y: counts.values,
-        type: "bar",
+        type: 'bar',
         marker: {
-            color: counts.labels.map((label) => {
-                if (label === "Yes") {
-                    return yesColor;
-                } else if (label === "No") {
-                    return noColor;
-                } else {
-                    return barColor;
-                }
-            }),
+          color: counts.labels.map((label) => {
+            if (label === 'Yes') {
+              return yesColor;
+            } else if (label === 'No') {
+              return noColor;
+            } else {
+              return barColor;
+            }
+          }),
         },
         // --- ADDED TEXT LABELS ---
         text: counts.values.map((v) => v.toString()),
-        textposition: "outside",
+        textposition: 'outside',
         textfont: {
-          family: "PP Mori, sans-serif",
+          family: 'PP Mori, sans-serif',
           size: 12,
           color: tickColor,
         },
         cliponaxis: false,
-        hoverinfo: "none",
+        hoverinfo: 'none',
       },
     ],
     [counts, barColor, yesColor, noColor, tickColor] // Added tickColor
@@ -82,32 +82,30 @@ const OrganizationOffersTraining = () => {
   const layout = useMemo<Partial<Layout>>(
     () => ({
       margin: { t: 50, r: 0, b: 60, l: 48 }, // Adjusted margins
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
       xaxis: {
         // --- REMOVED tickangle ---
-        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
       },
       yaxis: {
         title: {
-          text: "Number of respondents",
-          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+          text: 'Number of respondents',
+          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
         },
-        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
       },
     }),
     [tickColor]
   );
 
   const total = counts.values.reduce((a, b) => a + b, 0);
-  const responseRate =
-    responses.length > 0 ? (total / responses.length) * 100 : 0;
+  const responseRate = responses.length > 0 ? (total / responses.length) * 100 : 0;
 
   const question =
-    questionHeader ??
-    "Does your organization offer training on sustainable digital solutions?";
+    questionHeader ?? 'Does your organization offer training on sustainable digital solutions?';
   const description =
-    "Shows whether organizations offer training or resources on sustainable digital solutions.";
+    'Shows whether organizations offer training or resources on sustainable digital solutions.';
 
   return (
     <GraphWrapper
@@ -122,7 +120,7 @@ const OrganizationOffersTraining = () => {
           layout={layout}
           config={{ displayModeBar: false, responsive: true }}
           useResizeHandler
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: '100%', height: '100%' }}
         />
       </div>
     </GraphWrapper>

@@ -1,11 +1,11 @@
-import { useMemo } from "react";
-import Plot from "react-plotly.js";
-import type { Data, Layout } from "plotly.js";
+import { useMemo } from 'react';
+import Plot from 'react-plotly.js';
+import type { Data, Layout } from 'plotly.js';
 
-import GraphWrapper from "../../../components/GraphWrapper";
-import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
-import { useSurveyData } from "../../../data/SurveyContext";
-import useThemeColor from "../../../hooks/useThemeColor";
+import GraphWrapper from '../../../components/GraphWrapper';
+import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
+import { useSurveyData } from '../../../data/SurveyContext';
+import useThemeColor from '../../../hooks/useThemeColor';
 
 type CapacityStat = {
   label: string;
@@ -15,34 +15,29 @@ type CapacityStat = {
 // Define the categories and their search terms
 const capacityOptions = [
   {
-    label: "Yes",
-    searchTerms: ["yes"],
+    label: 'Yes',
+    searchTerms: ['yes'],
   },
   {
-    label: "No",
-    searchTerms: ["no"],
+    label: 'No',
+    searchTerms: ['no'],
   },
   {
-    label:
-      "My organization paid it on some occasions, and i paid it myself on others.",
-    searchTerms: [
-      "my organization paid it on some occasions, and i paid it myself on others.",
-    ],
+    label: 'My organization paid it on some occasions, and i paid it myself on others.',
+    searchTerms: ['my organization paid it on some occasions, and i paid it myself on others.'],
   },
 ];
 
-const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
+const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingPrivateCapacity = () => {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === "trainingPrivateCapacity"
-  )?.header;
+  const questionHeader = columnDefinitions.find((c) => c.key === 'trainingPrivateCapacity')?.header;
 
-  const yesColor = useThemeColor("--color-ireb-spring");
-  const noColor = useThemeColor("--color-ireb-mandarin");
-  const barColor = useThemeColor("--color-ireb-grey-02");
-  const titleColor = useThemeColor("--color-ireb-grey-01");
-  const tickColor = useThemeColor("--color-ireb-grey-01");
+  const yesColor = useThemeColor('--color-ireb-spring');
+  const noColor = useThemeColor('--color-ireb-mandarin');
+  const barColor = useThemeColor('--color-ireb-grey-02');
+  const titleColor = useThemeColor('--color-ireb-grey-01');
+  const tickColor = useThemeColor('--color-ireb-grey-01');
 
   const responses = useSurveyData();
 
@@ -52,14 +47,13 @@ const TrainingPrivateCapacity = () => {
 
     // 1. Filter for users who answered "Yes" to Q10
     const participants = responses.filter(
-      (r) =>
-        normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
+      (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
     );
 
     // 2. Count responses for Q13
     participants.forEach((r) => {
-      const raw = normalize(r.raw.trainingPrivateCapacity ?? "").toLowerCase();
-      if (!raw || raw === "n/a") return;
+      const raw = normalize(r.raw.trainingPrivateCapacity ?? '').toLowerCase();
+      if (!raw || raw === 'n/a') return;
 
       // Find which category this response matches
       const matchedOption = capacityOptions.find((opt) =>
@@ -67,10 +61,7 @@ const TrainingPrivateCapacity = () => {
       );
 
       if (matchedOption) {
-        counts.set(
-          matchedOption.label,
-          (counts.get(matchedOption.label) ?? 0) + 1
-        );
+        counts.set(matchedOption.label, (counts.get(matchedOption.label) ?? 0) + 1);
       }
     });
 
@@ -83,30 +74,30 @@ const TrainingPrivateCapacity = () => {
   const chartData = useMemo<Data[]>(() => {
     return [
       {
-        type: "bar",
-        orientation: "h",
+        type: 'bar',
+        orientation: 'h',
         x: stats.map((s) => s.count),
         y: stats.map((s) => s.label),
         marker: {
-            color: stats.map(function(s) {
-                if (s.label === "Yes") {
-                    return yesColor;
-                } else if(s.label === "No") {
-                    return noColor;
-                } else {
-                    return barColor;
-                }
-            }),
+          color: stats.map(function (s) {
+            if (s.label === 'Yes') {
+              return yesColor;
+            } else if (s.label === 'No') {
+              return noColor;
+            } else {
+              return barColor;
+            }
+          }),
         },
         text: stats.map((s) => s.count.toString()),
-        textposition: "outside",
+        textposition: 'outside',
         textfont: {
-          family: "PP Mori, sans-serif",
+          family: 'PP Mori, sans-serif',
           size: 12,
           color: tickColor,
         },
         cliponaxis: false,
-        hoverinfo: "none",
+        hoverinfo: 'none',
       },
     ];
   }, [stats, barColor, yesColor, noColor, tickColor]);
@@ -114,54 +105,50 @@ const TrainingPrivateCapacity = () => {
   const layout = useMemo<Partial<Layout>>(
     () => ({
       margin: { t: 60, r: 40, b: 60, l: 200 }, // Left margin for labels
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
       xaxis: {
         title: {
-          text: "Number of Respondents",
-          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+          text: 'Number of Respondents',
+          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
         },
-        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
       },
       yaxis: {
-          tickfont: {
-              family: "PP Mori, sans-serif",
-              size: 12,
-              color: tickColor,
-          },
-          automargin: true,
-          ticks: "outside",
-          ticklen: 10,
-          tickcolor: "rgba(0,0,0,0)",
+        tickfont: {
+          family: 'PP Mori, sans-serif',
+          size: 12,
+          color: tickColor,
+        },
+        automargin: true,
+        ticks: 'outside',
+        ticklen: 10,
+        tickcolor: 'rgba(0,0,0,0)',
       },
     }),
     [titleColor, tickColor]
   );
 
+  const eligibleParticipants = useMemo(() => {
+    return responses.filter(
+      (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
+    ).length;
+  }, [responses]);
 
-    const eligibleParticipants = useMemo(() => {
-        return responses.filter(
-            (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
-        ).length;
-    }, [responses]);
+  console.log(stats);
 
-    console.log(stats);
+  const numberOfResponses = useMemo(() => {
+    return stats.reduce((sum, item) => sum + item.count, 0);
+  }, [stats]);
 
-    const numberOfResponses = useMemo(() => {
-        return stats.reduce((sum, item) => sum + item.count, 0);
-    }, [stats]);
+  console.log(numberOfResponses);
 
-    console.log(numberOfResponses);
+  const responseRate =
+    eligibleParticipants > 0 ? (numberOfResponses / eligibleParticipants) * 100 : 0;
 
-    const responseRate =
-        eligibleParticipants > 0
-            ? (numberOfResponses / eligibleParticipants) * 100
-            : 0;
-
-  const question =
-    questionHeader ?? "Did you attend training in your private capacity?";
+  const question = questionHeader ?? 'Did you attend training in your private capacity?';
   const description =
-    "Shows whether respondents attended training on their own or through their organization.";
+    'Shows whether respondents attended training on their own or through their organization.';
 
   return (
     <GraphWrapper
@@ -174,7 +161,7 @@ const TrainingPrivateCapacity = () => {
         <Plot
           data={chartData}
           layout={layout}
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: '100%', height: '100%' }}
           useResizeHandler
           config={{ displayModeBar: false, responsive: true }}
         />

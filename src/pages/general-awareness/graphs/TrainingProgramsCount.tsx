@@ -1,11 +1,11 @@
-import { useMemo } from "react";
-import Plot from "react-plotly.js";
-import type { Data, Layout } from "plotly.js";
+import { useMemo } from 'react';
+import Plot from 'react-plotly.js';
+import type { Data, Layout } from 'plotly.js';
 
-import GraphWrapper from "../../../components/GraphWrapper";
-import { useSurveyData } from "../../../data/SurveyContext";
-import useThemeColor from "../../../hooks/useThemeColor";
-import { columnDefinitions } from "../../../data/SurveyColumnDefinitions.ts";
+import GraphWrapper from '../../../components/GraphWrapper';
+import { useSurveyData } from '../../../data/SurveyContext';
+import useThemeColor from '../../../hooks/useThemeColor';
+import { columnDefinitions } from '../../../data/SurveyColumnDefinitions.ts';
 
 type CountStat = {
   label: string;
@@ -13,13 +13,11 @@ type CountStat = {
   count: number;
 };
 
-const normalize = (v: string) => v.replace(/\s+/g, " ").trim();
+const normalize = (v: string) => v.replace(/\s+/g, ' ').trim();
 
-function categorizeCount(
-  rawValue: string
-): { label: string; sortKey: number } | null {
+function categorizeCount(rawValue: string): { label: string; sortKey: number } | null {
   const value = normalize(rawValue);
-  if (!value || value.toLowerCase() === "n/a") return null;
+  if (!value || value.toLowerCase() === 'n/a') return null;
 
   if (/^\d+$/.test(value)) {
     const n = Number(value);
@@ -63,12 +61,10 @@ function categorizeCount(
 }
 
 const TrainingProgramsCount = () => {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === "trainingCount"
-  )?.header;
-  const barColor = useThemeColor("--color-ireb-berry");
-  const titleColor = useThemeColor("--color-ireb-grey-01");
-  const tickColor = useThemeColor("--color-ireb-grey-01");
+  const questionHeader = columnDefinitions.find((c) => c.key === 'trainingCount')?.header;
+  const barColor = useThemeColor('--color-ireb-berry');
+  const titleColor = useThemeColor('--color-ireb-grey-01');
+  const tickColor = useThemeColor('--color-ireb-grey-01');
 
   const responses = useSurveyData();
 
@@ -76,12 +72,11 @@ const TrainingProgramsCount = () => {
     const counts = new Map<string, CountStat>();
 
     const participants = responses.filter(
-      (r) =>
-        normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
+      (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
     );
 
     participants.forEach((r) => {
-      const cat = categorizeCount(r.raw.trainingCount ?? "");
+      const cat = categorizeCount(r.raw.trainingCount ?? '');
       if (!cat) return;
       const key = cat.label;
       const existing = counts.get(key);
@@ -100,17 +95,17 @@ const TrainingProgramsCount = () => {
       {
         x: stats.map((s) => s.label),
         y: stats.map((s) => s.count),
-        type: "bar",
+        type: 'bar',
         marker: { color: barColor },
         text: stats.map((s) => s.count.toString()),
-        textposition: "outside",
+        textposition: 'outside',
         textfont: {
-          family: "PP Mori, sans-serif",
+          family: 'PP Mori, sans-serif',
           size: 12,
           color: tickColor,
         },
         cliponaxis: false,
-        hoverinfo: "none",
+        hoverinfo: 'none',
       },
     ];
   }, [stats, barColor, tickColor]);
@@ -118,43 +113,39 @@ const TrainingProgramsCount = () => {
   const layout = useMemo<Partial<Layout>>(
     () => ({
       margin: { t: 50, r: 0, b: 60, l: 48 }, // Changed b: 80 to b: 60
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
       xaxis: {
-        type: "category",
+        type: 'category',
         title: {
-          text: "Number of trainings",
-          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+          text: 'Number of trainings',
+          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
         },
         // --- REMOVED tickangle: -30 ---
-        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
       },
       yaxis: {
         title: {
-          text: "Number of respondents",
-          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+          text: 'Number of respondents',
+          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
         },
-        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
       },
     }),
     [titleColor, tickColor]
   );
 
-
   const eligibleParticipants = responses.filter(
-      (r) => normalize(r.raw.participatedInTraining ?? "").toLowerCase() === "yes"
+    (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
   );
 
   const numberOfResponses = stats.reduce((sum, s) => sum + s.count, 0);
   const responseRate =
-      eligibleParticipants.length > 0
-          ? (numberOfResponses / eligibleParticipants.length) * 100
-          : 0;
+    eligibleParticipants.length > 0 ? (numberOfResponses / eligibleParticipants.length) * 100 : 0;
 
   const question =
-    questionHeader?.replace("times", "") ?? "How many training programs have you attended?";
-  const description =
-    "Distribution of the number of training programs attended by respondents.";
+    questionHeader?.replace('times', '') ?? 'How many training programs have you attended?';
+  const description = 'Distribution of the number of training programs attended by respondents.';
 
   return (
     <GraphWrapper
@@ -167,7 +158,7 @@ const TrainingProgramsCount = () => {
         <Plot
           data={chartData}
           layout={layout}
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: '100%', height: '100%' }}
           useResizeHandler
           config={{ displayModeBar: false, responsive: true }}
         />

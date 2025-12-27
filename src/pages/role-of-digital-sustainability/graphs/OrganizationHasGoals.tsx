@@ -1,48 +1,46 @@
-import { useMemo } from "react";
-import Plot from "react-plotly.js";
-import type { Data, Layout } from "plotly.js";
+import { useMemo } from 'react';
+import Plot from 'react-plotly.js';
+import type { Data, Layout } from 'plotly.js';
 
-import { useSurveyData } from "../../../data/SurveyContext";
-import useThemeColor from "../../../hooks/useThemeColor";
-import { columnDefinitions } from "../../../data/SurveyColumnDefinitions";
-import GraphWrapper from "../../../components/GraphWrapper";
+import { useSurveyData } from '../../../data/SurveyContext';
+import useThemeColor from '../../../hooks/useThemeColor';
+import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
+import GraphWrapper from '../../../components/GraphWrapper';
 
-const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
+const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const OrganizationHasGoals = () => {
   const questionHeader = columnDefinitions.find(
-    (c) => c.key === "organizationHasDigitalSustainabilityGoals"
+    (c) => c.key === 'organizationHasDigitalSustainabilityGoals'
   )?.header;
-  const yesColor = useThemeColor("--color-ireb-spring");
-  const noColor = useThemeColor("--color-ireb-mandarin");
-  const barColor = useThemeColor("--color-ireb-grey-02");
-  const tickColor = useThemeColor("--color-ireb-grey-01");
+  const yesColor = useThemeColor('--color-ireb-spring');
+  const noColor = useThemeColor('--color-ireb-mandarin');
+  const barColor = useThemeColor('--color-ireb-grey-02');
+  const tickColor = useThemeColor('--color-ireb-grey-01');
 
   const responses = useSurveyData();
 
   const stats = useMemo(() => {
     const counts = new Map<string, number>();
-    counts.set("Yes", 0);
-    counts.set("No", 0);
-    counts.set("Not sure", 0);
+    counts.set('Yes', 0);
+    counts.set('No', 0);
+    counts.set('Not sure', 0);
 
     responses.forEach((r) => {
       // Key from SurveyColumnDefinition.ts
-      const raw = normalize(
-        r.raw.organizationHasDigitalSustainabilityGoals ?? ""
-      );
+      const raw = normalize(r.raw.organizationHasDigitalSustainabilityGoals ?? '');
       const lower = raw.toLowerCase();
 
-      if (lower === "yes") {
-        counts.set("Yes", (counts.get("Yes") ?? 0) + 1);
-      } else if (lower === "no") {
-        counts.set("No", (counts.get("No") ?? 0) + 1);
-      } else if (lower === "not sure") {
-        counts.set("Not sure", (counts.get("Not sure") ?? 0) + 1);
+      if (lower === 'yes') {
+        counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+      } else if (lower === 'no') {
+        counts.set('No', (counts.get('No') ?? 0) + 1);
+      } else if (lower === 'not sure') {
+        counts.set('Not sure', (counts.get('Not sure') ?? 0) + 1);
       }
     });
 
-    const labels = ["Yes", "No", "Not sure"];
+    const labels = ['Yes', 'No', 'Not sure'];
     return {
       labels,
       values: labels.map((label) => counts.get(label) ?? 0),
@@ -54,27 +52,27 @@ const OrganizationHasGoals = () => {
       {
         x: stats.labels,
         y: stats.values,
-        type: "bar",
+        type: 'bar',
         marker: {
-            color: stats.labels.map((label) => {
-                if (label === "Yes") {
-                    return yesColor;
-                } else if (label === "No") {
-                    return noColor;
-                } else {
-                    return barColor;
-                }
-            }),
+          color: stats.labels.map((label) => {
+            if (label === 'Yes') {
+              return yesColor;
+            } else if (label === 'No') {
+              return noColor;
+            } else {
+              return barColor;
+            }
+          }),
         },
         text: stats.values.map((v) => v.toString()),
-        textposition: "outside",
+        textposition: 'outside',
         textfont: {
-          family: "PP Mori, sans-serif",
+          family: 'PP Mori, sans-serif',
           size: 12,
           color: tickColor,
         },
         cliponaxis: false,
-        hoverinfo: "none",
+        hoverinfo: 'none',
       },
     ],
     [stats, barColor, yesColor, noColor, tickColor]
@@ -83,31 +81,28 @@ const OrganizationHasGoals = () => {
   const layout = useMemo<Partial<Layout>>(
     () => ({
       margin: { t: 50, r: 20, b: 60, l: 48 },
-      paper_bgcolor: "rgba(0,0,0,0)",
-      plot_bgcolor: "rgba(0,0,0,0)",
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
       xaxis: {
-        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
       },
       yaxis: {
         title: {
-          text: "Number of Respondents",
-          font: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+          text: 'Number of Respondents',
+          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
         },
-        tickfont: { family: "PP Mori, sans-serif", size: 12, color: tickColor },
+        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
       },
     }),
     [tickColor]
   );
 
   const total = stats.values.reduce((a, b) => a + b, 0);
-  const responseRate =
-    responses.length > 0 ? (total / responses.length) * 100 : 0;
+  const responseRate = responses.length > 0 ? (total / responses.length) * 100 : 0;
 
   const question =
-    questionHeader ??
-    "Does your organization have specific digital sustainability goals?";
-  const description =
-    "Shows whether organizations have specific digital sustainability goals.";
+    questionHeader ?? 'Does your organization have specific digital sustainability goals?';
+  const description = 'Shows whether organizations have specific digital sustainability goals.';
 
   return (
     <GraphWrapper
@@ -122,7 +117,7 @@ const OrganizationHasGoals = () => {
           layout={layout}
           config={{ displayModeBar: false, responsive: true }}
           useResizeHandler
-          style={{ width: "100%", height: "100%" }}
+          style={{ width: '100%', height: '100%' }}
         />
       </div>
     </GraphWrapper>
