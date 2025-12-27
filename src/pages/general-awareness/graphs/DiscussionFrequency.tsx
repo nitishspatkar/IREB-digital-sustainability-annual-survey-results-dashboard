@@ -67,17 +67,8 @@ export const DiscussionFrequency = ({
   onExplore: () => void;
   className?: string;
 }) => {
-  const {
-    frequencyStats,
-    otherFrequencyTexts,
-    chartBarColor,
-    tickColor,
-    surveyResponses,
-    titleColor,
-  } = useDiscussionFrequencyData();
-
-  const questionHeader =
-    'How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?  ';
+  const { frequencyStats, otherFrequencyTexts, chartBarColor, tickColor, surveyResponses } =
+    useDiscussionFrequencyData();
 
   // Stats Logic
   const numberOfResponses = frequencyStats.reduce((sum, stat) => sum + stat.count, 0);
@@ -140,11 +131,11 @@ export const DiscussionFrequency = ({
         tickcolor: 'rgba(0,0,0,0)',
       },
     }),
-    [titleColor, tickColor]
+    [tickColor]
   );
 
   const graphDesc = useGraphDescription('DiscussionFrequency');
-  const question = questionHeader ?? graphDesc.question;
+  const question = graphDesc.question;
   const description = graphDesc.description;
 
   return (

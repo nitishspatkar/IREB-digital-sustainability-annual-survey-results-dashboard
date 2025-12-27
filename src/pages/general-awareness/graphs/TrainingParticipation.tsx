@@ -15,8 +15,6 @@ type ParticipationStat = {
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingParticipation = () => {
-  const questionHeader =
-    'Have you participated in one or more training or educational programs on digital sustainability? ';
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
 
@@ -109,7 +107,7 @@ const TrainingParticipation = () => {
   const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
 
   const { question: graphQuestion, description } = useGraphDescription('TrainingParticipation');
-  const question = questionHeader ?? graphQuestion;
+  const question = graphQuestion;
 
   return (
     <GraphWrapper

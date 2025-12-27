@@ -3,7 +3,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
@@ -59,7 +58,6 @@ export const DemographicOrganizationalRole = ({
   className?: string;
 }) => {
   const { roleStats, otherRoleTexts, chartBarColor, tickColor, surveyResponses } = useRoleData();
-  const questionHeader = columnDefinitions.find((c) => c.key === 'role')?.header;
 
   const numberOfResponses = roleStats.reduce((sum, stat) => sum + stat.count, 0);
   const responseRate =
@@ -116,7 +114,7 @@ export const DemographicOrganizationalRole = ({
   return (
     <SurveyChart
       className={className}
-      question={questionHeader ?? question}
+      question={question}
       description={description}
       numberOfResponses={numberOfResponses}
       responseRate={responseRate}
@@ -131,10 +129,6 @@ export const DemographicOrganizationalRole = ({
 // --- COMPONENT 2: The Detailed View (Explore Page) ---
 export const DemographicOrganizationalRoleDetails = ({ onBack }: { onBack: () => void }) => {
   const { roleStats, otherRoleTexts } = useRoleData();
-
-  // Get headers
-  const mainQuestionHeader = columnDefinitions.find((c) => c.key === 'role')?.header;
-  const questionHeaderOther = columnDefinitions.find((c) => c.key === 'roleOther')?.header;
 
   const { title, question, description } = useGraphDescription(
     'DemographicOrganizationalRoleDetails'
@@ -151,9 +145,9 @@ export const DemographicOrganizationalRoleDetails = ({ onBack }: { onBack: () =>
 
   return (
     <SurveyExploreList
-      title={mainQuestionHeader ?? title}
+      title={title}
       items={otherRoleTexts}
-      question={questionHeaderOther ?? question}
+      question={question}
       description={description}
       numberOfResponses={numberOfResponsesOther}
       responseRate={otherResponseRate}

@@ -61,8 +61,6 @@ function categorizeCount(rawValue: string): { label: string; sortKey: number } |
 }
 
 const TrainingProgramsCount = () => {
-  const questionHeader =
-    'How many times training(s) or educational program(s) on digital sustainability did you participate in?  ';
   const barColor = useThemeColor('--color-ireb-berry');
   const titleColor = useThemeColor('--color-ireb-grey-01');
   const tickColor = useThemeColor('--color-ireb-grey-01');
@@ -145,7 +143,7 @@ const TrainingProgramsCount = () => {
     eligibleParticipants.length > 0 ? (numberOfResponses / eligibleParticipants.length) * 100 : 0;
 
   const { question: graphQuestion, description } = useGraphDescription('TrainingProgramsCount');
-  const question = questionHeader?.replace('times', '') ?? graphQuestion;
+  const question = graphQuestion;
 
   return (
     <GraphWrapper

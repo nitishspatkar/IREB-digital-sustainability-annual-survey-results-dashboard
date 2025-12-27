@@ -5,7 +5,6 @@ import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions';
 import { useGraphDescription } from '../../../hooks/useGraphDescription';
 
 type AwarenessStat = {
@@ -16,9 +15,6 @@ type AwarenessStat = {
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const DefinitionAwareness = () => {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === 'heardOfDigitalSustainabilityDefinition'
-  )?.header;
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const titleColor = useThemeColor('--color-ireb-grey-01');
@@ -107,15 +103,13 @@ const DefinitionAwareness = () => {
   const totalResponses = responses.length;
   const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
 
-  const { question: graphQuestion } = useGraphDescription('DefinitionAwareness');
-  const question = questionHeader ?? graphQuestion;
+  const { question: graphQuestion, description } = useGraphDescription('DefinitionAwareness');
+  const question = graphQuestion;
 
   return (
     <GraphWrapper
-      question={graphQuestion}
-      description={
-        question
-      } /* the question is wayyy to long, so for now we put it into the description */
+      question={question}
+      description={description}
       numberOfResponses={numberOfResponses}
       responseRate={responseRate}
     >

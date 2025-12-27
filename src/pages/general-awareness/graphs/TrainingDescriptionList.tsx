@@ -7,8 +7,6 @@ import { useGraphDescription } from '../../../hooks/useGraphDescription';
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingDescriptionList = () => {
-  const questionHeader =
-    'Please tell us a little about the training or educational programs on digital sustainability you participated in. ';
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');
 
@@ -37,7 +35,7 @@ const TrainingDescriptionList = () => {
   const responseRate =
     eligibleParticipants > 0 ? (numberOfResponses / eligibleParticipants) * 100 : 0;
 
-  const question = questionHeader ?? useGraphDescription('TrainingDescriptionList').question;
+  const question = useGraphDescription('TrainingDescriptionList').question;
   const description = useGraphDescription('TrainingDescriptionList').description;
 
   return (

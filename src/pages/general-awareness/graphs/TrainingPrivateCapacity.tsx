@@ -31,9 +31,6 @@ const capacityOptions = [
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const TrainingPrivateCapacity = () => {
-  const questionHeader =
-    'Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)? ';
-
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const barColor = useThemeColor('--color-ireb-grey-02');
@@ -148,7 +145,7 @@ const TrainingPrivateCapacity = () => {
     eligibleParticipants > 0 ? (numberOfResponses / eligibleParticipants) * 100 : 0;
 
   const { question: graphQuestion, description } = useGraphDescription('TrainingPrivateCapacity');
-  const question = questionHeader ?? graphQuestion;
+  const question = graphQuestion;
 
   return (
     <GraphWrapper
