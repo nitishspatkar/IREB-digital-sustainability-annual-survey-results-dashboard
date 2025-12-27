@@ -1,15 +1,13 @@
 import { useMemo } from 'react';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions.ts';
 import GraphWrapper from '../../../components/GraphWrapper';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const CustomerNotRequestingReasons = () => {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === 'customerNotRequestingReasons'
-  )?.header;
+  const questionHeader =
+    'Why do you think that your customers and users have not asked explicitly to build sustainable digital solutions? ';
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');
 

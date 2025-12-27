@@ -4,13 +4,11 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions.ts';
 import GraphWrapper from '../../../components/GraphWrapper';
 
 const OrganizationOffersTraining = () => {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === 'organizationOffersTraining'
-  )?.header;
+  const questionHeader =
+    'Does your organization offer training or resources to employees on sustainable software development practices? ';
   const yesColor = useThemeColor('--color-ireb-spring');
   const noColor = useThemeColor('--color-ireb-mandarin');
   const barColor = useThemeColor('--color-ireb-grey-02');

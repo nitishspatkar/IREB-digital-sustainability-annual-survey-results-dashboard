@@ -1,15 +1,13 @@
 import { useMemo } from 'react';
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions.ts';
 import GraphWrapper from '../../../components/GraphWrapper';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const OrganizationTrainingDescriptionList = () => {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === 'organizationTrainingDescription'
-  )?.header;
+  const questionHeader =
+    'Can you tell us a little about the training or resources your organization offers? ';
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const borderColor = useThemeColor('--color-ireb-grey-01');
 

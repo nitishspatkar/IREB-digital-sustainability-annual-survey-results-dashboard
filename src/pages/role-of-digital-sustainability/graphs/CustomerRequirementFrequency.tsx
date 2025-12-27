@@ -4,7 +4,6 @@ import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
-import { columnDefinitions } from '../../../data/SurveyColumnDefinitions.ts';
 import GraphWrapper from '../../../components/GraphWrapper';
 
 type FrequencyStat = {
@@ -24,9 +23,8 @@ const frequencyOrder = [
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const CustomerRequirementFrequency = () => {
-  const questionHeader = columnDefinitions.find(
-    (c) => c.key === 'customerRequirementFrequency'
-  )?.header;
+  const questionHeader =
+    'How often is the sustainability of your digital solutions an explicit requirement of the customer or the users? ';
   const barColor = useThemeColor('--color-ireb-berry');
   const tickColor = useThemeColor('--color-ireb-grey-01');
 
