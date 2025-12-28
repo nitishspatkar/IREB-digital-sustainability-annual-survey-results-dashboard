@@ -1,8 +1,8 @@
 // src/components/GraphViews.tsx
 import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
-import GraphWrapper from './GraphWrapper'; // Importiert den Wrapper aus dem gleichen Ordner
-import useThemeColor from '../hooks/useThemeColor'; // Pfad ggf. anpassen
+import GraphWrapper from './GraphWrapper';
+import useThemeColor from '../hooks/useThemeColor';
 
 // --- GEMEINSAME TYPEN ---
 interface BaseProps {
@@ -19,6 +19,10 @@ interface ChartProps extends BaseProps {
   layout: Partial<Layout>;
   hasExploreData: boolean;
   onExplore?: () => void;
+  // Comparison props
+  availableYears?: readonly string[];
+  compareYears?: string[];
+  onToggleCompareYear?: (year: string) => void;
 }
 
 export const SurveyChart = ({
@@ -31,6 +35,9 @@ export const SurveyChart = ({
   hasExploreData,
   onExplore,
   className,
+  availableYears,
+  compareYears,
+  onToggleCompareYear,
 }: ChartProps) => {
   return (
     <div className={className}>
@@ -41,6 +48,9 @@ export const SurveyChart = ({
         responseRate={responseRate}
         showExploreButton={hasExploreData}
         onExplore={onExplore}
+        availableYears={availableYears}
+        compareYears={compareYears}
+        onToggleCompareYear={onToggleCompareYear}
       >
         <div className="h-[520px]">
           <Plot

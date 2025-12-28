@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-interface GraphWrapperProps {
+export interface GraphWrapperProps {
   question: string;
   description?: string;
   numberOfResponses?: number;
@@ -10,6 +10,10 @@ interface GraphWrapperProps {
   showExploreButton?: boolean;
   onBack?: () => void;
   showBackButton?: boolean;
+  // --- Comparison Props ---
+  availableYears?: readonly string[];
+  compareYears?: string[];
+  onToggleCompareYear?: (year: string) => void;
 }
 
 const GraphWrapper = ({
@@ -22,6 +26,9 @@ const GraphWrapper = ({
   showExploreButton = false,
   onBack,
   showBackButton = false,
+  availableYears,
+  compareYears,
+  onToggleCompareYear,
 }: GraphWrapperProps) => {
   const showNumberOfResponses = typeof numberOfResponses === 'number';
   const showResponseRate = typeof responseRate === 'number';
@@ -65,26 +72,49 @@ const GraphWrapper = ({
         </div>
       </div>
 
-      {/* Action buttons */}
-      <div className="flex gap-4">
-        <button className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-berry text-white border-ireb-berry shadow-card">
-          Results
-        </button>
-        {showExploreButton && (
-          <button
-            onClick={onExplore}
-            className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
-          >
-            Explore
+      {/* Action buttons & Comparison Controls */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+        <div className="flex gap-4">
+          <button className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-berry text-white border-ireb-berry shadow-card">
+            Results
           </button>
-        )}
-        {showBackButton && (
-          <button
-            onClick={onBack}
-            className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
-          >
-            <span className="pr-2">←</span> Back to Overview
-          </button>
+          {showExploreButton && (
+            <button
+              onClick={onExplore}
+              className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
+            >
+              Explore
+            </button>
+          )}
+          {showBackButton && (
+            <button
+              onClick={onBack}
+              className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
+            >
+              <span className="pr-2">←</span> Back to Overview
+            </button>
+          )}
+        </div>
+
+        {/* Comparison Checkboxes */}
+        {availableYears && availableYears.length > 0 && onToggleCompareYear && (
+          <div className="flex items-center gap-4 font-mori text-sm text-ireb-grey-01 bg-white px-4 py-3 border border-ireb-superlight-berry">
+            <span className="font-bold text-ireb-berry">Compare:</span>
+            {availableYears.map((year) => (
+              <label
+                key={year}
+                className="flex items-center gap-2 cursor-pointer select-none hover:text-ireb-berry"
+              >
+                <input
+                  type="checkbox"
+                  checked={compareYears?.includes(year)}
+                  onChange={() => onToggleCompareYear(year)}
+                  className="accent-ireb-berry h-4 w-4 cursor-pointer"
+                />
+                {year}
+              </label>
+            ))}
+          </div>
         )}
       </div>
     </div>
