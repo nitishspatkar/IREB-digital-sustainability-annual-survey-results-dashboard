@@ -39,7 +39,7 @@
   },
   "DefinitionAwareness": {
     "question": "Have you heard of the term 'digital sustainability'?",
-    "description": "Have you heard of the term 'digital sustainability'?"
+    "description": "We consider Digital Sustainability an umbrella term for two aspects: Sustainable Software and Sustainable by Software. Sustainable Software concerns the sustainability of digital solutions in terms of their impact on environmental, economic, technical, social, and individual dimensions, including carbon footprint (Green IT) and process resources. Sustainable by Software describes digital solutions designed to achieve positive sustainability impacts to help individuals and organizations reach sustainability goals, such as such as the United Nations Sustainable Development Goals (SDGs) more effectively. Have you heard of this or a similar definition of digital sustainability before?"
   },
   "DiscussionFrequency": {
     "question": "How often do you discuss digital sustainability in your professional environment?",
