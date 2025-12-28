@@ -1,5 +1,5 @@
 import graphDescriptions2025 from '../data/graphDescriptions2025.json';
-import { useYear } from '../data/YearContext';
+import { useYear } from '../data/data-parsing-logic/YearContext';
 
 const descriptionsByYear: Record<string, typeof graphDescriptions2025> = {
   '2025': graphDescriptions2025,

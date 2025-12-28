@@ -3,7 +3,7 @@ import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 
 import GraphWrapper from '../../../components/GraphWrapper';
-import { useSurveyData } from '../../../data/SurveyContext';
+import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { useGraphDescription } from '../../../hooks/useGraphDescription';
 

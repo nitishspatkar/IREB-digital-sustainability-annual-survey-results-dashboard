@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { useSurveyData } from '../../data/SurveyContext';
+import { useSurveyData } from '../../data/data-parsing-logic/SurveyContext';
 
 // Deine Diagramm-Imports
 import DemographicAgeGroup from './graphs/DemographicAgeGroup';

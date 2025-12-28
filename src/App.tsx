@@ -2,9 +2,9 @@ import { useEffect, useState, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import YearSwitcher from './components/YearSwitcher'; // Import YearSwitcher
-import { SurveyProvider } from './data/SurveyContext';
-import { YearProvider } from './data/YearContext';
-import { SurveyRepository } from './data/SurveyRepository';
+import { SurveyProvider } from './data/data-parsing-logic/SurveyContext';
+import { YearProvider } from './data/data-parsing-logic/YearContext';
+import { SurveyRepository } from './data/data-parsing-logic/SurveyRepository';
 import './index.css';
 
 const Demographic = lazy(() => import('./pages/demographic/DemographicPage'));

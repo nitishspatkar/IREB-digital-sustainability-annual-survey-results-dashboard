@@ -6,8 +6,9 @@ import { SurveyResponse } from './SurveyResponse';
  * Uses SurveyCsvParser to load CSV data and wraps it in SurveyResponse objects.
  */
 export class SurveyRepository {
-  private static surveyModules = import.meta.glob<string>('./*.csv', {
-    as: 'raw',
+  private static surveyModules = import.meta.glob<string>('../*.csv', {
+    query: '?raw',
+    import: 'default',
     eager: true,
   });
   private static cachedSurveys: Map<string, SurveyResponse[]> = new Map();
@@ -27,7 +28,7 @@ export class SurveyRepository {
    * Results are cached for performance.
    */
   static getSurvey(year: string): readonly SurveyResponse[] {
-    const path = `./${year}.csv`;
+    const path = `../${year}.csv`;
     const csvContent = this.surveyModules[path];
 
     if (!csvContent) {

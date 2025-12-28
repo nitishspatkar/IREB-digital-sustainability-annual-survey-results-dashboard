@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { SurveyCsvParser, type SurveyRecord } from './SurveyCsvParser';
 
-const csvContent = readFileSync(new URL('./2025.csv', import.meta.url), 'utf-8');
+const csvContent = readFileSync(new URL('../2025.csv', import.meta.url), 'utf-8');
 
 describe('SurveyCsvParser', () => {
   const parser = SurveyCsvParser.fromCsv(csvContent);

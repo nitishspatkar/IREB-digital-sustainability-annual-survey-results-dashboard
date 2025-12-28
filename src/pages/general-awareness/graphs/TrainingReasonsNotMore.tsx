@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
-import { useSurveyData } from '../../../data/SurveyContext';
+import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
 import useThemeColor from '../../../hooks/useThemeColor';
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 import { useGraphDescription } from '../../../hooks/useGraphDescription';
