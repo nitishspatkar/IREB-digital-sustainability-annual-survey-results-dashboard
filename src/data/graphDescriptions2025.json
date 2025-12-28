@@ -42,7 +42,7 @@
     "description": "We consider Digital Sustainability an umbrella term for two aspects: Sustainable Software and Sustainable by Software. Sustainable Software concerns the sustainability of digital solutions in terms of their impact on environmental, economic, technical, social, and individual dimensions, including carbon footprint (Green IT) and process resources. Sustainable by Software describes digital solutions designed to achieve positive sustainability impacts to help individuals and organizations reach sustainability goals, such as such as the United Nations Sustainable Development Goals (SDGs) more effectively. Have you heard of this or a similar definition of digital sustainability before?"
   },
   "DiscussionFrequency": {
-    "question": "How often do you discuss digital sustainability in your professional environment?",
+    "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
     "description": "Shows the frequency of digital sustainability discussions among respondents."
   },
   "DiscussionFrequencyDetails": {
@@ -51,19 +51,19 @@
     "description": "Lists the free-text entries for the discussion frequency."
   },
   "TrainingDescriptionList": {
-    "question": "Please describe the training programs you attended",
+    "question": "Please tell us a little about the training or educational programs on digital sustainability you participated in.",
     "description": "Descriptions of training programs attended by respondents."
   },
   "TrainingParticipation": {
-    "question": "Have you participated in training on digital sustainability?",
+    "question": "Have you participated in one or more training or educational programs on digital sustainability?",
     "description": "Shows whether respondents have participated in digital sustainability training programs."
   },
   "TrainingPrivateCapacity": {
-    "question": "Did you attend training in your private capacity?",
+    "question": "Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)?",
     "description": "Shows whether respondents attended training on their own or through their organization."
   },
   "TrainingProgramsCount": {
-    "question": "How many training programs have you attended?",
+    "question": "How many training(s) or educational program(s) on digital sustainability did you participate in?",
     "description": "Distribution of the number of training programs attended by respondents."
   },
   "TrainingReasonsNo": {
