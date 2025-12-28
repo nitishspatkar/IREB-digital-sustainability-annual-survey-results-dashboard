@@ -10,6 +10,7 @@ interface GraphWrapperProps {
   showExploreButton?: boolean;
   onBack?: () => void;
   showBackButton?: boolean;
+  customComparisonToggle?: ReactNode; // New prop for custom toggle component
 }
 
 const GraphWrapper = ({
@@ -22,6 +23,7 @@ const GraphWrapper = ({
   showExploreButton = false,
   onBack,
   showBackButton = false,
+  customComparisonToggle, // Use new prop here
 }: GraphWrapperProps) => {
   const showNumberOfResponses = typeof numberOfResponses === 'number';
   const showResponseRate = typeof responseRate === 'number';
@@ -85,6 +87,10 @@ const GraphWrapper = ({
           >
             <span className="pr-2">←</span> Back to Overview
           </button>
+        )}
+
+        {customComparisonToggle && (
+          <div className="flex items-center gap-2 ml-auto">{customComparisonToggle}</div>
         )}
       </div>
     </div>
