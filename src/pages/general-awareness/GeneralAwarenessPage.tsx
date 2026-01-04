@@ -36,7 +36,6 @@ const EXPLORE_VIEWS = {
     Component: TrainingReasonsNotMoreDetails,
     anchorId: 'graph-training-reasons-not-more',
   },
-  // Hier können später weitere "Explore"-Views hinzugefügt werden (z.B. für TrainingReasonsNo)
 } as const;
 
 type ExploreViewId = keyof typeof EXPLORE_VIEWS;
