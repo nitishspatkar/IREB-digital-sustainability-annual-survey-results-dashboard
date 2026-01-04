@@ -1,5 +1,6 @@
-import { GenericChart } from '../../../components/GraphViews';
+import { GenericChart, ExploreView } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
+import { useGraphDescription } from '../../../hooks/useGraphDescription';
 import { DefinitionAwarenessByRole } from '../../explore-graphs/DefinitionAwarenessByRole';
 import { DefinitionAwarenessByExperience } from '../../explore-graphs/DefinitionAwarenessByExperience';
 import { DefinitionAwarenessByAge } from '../../explore-graphs/DefinitionAwarenessByAge';
@@ -53,8 +54,24 @@ const processData: ChartProcessor = (responses, palette) => {
   };
 };
 
+// The Details Component
+export const DefinitionAwarenessDetails = ({ onBack }: { onBack: () => void }) => {
+  const { question } = useGraphDescription('DefinitionAwareness');
+  return (
+    <ExploreView
+      title={question}
+      components={[
+        DefinitionAwarenessByRole,
+        DefinitionAwarenessByAge,
+        DefinitionAwarenessByExperience,
+      ]}
+      onBack={onBack}
+    />
+  );
+};
+
 // The Component
-export const DefinitionAwareness = () => {
+export const DefinitionAwareness = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="DefinitionAwareness"
@@ -68,6 +85,7 @@ export const DefinitionAwareness = () => {
         DefinitionAwarenessByAge,
         DefinitionAwarenessByExperience,
       ]}
+      onExplore={onExplore}
     />
   );
 };
