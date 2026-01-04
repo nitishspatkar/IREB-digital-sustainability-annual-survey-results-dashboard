@@ -147,11 +147,12 @@ export const ExploreView = ({ title, components, onBack }: ExploreViewProps) => 
 };
 
 // --- VIEW 4: GENERIC CHART (Flexible Chart View) ---
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useSurveyData } from '../data/data-parsing-logic/SurveyContext';
 import type { SurveyResponse } from '../data/data-parsing-logic/SurveyResponse';
 import { useGraphDescription } from '../hooks/useGraphDescription';
 import type { GraphId } from '../hooks/useGraphDescription';
+import { useGraphExplore } from '../contexts/GraphExploreContext';
 
 // 1. Define the Palette that will be passed to your logic
 export type ChartPalette = {
@@ -196,7 +197,7 @@ export const GenericChart = ({
   exploreComponents,
 }: GenericChartProps) => {
   // --- A. Boilerplate Hooks ---
-  const [isExploreOpen, setIsExploreOpen] = useState(false);
+  const { activeExploreId, setActiveExploreId } = useGraphExplore();
   const responses = useSurveyData();
   const { question, description } = useGraphDescription(graphId);
 
@@ -261,15 +262,21 @@ export const GenericChart = ({
     if (onExplore) {
       onExplore();
     } else if (exploreComponents && exploreComponents.length > 0) {
-      setIsExploreOpen(true);
+      setActiveExploreId(graphId);
     }
   };
 
   const handleBack = () => {
-    setIsExploreOpen(false);
+    setActiveExploreId(null);
   };
 
-  if (isExploreOpen && exploreComponents) {
+  // Hide this chart if another chart is being explored
+  if (activeExploreId !== null && activeExploreId !== graphId) {
+    return null;
+  }
+
+  // Show explore view if this chart is being explored
+  if (activeExploreId === graphId && exploreComponents) {
     return <ExploreView title={question} components={exploreComponents} onBack={handleBack} />;
   }
 

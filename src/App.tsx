@@ -5,6 +5,7 @@ import YearSwitcher from './components/YearSwitcher'; // Import YearSwitcher
 import { SurveyProvider } from './data/data-parsing-logic/SurveyContext';
 import { YearProvider } from './data/data-parsing-logic/YearContext';
 import { SurveyRepository } from './data/data-parsing-logic/SurveyRepository';
+import { GraphExploreProvider } from './contexts/GraphExploreContext';
 import './index.css';
 
 const Demographic = lazy(() => import('./pages/demographic/DemographicPage'));
@@ -53,19 +54,21 @@ function App() {
 
             <YearProvider value={activeYear}>
               <SurveyProvider value={surveyData}>
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/" element={<Navigate to="/demographics" replace />} />
-                    <Route path="/demographics" element={<Demographic />} />
-                    <Route path="/general-awareness" element={<GeneralAwareness />} />
-                    <Route
-                      path="/digital-sustainability-role"
-                      element={<DigitalSustainabilityRole />}
-                    />
-                    <Route path="/sustainability-tasks" element={<SustainabilityTasks />} />
-                    <Route path="*" element={<Navigate to="/demographics" replace />} />
-                  </Routes>
-                </Suspense>
+                <GraphExploreProvider>
+                  <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                      <Route path="/" element={<Navigate to="/demographics" replace />} />
+                      <Route path="/demographics" element={<Demographic />} />
+                      <Route path="/general-awareness" element={<GeneralAwareness />} />
+                      <Route
+                        path="/digital-sustainability-role"
+                        element={<DigitalSustainabilityRole />}
+                      />
+                      <Route path="/sustainability-tasks" element={<SustainabilityTasks />} />
+                      <Route path="*" element={<Navigate to="/demographics" replace />} />
+                    </Routes>
+                  </Suspense>
+                </GraphExploreProvider>
               </SurveyProvider>
             </YearProvider>
           </div>
