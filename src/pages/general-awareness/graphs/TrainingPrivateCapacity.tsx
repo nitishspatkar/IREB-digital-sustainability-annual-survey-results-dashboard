@@ -1,27 +1,10 @@
-import { useMemo } from 'react';
-import Plot from 'react-plotly.js';
-import type { Data, Layout } from 'plotly.js';
-
-import GraphWrapper from '../../../components/GraphWrapper';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
-
-type CapacityStat = {
-  label: string;
-  count: number;
-};
+import { GenericChart } from '../../../components/GraphViews';
+import type { ChartProcessor } from '../../../components/GraphViews';
 
 // Define the categories and their search terms
 const capacityOptions = [
-  {
-    label: 'Yes',
-    searchTerms: ['yes'],
-  },
-  {
-    label: 'No',
-    searchTerms: ['no'],
-  },
+  { label: 'Yes', searchTerms: ['yes'] },
+  { label: 'No', searchTerms: ['no'] },
   {
     label: 'My organization paid it on some occasions, and i paid it myself on others.',
     searchTerms: ['my organization paid it on some occasions, and i paid it myself on others.'],
@@ -30,61 +13,47 @@ const capacityOptions = [
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-const TrainingPrivateCapacity = () => {
-  const yesColor = useThemeColor('--color-ireb-spring');
-  const noColor = useThemeColor('--color-ireb-mandarin');
-  const barColor = useThemeColor('--color-ireb-grey-02');
-  const titleColor = useThemeColor('--color-ireb-grey-01');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
+// The Logic (Pure Function)
+// Precondition: Q10 = Yes (participatedInTraining)
+const processData: ChartProcessor = (responses, palette) => {
+  const counts = new Map<string, number>();
+  capacityOptions.forEach((opt) => counts.set(opt.label, 0));
 
-  const responses = useSurveyData();
+  const participants = responses.filter(
+    (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
+  );
 
-  const stats = useMemo<CapacityStat[]>(() => {
-    const counts = new Map<string, number>();
-    capacityOptions.forEach((opt) => counts.set(opt.label, 0));
+  participants.forEach((r) => {
+    const raw = normalize(r.raw.trainingPrivateCapacity ?? '').toLowerCase();
+    if (!raw || raw === 'n/a') return;
 
-    // 1. Filter for users who answered "Yes" to Q10
-    const participants = responses.filter(
-      (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
+    const matchedOption = capacityOptions.find((opt) =>
+      opt.searchTerms.some((term) => raw.startsWith(term))
     );
 
-    // 2. Count responses for Q13
-    participants.forEach((r) => {
-      const raw = normalize(r.raw.trainingPrivateCapacity ?? '').toLowerCase();
-      if (!raw || raw === 'n/a') return;
+    if (matchedOption) {
+      counts.set(matchedOption.label, (counts.get(matchedOption.label) ?? 0) + 1);
+    }
+  });
 
-      // Find which category this response matches
-      const matchedOption = capacityOptions.find((opt) =>
-        opt.searchTerms.some((term) => raw.startsWith(term))
-      );
+  const stats = Array.from(counts.entries())
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => a.count - b.count);
 
-      if (matchedOption) {
-        counts.set(matchedOption.label, (counts.get(matchedOption.label) ?? 0) + 1);
-      }
-    });
+  const total = stats.reduce((sum, s) => sum + s.count, 0);
 
-    // 3. Format and sort (ascending for horizontal bar)
-    return Array.from(counts.entries())
-      .map(([label, count]) => ({ label, count }))
-      .sort((a, b) => a.count - b.count);
-  }, [responses]);
-
-  const chartData = useMemo<Data[]>(() => {
-    return [
+  return {
+    traces: [
       {
         type: 'bar',
         orientation: 'h',
         x: stats.map((s) => s.count),
         y: stats.map((s) => s.label),
         marker: {
-          color: stats.map(function (s) {
-            if (s.label === 'Yes') {
-              return yesColor;
-            } else if (s.label === 'No') {
-              return noColor;
-            } else {
-              return barColor;
-            }
+          color: stats.map((s) => {
+            if (s.label === 'Yes') return palette.spring;
+            if (s.label === 'No') return palette.mandarin;
+            return palette.grey02;
           }),
         },
         text: stats.map((s) => s.count.toString()),
@@ -92,78 +61,36 @@ const TrainingPrivateCapacity = () => {
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 12,
-          color: tickColor,
+          color: palette.grey,
         },
         cliponaxis: false,
         hoverinfo: 'none',
       },
-    ];
-  }, [stats, barColor, yesColor, noColor, tickColor]);
+    ],
+    stats: {
+      numberOfResponses: total,
+      totalEligible: participants.length,
+    },
+  };
+};
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 60, r: 40, b: 60, l: 200 }, // Left margin for labels
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        title: {
-          text: 'Number of Respondents',
-          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        },
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-      yaxis: {
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-        automargin: true,
-        ticks: 'outside',
-        ticklen: 10,
-        tickcolor: 'rgba(0,0,0,0)',
-      },
-    }),
-    [titleColor, tickColor]
-  );
-
-  const eligibleParticipants = useMemo(() => {
-    return responses.filter(
-      (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
-    ).length;
-  }, [responses]);
-
-  console.log(stats);
-
-  const numberOfResponses = useMemo(() => {
-    return stats.reduce((sum, item) => sum + item.count, 0);
-  }, [stats]);
-
-  console.log(numberOfResponses);
-
-  const responseRate =
-    eligibleParticipants > 0 ? (numberOfResponses / eligibleParticipants) * 100 : 0;
-
-  const { question: graphQuestion, description } = useGraphDescription('TrainingPrivateCapacity');
-  const question = graphQuestion;
-
+// The Component
+const TrainingPrivateCapacity = () => {
   return (
-    <GraphWrapper
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-    >
-      <div className="h-[520px]">
-        <Plot
-          data={chartData}
-          layout={layout}
-          style={{ width: '100%', height: '100%' }}
-          useResizeHandler
-          config={{ displayModeBar: false, responsive: true }}
-        />
-      </div>
-    </GraphWrapper>
+    <GenericChart
+      graphId="TrainingPrivateCapacity"
+      processor={processData}
+      layout={{
+        margin: { t: 60, r: 40, b: 60, l: 200 },
+        xaxis: { title: { text: 'Number of Respondents' } },
+        yaxis: {
+          automargin: true,
+          ticks: 'outside',
+          ticklen: 10,
+          tickcolor: 'rgba(0,0,0,0)',
+        },
+      }}
+    />
   );
 };
 

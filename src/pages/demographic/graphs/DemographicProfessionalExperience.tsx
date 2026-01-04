@@ -1,130 +1,79 @@
-import { useMemo } from 'react';
-import Plot from 'react-plotly.js';
-import type { Data, Layout } from 'plotly.js';
+import { GenericChart } from '../../../components/GraphViews';
+import type { ChartProcessor } from '../../../components/GraphViews';
 
-import GraphWrapper from '../../../components/GraphWrapper';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
+// Helper to sort experience ranges naturally
+const sortExperience = (a: string, b: string) => {
+  const aMatch = a.match(/^(\d+)/);
+  const bMatch = b.match(/^(\d+)/);
 
-export function DemographicProfessionalExperience() {
-  const surveyResponses = useSurveyData();
-  const chartBarColor = useThemeColor('--color-ireb-berry');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
+  if (a.startsWith('Less than')) return -1;
+  if (b.startsWith('Less than')) return 1;
+  if (a.startsWith('More than')) return 1;
+  if (b.startsWith('More than')) return -1;
+  if (aMatch && bMatch) {
+    return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
+  }
 
-  const experienceStats = useMemo(() => {
-    const counts = new Map<string, number>();
+  return a.localeCompare(b);
+};
 
-    surveyResponses.forEach((response) => {
-      const experience = response.raw.professionalExperienceYears ?? '';
-      if (experience.length > 0 && experience.toLowerCase() !== 'n/a') {
-        counts.set(experience, (counts.get(experience) ?? 0) + 1);
-      }
-    });
+// The Logic (Pure Function)
+const processData: ChartProcessor = (responses, palette) => {
+  const counts = new Map<string, number>();
 
-    return Array.from(counts.entries())
-      .map(([experience, count]) => ({ experience, count }))
-      .sort((a, b) => {
-        const aMatch = a.experience.match(/^(\d+)/);
-        const bMatch = b.experience.match(/^(\d+)/);
+  responses.forEach((response) => {
+    const experience = response.raw.professionalExperienceYears ?? '';
+    if (experience.length > 0 && experience.toLowerCase() !== 'n/a') {
+      counts.set(experience, (counts.get(experience) ?? 0) + 1);
+    }
+  });
 
-        if (a.experience.startsWith('Less than')) return -1;
-        if (b.experience.startsWith('Less than')) return 1;
-        if (a.experience.startsWith('More than')) return 1;
-        if (b.experience.startsWith('More than')) return -1;
-        if (aMatch && bMatch) {
-          return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
-        }
+  const sorted = Array.from(counts.entries())
+    .map(([experience, count]) => ({ experience, count }))
+    .sort((a, b) => sortExperience(a.experience, b.experience));
 
-        return a.experience.localeCompare(b.experience);
-      });
-  }, [surveyResponses]);
+  const total = sorted.reduce((sum, stat) => sum + stat.count, 0);
 
-  const numberOfResponses = experienceStats.reduce((sum, stat) => sum + stat.count, 0);
-  const totalResponses = surveyResponses.length;
-  const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
-
-  const data: Data[] = useMemo(
-    () => [
+  return {
+    traces: [
       {
-        x: experienceStats.map((item) => item.experience),
-        y: experienceStats.map((item) => item.count),
         type: 'bar',
-        marker: {
-          color: chartBarColor,
-        },
-        text: experienceStats.map((item) => item.count.toString()),
+        x: sorted.map((item) => item.experience),
+        y: sorted.map((item) => item.count),
+        marker: { color: palette.berry },
+        text: sorted.map((item) => item.count.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 12,
-          color: tickColor,
+          color: palette.grey,
         },
         cliponaxis: false,
         hoverinfo: 'none',
       },
     ],
-    [experienceStats, chartBarColor, tickColor]
-  );
+    stats: {
+      numberOfResponses: total,
+    },
+  };
+};
 
-  const layout: Partial<Layout> = useMemo(
-    () => ({
-      margin: { t: 50, r: 40, b: 60, l: 60 },
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        automargin: true,
-        title: {
-          text: 'Years of Experience',
-          font: {
-            family: 'PP Mori, sans-serif',
-            size: 12,
-            color: tickColor,
-          },
-        },
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-      },
-      yaxis: {
-        title: {
-          text: 'Number of Respondents',
-          font: {
-            family: 'PP Mori, sans-serif',
-            size: 12,
-            color: tickColor,
-          },
-        },
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-      },
-    }),
-    [tickColor]
-  );
-
-  const { question, description } = useGraphDescription('DemographicProfessionalExperience');
-
+// The Component
+export function DemographicProfessionalExperience() {
   return (
-    <GraphWrapper
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-    >
-      <div className="h-[520px]">
-        <Plot
-          data={data}
-          layout={layout}
-          style={{ width: '100%', height: '100%' }}
-          useResizeHandler
-          config={{ displayModeBar: false, responsive: true }}
-        />
-      </div>
-    </GraphWrapper>
+    <GenericChart
+      graphId="DemographicProfessionalExperience"
+      processor={processData}
+      layout={{
+        margin: { t: 50, r: 40, b: 60, l: 60 },
+        xaxis: {
+          automargin: true,
+          title: { text: 'Years of Experience' },
+        },
+        yaxis: {
+          title: { text: 'Number of Respondents' },
+        },
+      }}
+    />
   );
 }

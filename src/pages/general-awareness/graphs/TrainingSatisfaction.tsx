@@ -1,129 +1,74 @@
-import { useMemo } from 'react';
-import Plot from 'react-plotly.js';
-import type { Data, Layout } from 'plotly.js';
-
-import GraphWrapper from '../../../components/GraphWrapper';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
-
-type SatisfactionStat = {
-  label: string;
-  count: number;
-};
+import { GenericChart } from '../../../components/GraphViews';
+import type { ChartProcessor } from '../../../components/GraphViews';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-const TrainingSatisfaction = () => {
-  const { question, description } = useGraphDescription('TrainingSatisfaction');
-  const yesColor = useThemeColor('--color-ireb-spring');
-  const noColor = useThemeColor('--color-ireb-mandarin');
-  const titleColor = useThemeColor('--color-ireb-grey-01');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
+// The Logic (Pure Function)
+// This chart only applies to respondents who participated in training
+const processData: ChartProcessor = (responses, palette) => {
+  // Filter to only participants who said 'Yes' to training participation
+  const participants = responses.filter(
+    (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
+  );
 
-  const responses = useSurveyData();
+  const counts = new Map<string, number>();
+  counts.set('Yes', 0);
+  counts.set('No', 0);
 
-  const stats = useMemo<SatisfactionStat[]>(() => {
-    const counts = new Map<string, number>();
+  participants.forEach((r) => {
+    const raw = normalize(r.raw.trainingSatisfaction ?? '');
+    if (!raw || raw.toLowerCase() === 'n/a') return;
 
-    const participants = responses.filter(
-      (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
-    );
+    const lower = raw.toLowerCase();
+    if (lower === 'yes') {
+      counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+    } else if (lower === 'no') {
+      counts.set('No', (counts.get('No') ?? 0) + 1);
+    }
+  });
 
-    participants.forEach((r) => {
-      const raw = normalize(r.raw.trainingSatisfaction ?? '');
-      if (!raw || raw.toLowerCase() === 'n/a') return;
+  const labels = ['Yes', 'No'];
+  const values = labels.map((label) => counts.get(label) ?? 0);
+  const total = values.reduce((a, b) => a + b, 0);
 
-      let key = raw;
-      const lower = raw.toLowerCase();
-      if (lower === 'yes') key = 'Yes';
-      else if (lower === 'no') key = 'No';
-
-      counts.set(key, (counts.get(key) ?? 0) + 1);
-    });
-
-    const order = ['Yes', 'No'];
-    const items = Array.from(counts.entries()).map(([label, count]) => ({
-      label,
-      count,
-    }));
-
-    order.forEach((label) => {
-      if (!counts.has(label)) items.push({ label, count: 0 });
-    });
-
-    return items.sort((a, b) => order.indexOf(a.label) - order.indexOf(b.label));
-  }, [responses]);
-
-  const chartData = useMemo<Data[]>(() => {
-    return [
+  return {
+    traces: [
       {
-        x: stats.map((s) => s.label),
-        y: stats.map((s) => s.count),
         type: 'bar',
+        x: labels,
+        y: values,
         marker: {
-          color: stats.map((s) => (s.label === 'Yes' ? yesColor : noColor)),
+          color: labels.map((label) => (label === 'Yes' ? palette.spring : palette.mandarin)),
         },
-        // --- CHANGES START HERE ---
-        text: stats.map((s) => s.count.toString()),
+        text: values.map((v) => v.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 12,
-          color: tickColor,
+          color: palette.grey,
         },
         cliponaxis: false,
-        // --- CHANGES END HERE ---
         hoverinfo: 'none',
       },
-    ];
-  }, [stats, yesColor, noColor, tickColor]); // Added tickColor
+    ],
+    stats: {
+      numberOfResponses: total,
+      totalEligible: participants.length, // Only training participants are eligible
+    },
+  };
+};
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 50, r: 0, b: 60, l: 40 }, // Changed t: 30 to t: 50
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-      yaxis: {
-        title: {
-          text: 'Number of Respondents',
-          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        },
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-    }),
-    [titleColor, tickColor]
-  );
-
-  const eligibleParticipants = responses.filter(
-    (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
-  ).length;
-
-  const numberOfResponses = stats.reduce((sum, s) => sum + s.count, 0);
-
-  const responseRate =
-    eligibleParticipants > 0 ? (numberOfResponses / eligibleParticipants) * 100 : 0;
-
+// The Component
+const TrainingSatisfaction = () => {
   return (
-    <GraphWrapper
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-    >
-      <div className="h-[520px]">
-        <Plot
-          data={chartData}
-          layout={layout}
-          style={{ width: '100%', height: '100%' }}
-          useResizeHandler
-          config={{ displayModeBar: false, responsive: true }}
-        />
-      </div>
-    </GraphWrapper>
+    <GenericChart
+      graphId="TrainingSatisfaction"
+      processor={processData}
+      layout={{
+        margin: { t: 50, r: 0, b: 60, l: 40 },
+        yaxis: { title: { text: 'Number of Respondents' } },
+      }}
+    />
   );
 };
 

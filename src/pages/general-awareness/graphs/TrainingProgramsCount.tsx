@@ -1,11 +1,5 @@
-import { useMemo } from 'react';
-import Plot from 'react-plotly.js';
-import type { Data, Layout } from 'plotly.js';
-
-import GraphWrapper from '../../../components/GraphWrapper';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
+import { GenericChart } from '../../../components/GraphViews';
+import type { ChartProcessor } from '../../../components/GraphViews';
 
 type CountStat = {
   label: string;
@@ -60,108 +54,70 @@ function categorizeCount(rawValue: string): { label: string; sortKey: number } |
   return { label: value, sortKey: Number.POSITIVE_INFINITY };
 }
 
-const TrainingProgramsCount = () => {
-  const barColor = useThemeColor('--color-ireb-berry');
-  const titleColor = useThemeColor('--color-ireb-grey-01');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
+// The Logic (Pure Function)
+// Precondition: Q10 = Yes (participatedInTraining)
+const processData: ChartProcessor = (responses, palette) => {
+  const counts = new Map<string, CountStat>();
 
-  const responses = useSurveyData();
+  const participants = responses.filter(
+    (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
+  );
 
-  const stats = useMemo<CountStat[]>(() => {
-    const counts = new Map<string, CountStat>();
+  participants.forEach((r) => {
+    const cat = categorizeCount(r.raw.trainingCount ?? '');
+    if (!cat) return;
+    const key = cat.label;
+    const existing = counts.get(key);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      counts.set(key, { label: cat.label, sortKey: cat.sortKey, count: 1 });
+    }
+  });
 
-    const participants = responses.filter(
-      (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
-    );
+  const stats = Array.from(counts.values()).sort((a, b) => a.sortKey - b.sortKey);
+  const total = stats.reduce((sum, s) => sum + s.count, 0);
 
-    participants.forEach((r) => {
-      const cat = categorizeCount(r.raw.trainingCount ?? '');
-      if (!cat) return;
-      const key = cat.label;
-      const existing = counts.get(key);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        counts.set(key, { label: cat.label, sortKey: cat.sortKey, count: 1 });
-      }
-    });
-
-    return Array.from(counts.values()).sort((a, b) => a.sortKey - b.sortKey);
-  }, [responses]);
-
-  const chartData = useMemo<Data[]>(() => {
-    return [
+  return {
+    traces: [
       {
+        type: 'bar',
         x: stats.map((s) => s.label),
         y: stats.map((s) => s.count),
-        type: 'bar',
-        marker: { color: barColor },
+        marker: { color: palette.berry },
         text: stats.map((s) => s.count.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 12,
-          color: tickColor,
+          color: palette.grey,
         },
         cliponaxis: false,
         hoverinfo: 'none',
       },
-    ];
-  }, [stats, barColor, tickColor]);
+    ],
+    stats: {
+      numberOfResponses: total,
+      totalEligible: participants.length,
+    },
+  };
+};
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 50, r: 0, b: 60, l: 48 }, // Changed b: 80 to b: 60
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        type: 'category',
-        title: {
-          text: 'Number of trainings',
-          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        },
-        // --- REMOVED tickangle: -30 ---
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-      yaxis: {
-        title: {
-          text: 'Number of respondents',
-          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        },
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-    }),
-    [titleColor, tickColor]
-  );
-
-  const eligibleParticipants = responses.filter(
-    (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
-  );
-
-  const numberOfResponses = stats.reduce((sum, s) => sum + s.count, 0);
-  const responseRate =
-    eligibleParticipants.length > 0 ? (numberOfResponses / eligibleParticipants.length) * 100 : 0;
-
-  const { question: graphQuestion, description } = useGraphDescription('TrainingProgramsCount');
-  const question = graphQuestion;
-
+// The Component
+const TrainingProgramsCount = () => {
   return (
-    <GraphWrapper
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-    >
-      <div className="h-[520px]">
-        <Plot
-          data={chartData}
-          layout={layout}
-          style={{ width: '100%', height: '100%' }}
-          useResizeHandler
-          config={{ displayModeBar: false, responsive: true }}
-        />
-      </div>
-    </GraphWrapper>
+    <GenericChart
+      graphId="TrainingProgramsCount"
+      processor={processData}
+      layout={{
+        margin: { t: 50, r: 0, b: 60, l: 48 },
+        xaxis: {
+          type: 'category',
+          title: { text: 'Number of trainings' },
+        },
+        yaxis: { title: { text: 'Number of respondents' } },
+      }}
+    />
   );
 };
 

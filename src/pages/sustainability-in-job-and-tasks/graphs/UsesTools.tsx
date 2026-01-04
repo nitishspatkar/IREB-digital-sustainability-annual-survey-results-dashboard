@@ -1,132 +1,79 @@
-import { useMemo } from 'react';
-import Plot from 'react-plotly.js';
-import type { Data, Layout } from 'plotly.js';
-
-import GraphWrapper from '../../../components/GraphWrapper';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
+import { GenericChart } from '../../../components/GraphViews';
+import type { ChartProcessor } from '../../../components/GraphViews';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-const UsesTools = () => {
-  const { question, description } = useGraphDescription('UsesTools');
+// The Logic (Pure Function)
+// Precondition: Q28 = Yes (personIncorporatesSustainability)
+const processData: ChartProcessor = (responses, palette) => {
+  const filteredResponses = responses.filter(
+    (r) => normalize(r.raw.personIncorporatesSustainability ?? '').toLowerCase() === 'yes'
+  );
 
-  const yesColor = useThemeColor('--color-ireb-spring');
-  const noColor = useThemeColor('--color-ireb-mandarin');
-  const barColor = useThemeColor('--color-ireb-grey-02');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
+  const counts = new Map<string, number>();
+  counts.set('Yes', 0);
+  counts.set('No', 0);
+  counts.set('Not sure', 0);
 
-  const responses = useSurveyData();
+  filteredResponses.forEach((r) => {
+    const raw = normalize(r.raw.usesTools ?? '');
+    const lower = raw.toLowerCase();
 
-  const stats = useMemo(() => {
-    const counts = new Map<string, number>();
-    counts.set('Yes', 0);
-    counts.set('No', 0);
-    counts.set('Not sure', 0);
+    if (lower === 'yes') {
+      counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+    } else if (lower === 'no') {
+      counts.set('No', (counts.get('No') ?? 0) + 1);
+    } else if (lower === 'not sure') {
+      counts.set('Not sure', (counts.get('Not sure') ?? 0) + 1);
+    }
+  });
 
-    // --- Precondition: Q28 = Yes ---
-    const filteredResponses = responses.filter(
-      (r) => normalize(r.raw.personIncorporatesSustainability ?? '').toLowerCase() === 'yes'
-    );
+  const labels = ['Yes', 'No', 'Not sure'];
+  const values = labels.map((label) => counts.get(label) ?? 0);
+  const total = values.reduce((a, b) => a + b, 0);
 
-    filteredResponses.forEach((r) => {
-      // Key for Q31
-      const raw = normalize(r.raw.usesTools ?? '');
-      const lower = raw.toLowerCase();
-
-      if (lower === 'yes') {
-        counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
-      } else if (lower === 'no') {
-        counts.set('No', (counts.get('No') ?? 0) + 1);
-      } else if (lower === 'not sure') {
-        counts.set('Not sure', (counts.get('Not sure') ?? 0) + 1);
-      }
-    });
-
-    const labels = ['Yes', 'No', 'Not sure'];
-
-    return {
-      labels,
-      values: labels.map((label) => counts.get(label) ?? 0),
-      totalEligible: filteredResponses.length, // <--- EXPORTED FROM SCOPE
-    };
-  }, [responses]);
-
-  const data = useMemo<Data[]>(
-    () => [
+  return {
+    traces: [
       {
-        x: stats.labels,
-        y: stats.values,
         type: 'bar',
+        x: labels,
+        y: values,
         marker: {
-          color: stats.labels.map((label) => {
-            if (label === 'Yes') {
-              return yesColor;
-            } else if (label === 'No') {
-              return noColor;
-            } else {
-              return barColor;
-            }
+          color: labels.map((label) => {
+            if (label === 'Yes') return palette.spring;
+            if (label === 'No') return palette.mandarin;
+            return palette.grey02;
           }),
         },
-        text: stats.values.map((v) => v.toString()),
+        text: values.map((v) => v.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 12,
-          color: tickColor,
+          color: palette.grey,
         },
         cliponaxis: false,
         hoverinfo: 'none',
       },
     ],
-    [stats, barColor, yesColor, noColor, tickColor]
-  );
+    stats: {
+      numberOfResponses: total,
+      totalEligible: filteredResponses.length,
+    },
+  };
+};
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 50, r: 20, b: 60, l: 48 },
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-      yaxis: {
-        title: {
-          text: 'Number of Respondents',
-          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        },
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-    }),
-    [tickColor]
-  );
-
-  const numberOfResponses = stats.values.reduce((a, b) => a + b, 0);
-
-  // Use the value exported from useMemo
-  const totalResponses = stats.totalEligible;
-
-  const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
-
+// The Component
+const UsesTools = () => {
   return (
-    <GraphWrapper
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-    >
-      <div className="h-[520px]">
-        <Plot
-          data={data}
-          layout={layout}
-          config={{ displayModeBar: false, responsive: true }}
-          useResizeHandler
-          style={{ width: '100%', height: '100%' }}
-        />
-      </div>
-    </GraphWrapper>
+    <GenericChart
+      graphId="UsesTools"
+      processor={processData}
+      layout={{
+        margin: { t: 50, r: 20, b: 60, l: 48 },
+        yaxis: { title: { text: 'Number of Respondents' } },
+      }}
+    />
   );
 };
 

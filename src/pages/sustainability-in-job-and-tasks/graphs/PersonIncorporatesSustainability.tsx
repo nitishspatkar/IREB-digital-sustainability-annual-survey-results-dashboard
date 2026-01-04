@@ -1,115 +1,66 @@
-import { useMemo } from 'react';
-import Plot from 'react-plotly.js';
-import type { Data, Layout } from 'plotly.js';
-
-import GraphWrapper from '../../../components/GraphWrapper';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
+import { GenericChart } from '../../../components/GraphViews';
+import type { ChartProcessor } from '../../../components/GraphViews';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-const PersonIncorporatesSustainability = () => {
-  const { question, description } = useGraphDescription('PersonIncorporatesSustainability');
-  const yesColor = useThemeColor('--color-ireb-spring');
-  const noColor = useThemeColor('--color-ireb-mandarin');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
+// The Logic (Pure Function)
+const processData: ChartProcessor = (responses, palette) => {
+  const counts = new Map<string, number>();
+  counts.set('Yes', 0);
+  counts.set('No', 0);
 
-  const responses = useSurveyData();
+  responses.forEach((r) => {
+    const raw = normalize(r.raw.personIncorporatesSustainability ?? '');
+    const lower = raw.toLowerCase();
 
-  const stats = useMemo(() => {
-    const counts = new Map<string, number>();
-    counts.set('Yes', 0);
-    counts.set('No', 0);
+    if (lower === 'yes') {
+      counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+    } else if (lower === 'no') {
+      counts.set('No', (counts.get('No') ?? 0) + 1);
+    }
+  });
 
-    responses.forEach((r) => {
-      // Key for Q28
-      const raw = normalize(r.raw.personIncorporatesSustainability ?? '');
-      const lower = raw.toLowerCase();
+  const labels = ['Yes', 'No'];
+  const values = labels.map((label) => counts.get(label) ?? 0);
+  const total = values.reduce((a, b) => a + b, 0);
 
-      if (lower === 'yes') {
-        counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
-      } else if (lower === 'no') {
-        counts.set('No', (counts.get('No') ?? 0) + 1);
-      }
-    });
-
-    const labels = ['Yes', 'No'];
-    return {
-      labels,
-      values: labels.map((label) => counts.get(label) ?? 0),
-    };
-  }, [responses]);
-
-  const data = useMemo<Data[]>(
-    () => [
+  return {
+    traces: [
       {
-        x: stats.labels,
-        y: stats.values,
         type: 'bar',
+        x: labels,
+        y: values,
         marker: {
-          color: stats.labels.map((label) => {
-            if (label === 'Yes') {
-              return yesColor;
-            } else if (label === 'No') {
-              return noColor;
-            }
-          }),
+          color: labels.map((label) => (label === 'Yes' ? palette.spring : palette.mandarin)),
         },
-        text: stats.values.map((v) => v.toString()),
+        text: values.map((v) => v.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 12,
-          color: tickColor,
+          color: palette.grey,
         },
         cliponaxis: false,
         hoverinfo: 'none',
       },
     ],
-    [stats, yesColor, noColor, tickColor]
-  );
+    stats: {
+      numberOfResponses: total,
+    },
+  };
+};
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 50, r: 20, b: 60, l: 48 },
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-      yaxis: {
-        title: {
-          text: 'Number of Respondents',
-          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        },
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-    }),
-    [tickColor]
-  );
-
-  const numberOfResponses = stats.values.reduce((a, b) => a + b, 0);
-  const totalResponses = responses.length;
-  const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
-
+// The Component
+const PersonIncorporatesSustainability = () => {
   return (
-    <GraphWrapper
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-    >
-      <div className="h-[520px]">
-        <Plot
-          data={data}
-          layout={layout}
-          config={{ displayModeBar: false, responsive: true }}
-          useResizeHandler
-          style={{ width: '100%', height: '100%' }}
-        />
-      </div>
-    </GraphWrapper>
+    <GenericChart
+      graphId="PersonIncorporatesSustainability"
+      processor={processData}
+      layout={{
+        margin: { t: 50, r: 20, b: 60, l: 48 },
+        yaxis: { title: { text: 'Number of Respondents' } },
+      }}
+    />
   );
 };
 
