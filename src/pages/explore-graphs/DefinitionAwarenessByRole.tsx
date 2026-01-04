@@ -117,7 +117,6 @@ export const DefinitionAwarenessByRole = ({ onBack }: { onBack: () => void }) =>
       layout={layout}
       hasExploreData={false}
       showBackButton={true}
-      showExploreTitle={true}
       onBack={onBack}
     />
   );

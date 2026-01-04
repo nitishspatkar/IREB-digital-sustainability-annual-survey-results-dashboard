@@ -1,140 +1,73 @@
-import { useMemo } from 'react';
-import type { Data, Layout } from 'plotly.js';
-
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
-import { SurveyChart } from '../../../components/GraphViews.tsx';
-import { DefinitionAwarenessByRole } from '../../explore-graphs/DefinitionAwarenessByRole.tsx';
-import { DefinitionAwarenessByExperience } from '../../explore-graphs/DefinitionAwarenessByExperience.tsx';
-import { DefinitionAwarenessByAge } from '../../explore-graphs/DefinitionAwarenessByAge.tsx';
-
-type AwarenessStat = {
-  label: string;
-  count: number;
-};
+import { GenericChart } from '../../../components/GraphViews';
+import type { ChartProcessor } from '../../../components/GraphViews';
+import { DefinitionAwarenessByRole } from '../../explore-graphs/DefinitionAwarenessByRole';
+import { DefinitionAwarenessByExperience } from '../../explore-graphs/DefinitionAwarenessByExperience';
+import { DefinitionAwarenessByAge } from '../../explore-graphs/DefinitionAwarenessByAge';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-export const DefinitionAwareness = ({
-  onExplore,
-  className,
-}: {
-  onExplore: () => void;
-  className?: string;
-}) => {
-  const yesColor = useThemeColor('--color-ireb-spring');
-  const noColor = useThemeColor('--color-ireb-mandarin');
-  const titleColor = useThemeColor('--color-ireb-grey-01');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
+// The Logic (Pure Function)
+const processData: ChartProcessor = (responses, palette) => {
+  const counts = new Map<string, number>();
+  counts.set('Yes', 0);
+  counts.set('No', 0);
 
-  const responses = useSurveyData();
+  responses.forEach((r) => {
+    const raw = normalize(r.raw.heardOfDigitalSustainabilityDefinition ?? '');
+    const lower = raw.toLowerCase();
 
-  const stats = useMemo<AwarenessStat[]>(() => {
-    const counts = new Map<string, number>();
-    counts.set('Yes', 0);
-    counts.set('No', 0);
+    if (lower === 'yes') {
+      counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+    } else if (lower === 'no') {
+      counts.set('No', (counts.get('No') ?? 0) + 1);
+    }
+  });
 
-    responses.forEach((r) => {
-      const raw = normalize(r.raw.heardOfDigitalSustainabilityDefinition ?? '');
-      const lower = raw.toLowerCase();
+  const labels = ['Yes', 'No'];
+  const values = labels.map((label) => counts.get(label) ?? 0);
+  const total = values.reduce((a, b) => a + b, 0);
 
-      if (lower === 'yes') {
-        counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
-      } else if (lower === 'no') {
-        counts.set('No', (counts.get('No') ?? 0) + 1);
-      }
-    });
-
-    return [
-      { label: 'Yes', count: counts.get('Yes') ?? 0 },
-      { label: 'No', count: counts.get('No') ?? 0 },
-    ];
-  }, [responses]);
-
-  const chartData = useMemo<Data[]>(() => {
-    return [
+  return {
+    traces: [
       {
-        x: stats.map((s) => s.label),
-        y: stats.map((s) => s.count),
         type: 'bar',
+        x: labels,
+        y: values,
         marker: {
-          color: stats.map((s) => (s.label === 'Yes' ? yesColor : noColor)),
+          color: labels.map((label) => (label === 'Yes' ? palette.spring : palette.mandarin)),
         },
-        // --- CHANGES START HERE ---
-        text: stats.map((s) => s.count.toString()),
+        text: values.map((v) => v.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 12,
-          color: tickColor,
+          color: palette.grey,
         },
         cliponaxis: false,
-        // --- CHANGES END HERE ---
         hoverinfo: 'none',
       },
-    ];
-  }, [stats, yesColor, noColor, tickColor]); // Added tickColor
-
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 60, r: 20, b: 60, l: 48 }, // t: 60 is already good
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-      },
-      yaxis: {
-        title: {
-          text: 'Number of Respondents',
-          font: {
-            family: 'PP Mori, sans-serif',
-            size: 12,
-            color: tickColor,
-          },
-        },
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-      },
-    }),
-    [titleColor, tickColor]
-  );
-
-  const numberOfResponses = stats.reduce((sum, stat) => sum + stat.count, 0);
-  const totalResponses = responses.length;
-  const responseRate = totalResponses > 0 ? (numberOfResponses / totalResponses) * 100 : 0;
-
-  const { question: graphQuestion, description } = useGraphDescription('DefinitionAwareness');
-  const question = graphQuestion;
-
-  return (
-    <SurveyChart
-      className={className}
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-      data={chartData}
-      layout={layout}
-      hasExploreData={true}
-      onExplore={onExplore}
-    />
-  );
+    ],
+    stats: {
+      numberOfResponses: total,
+    },
+  };
 };
 
-export const DefinitionAwarenessDetails = ({ onBack }: { onBack: () => void }) => {
+// The Component
+export const DefinitionAwareness = () => {
   return (
-    <div className="space-y-12">
-      <DefinitionAwarenessByRole onBack={onBack} />
-      <DefinitionAwarenessByAge onBack={onBack} />
-      <DefinitionAwarenessByExperience onBack={onBack} />
-    </div>
+    <GenericChart
+      graphId="DefinitionAwareness"
+      processor={processData}
+      layout={{
+        margin: { t: 60, r: 20, b: 60, l: 48 },
+        yaxis: { title: { text: 'Number of Respondents' } },
+      }}
+      exploreComponents={[
+        DefinitionAwarenessByRole,
+        DefinitionAwarenessByAge,
+        DefinitionAwarenessByExperience,
+      ]}
+    />
   );
 };

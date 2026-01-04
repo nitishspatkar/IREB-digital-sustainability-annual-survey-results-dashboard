@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { DefinitionAwareness, DefinitionAwarenessDetails } from './graphs/DefinitionAwareness';
+import { DefinitionAwareness } from './graphs/DefinitionAwareness';
 import { DiscussionFrequency, DiscussionFrequencyDetails } from './graphs/DiscussionFrequency';
 import TrainingDescriptionList from './graphs/TrainingDescriptionList';
 import TrainingParticipation from './graphs/TrainingParticipation';
@@ -20,10 +20,6 @@ const GraphAnchor = ({ id, children }: { id: string; children: React.ReactNode }
 
 // --- CONFIGURATION ---
 const EXPLORE_VIEWS = {
-  definition_awareness: {
-    Component: DefinitionAwarenessDetails,
-    anchorId: 'graph-definition-awareness',
-  },
   discussion_freq: {
     Component: DiscussionFrequencyDetails,
     anchorId: 'graph-discussion-freq',
@@ -67,7 +63,7 @@ const GeneralAwareness = () => {
 
       <div className="grid grid-cols-1 gap-18">
         <GraphAnchor id="graph-definition-awareness">
-          <DefinitionAwareness onExplore={() => setActiveView('definition_awareness')} />
+          <DefinitionAwareness />
         </GraphAnchor>
 
         <GraphAnchor id="graph-discussion-freq">

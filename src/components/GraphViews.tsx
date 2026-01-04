@@ -124,8 +124,30 @@ export const SurveyExploreList = ({
   );
 };
 
-// --- VIEW 3: GENERIC CHART (Flexible Chart View) ---
-import { useMemo } from 'react';
+// --- VIEW 3: EXPLORE VIEW (Multiple Charts Page) ---
+export type ExploreComponent = React.ComponentType<{ onBack: () => void }>;
+
+interface ExploreViewProps {
+  title: string;
+  components: ExploreComponent[];
+  onBack: () => void;
+}
+
+export const ExploreView = ({ title, components, onBack }: ExploreViewProps) => {
+  return (
+    <div className="space-y-12">
+      <h1 className="text-2xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
+        Explore: {title}
+      </h1>
+      {components.map((Component, index) => (
+        <Component key={index} onBack={onBack} />
+      ))}
+    </div>
+  );
+};
+
+// --- VIEW 4: GENERIC CHART (Flexible Chart View) ---
+import { useMemo, useState } from 'react';
 import { useSurveyData } from '../data/data-parsing-logic/SurveyContext';
 import type { SurveyResponse } from '../data/data-parsing-logic/SurveyResponse';
 import { useGraphDescription } from '../hooks/useGraphDescription';
@@ -163,10 +185,18 @@ interface GenericChartProps {
   processor: ChartProcessor; // The unique logic function
   layout?: Partial<Layout>; // Unique layout overrides
   onExplore?: () => void;
+  exploreComponents?: ExploreComponent[]; // Optional array of explore components
 }
 
-export const GenericChart = ({ graphId, processor, layout = {}, onExplore }: GenericChartProps) => {
+export const GenericChart = ({
+  graphId,
+  processor,
+  layout = {},
+  onExplore,
+  exploreComponents,
+}: GenericChartProps) => {
   // --- A. Boilerplate Hooks ---
+  const [isExploreOpen, setIsExploreOpen] = useState(false);
   const responses = useSurveyData();
   const { question, description } = useGraphDescription(graphId);
 
@@ -227,6 +257,22 @@ export const GenericChart = ({ graphId, processor, layout = {}, onExplore }: Gen
     yaxis: { ...defaultLayout.yaxis, ...layout.yaxis },
   };
 
+  const handleExplore = () => {
+    if (onExplore) {
+      onExplore();
+    } else if (exploreComponents && exploreComponents.length > 0) {
+      setIsExploreOpen(true);
+    }
+  };
+
+  const handleBack = () => {
+    setIsExploreOpen(false);
+  };
+
+  if (isExploreOpen && exploreComponents) {
+    return <ExploreView title={question} components={exploreComponents} onBack={handleBack} />;
+  }
+
   return (
     <SurveyChart
       question={question}
@@ -235,8 +281,8 @@ export const GenericChart = ({ graphId, processor, layout = {}, onExplore }: Gen
       responseRate={responseRate}
       data={traces}
       layout={finalLayout}
-      hasExploreData={!!onExplore}
-      onExplore={onExplore}
+      hasExploreData={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
+      onExplore={handleExplore}
     />
   );
 };
