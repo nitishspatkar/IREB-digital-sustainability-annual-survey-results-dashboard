@@ -41,6 +41,18 @@
     "question": "Have you heard of the term 'digital sustainability'?",
     "description": "We consider Digital Sustainability an umbrella term for two aspects: Sustainable Software and Sustainable by Software. Sustainable Software concerns the sustainability of digital solutions in terms of their impact on environmental, economic, technical, social, and individual dimensions, including carbon footprint (Green IT) and process resources. Sustainable by Software describes digital solutions designed to achieve positive sustainability impacts to help individuals and organizations reach sustainability goals, such as such as the United Nations Sustainable Development Goals (SDGs) more effectively. Have you heard of this or a similar definition of digital sustainability before?"
   },
+  "DefinitionAwarenessByRole": {
+    "question": "Have you heard of the term 'digital sustainability'?",
+    "description": "A clear majority of practitioners in RE indicate that they are not familiar with the definition, while stakeholders in all other roles (management, technical, and research) have a clear majority indicating that they are familiar with the definition"
+  },
+  "DefinitionAwarenessByAge": {
+    "question": "Have you heard of the term 'digital sustainability'?",
+    "description": "Factors related to better familiarity with the definition were respondents over 60 years old or working at a research organization."
+  },
+  "DefinitionAwarenessByExperience": {
+    "question": "Have you heard of the term 'digital sustainability'?",
+    "description": "Less familiarity was observed with respondents with 10 or fewer years of experience, or who responded to many questions about their organization’s sustainability practices that they were not sure. Familiarity was independent of region."
+  },
   "DiscussionFrequency": {
     "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
     "description": "Shows the frequency of digital sustainability discussions among respondents."

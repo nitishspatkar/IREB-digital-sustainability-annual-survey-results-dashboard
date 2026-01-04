@@ -18,7 +18,10 @@ interface ChartProps extends BaseProps {
   data: Data[];
   layout: Partial<Layout>;
   hasExploreData: boolean;
+  showBackButton?: boolean;
+  showExploreTitle?: boolean;
   onExplore?: () => void;
+  onBack?: () => void;
 }
 
 export const SurveyChart = ({
@@ -29,11 +32,19 @@ export const SurveyChart = ({
   data,
   layout,
   hasExploreData,
+  showBackButton,
+  showExploreTitle,
   onExplore,
   className,
+  onBack,
 }: ChartProps) => {
   return (
-    <div className={className}>
+    <div className={`space-y-6 ${className ?? ''}`}>
+      {showExploreTitle && (
+        <h1 className="text-2xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
+          Explore: {question}
+        </h1>
+      )}
       <GraphWrapper
         question={question}
         description={description}
@@ -41,6 +52,8 @@ export const SurveyChart = ({
         responseRate={responseRate}
         showExploreButton={hasExploreData}
         onExplore={onExplore}
+        showBackButton={showBackButton}
+        onBack={onBack}
       >
         <div className="h-[520px]">
           <Plot
