@@ -17,6 +17,7 @@ import {
   DemographicOrganizationalRoleDetails,
 } from './graphs/DemographicOrganizationalRole';
 import type { RespondentStat } from './demographicTypes';
+import DemographicRegionDistribution from './graphs/DemographicRegionDistribution.tsx';
 
 // Hilfs-Komponente für den Anker (spart Schreibarbeit im JSX)
 const GraphAnchor = ({ id, children }: { id: string; children: React.ReactNode }) => (
@@ -88,6 +89,7 @@ const Demographic = () => {
       </header>
 
       <div className="grid grid-cols-1 gap-18">
+        <DemographicRegionDistribution respondentStats={respondentStats} />
         <DemographicCountryTable respondentStats={respondentStats} />
         <DemographicChoropleth respondentStats={respondentStats} />
         <DemographicAgeGroup />

@@ -20,6 +20,10 @@
     "question": "What is your current country of residence?",
     "description": "Tabulates how many respondents we received from each country."
   },
+  "DemographicByRegion": {
+    "question": "What is your current country of residence?",
+    "description": "Shows how respondents distribute across the provided regions."
+  },
   "DemographicOrganizationalRole": {
     "question": "Which of the following best describes your current role in the organization?",
     "description": "Shows how respondents distribute across the provided organizational role options."
