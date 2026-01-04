@@ -6,6 +6,7 @@ import useThemeColor from '../../../hooks/useThemeColor';
 // Import der neuen generischen Views
 import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
 import { useGraphDescription } from '../../../hooks/useGraphDescription';
+import { DiscussionFrequencyByRole } from '../../explore-graphs/DiscussionFrequencyByRole.tsx';
 
 type DiscussionFrequencyStat = {
   frequency: string;
@@ -67,7 +68,7 @@ export const DiscussionFrequency = ({
   onExplore: () => void;
   className?: string;
 }) => {
-  const { frequencyStats, otherFrequencyTexts, chartBarColor, tickColor, surveyResponses } =
+  const { frequencyStats, chartBarColor, tickColor, surveyResponses } =
     useDiscussionFrequencyData();
 
   // Stats Logic
@@ -147,14 +148,13 @@ export const DiscussionFrequency = ({
       responseRate={responseRate}
       data={chartData}
       layout={layout}
-      hasExploreData={otherFrequencyTexts.length > 0}
+      hasExploreData={true}
       onExplore={onExplore}
     />
   );
 };
 
-// --- COMPONENT 2: Detail List (Explore Page) ---
-export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) => {
+export const DiscussionFrequencyOther = ({ onBack }: { onBack: () => void }) => {
   const { frequencyStats, otherFrequencyTexts } = useDiscussionFrequencyData();
 
   const { title, question, description } = useGraphDescription('DiscussionFrequencyDetails');
@@ -169,6 +169,10 @@ export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) =
   const otherResponseRate =
     numberOfResponsesOtherAll > 0 ? (numberOfResponsesOther / numberOfResponsesOtherAll) * 100 : 0;
 
+  if (otherFrequencyTexts.length === 0) {
+    return null;
+  }
+
   return (
     <SurveyExploreList
       title={title}
@@ -182,4 +186,11 @@ export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) =
   );
 };
 
-export default DiscussionFrequency;
+export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) => {
+  return (
+    <div className="space-y-12">
+      <DiscussionFrequencyOther onBack={onBack} />
+      <DiscussionFrequencyByRole onBack={onBack} />
+    </div>
+  );
+};
