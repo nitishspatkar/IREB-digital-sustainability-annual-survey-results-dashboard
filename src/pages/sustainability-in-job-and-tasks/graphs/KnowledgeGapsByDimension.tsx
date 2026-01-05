@@ -1,195 +1,128 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
+import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
+import { KnowledgeGapsByDimensionOther } from '../../explore-graphs/KnowledgeGapsByDimensionOther';
 
-// --- SHARED DATA LOGIC ---
-const useKnowledgeGapsData = () => {
-  const responses = useSurveyData();
-  const barColor = useThemeColor('--color-ireb-berry');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
+// --- PROCESSOR ---
+const knowledgeGapsProcessor: ChartProcessor = (responses, palette) => {
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
-  console.log(responses.length);
+  let environmental = 0;
+  let social = 0;
+  let individual = 0;
+  let economic = 0;
+  let technical = 0;
+  let none = 0;
+  let other = 0;
+  let numberOfRespondents = 0;
 
-  const { stats, otherTexts, totalRespondentsWithAnswer, totalEligible } = useMemo(() => {
-    const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+  responses.forEach((r) => {
+    const raw = r.raw;
+    let hasAnswer = false;
 
-    let environmental = 0;
-    let social = 0;
-    let individual = 0;
-    let economic = 0;
-    let technical = 0;
-    let none = 0;
-    let other = 0;
-    let numberOfRespondents = 0;
+    if (norm(raw.lackKnowledgeEnvironmental) === 'yes') {
+      environmental += 1;
+      hasAnswer = true;
+    }
+    if (norm(raw.lackKnowledgeSocial) === 'yes') {
+      social += 1;
+      hasAnswer = true;
+    }
+    if (norm(raw.lackKnowledgeIndividual) === 'yes') {
+      individual += 1;
+      hasAnswer = true;
+    }
+    if (norm(raw.lackKnowledgeEconomic) === 'yes') {
+      economic += 1;
+      hasAnswer = true;
+    }
+    if (norm(raw.lackKnowledgeTechnical) === 'yes') {
+      technical += 1;
+      hasAnswer = true;
+    }
+    if (norm(raw.lackKnowledgeNone) === 'yes') {
+      none += 1;
+      hasAnswer = true;
+    }
 
-    responses.forEach((r) => {
-      const raw = r.raw;
-      let hasAnswer = false;
+    if (
+      norm(raw.lackKnowledgeEnvironmental) === 'no' &&
+      norm(raw.lackKnowledgeSocial) === 'no' &&
+      norm(raw.lackKnowledgeIndividual) === 'no' &&
+      norm(raw.lackKnowledgeEconomic) === 'no' &&
+      norm(raw.lackKnowledgeTechnical) === 'no' &&
+      norm(raw.lackKnowledgeNone) === 'no'
+    ) {
+      hasAnswer = true;
+    }
 
-      if (norm(raw.lackKnowledgeEnvironmental) === 'yes') {
-        environmental += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.lackKnowledgeSocial) === 'yes') {
-        social += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.lackKnowledgeIndividual) === 'yes') {
-        individual += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.lackKnowledgeEconomic) === 'yes') {
-        economic += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.lackKnowledgeTechnical) === 'yes') {
-        technical += 1;
-        hasAnswer = true;
-      }
-      if (norm(raw.lackKnowledgeNone) === 'yes') {
-        none += 1;
-        hasAnswer = true;
-      }
+    const otherVal = norm(raw.lackKnowledgeOther);
+    if (otherVal.length > 0 && otherVal !== 'n/a') {
+      other += 1;
+      hasAnswer = true;
+    }
 
-      if (
-        norm(raw.lackKnowledgeEnvironmental) === 'no' &&
-        norm(raw.lackKnowledgeSocial) === 'no' &&
-        norm(raw.lackKnowledgeIndividual) === 'no' &&
-        norm(raw.lackKnowledgeEconomic) === 'no' &&
-        norm(raw.lackKnowledgeTechnical) === 'no' &&
-        norm(raw.lackKnowledgeNone) === 'no'
-      ) {
-        hasAnswer = true;
-      }
+    if (hasAnswer) {
+      numberOfRespondents += 1;
+    }
+  });
 
-      const otherVal = norm(raw.lackKnowledgeOther);
-      if (otherVal.length > 0 && otherVal !== 'n/a') {
-        other += 1;
-        hasAnswer = true;
-      }
+  const items = [
+    { label: 'Environmental', value: environmental },
+    { label: 'Social', value: social },
+    { label: 'Individual', value: individual },
+    { label: 'Economic', value: economic },
+    { label: 'Technical', value: technical },
+    { label: 'None', value: none },
+    { label: 'Other', value: other },
+  ];
 
-      if (hasAnswer) {
-        numberOfRespondents += 1;
-      }
-    });
+  // Sort ascending by value for horizontal chart
+  items.sort((a, b) => a.value - b.value);
 
-    const items = [
-      { label: 'Environmental', value: environmental },
-      { label: 'Social', value: social },
-      { label: 'Individual', value: individual },
-      { label: 'Economic', value: economic },
-      { label: 'Technical', value: technical },
-      { label: 'None', value: none },
-      { label: 'Other', value: other },
-    ];
-
-    // Sort ascending by value for horizontal chart
-    items.sort((a, b) => a.value - b.value);
-
-    // Extract texts
-    const texts = responses
-      .map((r) => (r.raw.lackKnowledgeOther ?? '').trim())
-      .filter((value) => {
-        if (!value) return false;
-        const lower = value.toLowerCase();
-        return lower.length > 0 && lower !== 'n/a';
-      });
-
-    return {
-      stats: items,
-      otherTexts: texts,
-      totalRespondentsWithAnswer: numberOfRespondents,
-      totalEligible: responses.length,
-    };
-  }, [responses]);
+  const traces: Data[] = [
+    {
+      type: 'bar',
+      orientation: 'h',
+      x: items.map((i) => i.value),
+      y: items.map((i) => i.label),
+      marker: { color: palette.berry },
+      text: items.map((i) => i.value.toString()),
+      textposition: 'outside',
+      textfont: {
+        family: 'PP Mori, sans-serif',
+        size: 12,
+        color: palette.grey,
+      },
+      cliponaxis: false,
+      hoverinfo: 'none',
+    },
+  ];
 
   return {
-    stats,
-    otherTexts,
-    totalRespondentsWithAnswer,
-    totalEligible,
-    barColor,
-    tickColor,
+    traces,
+    stats: {
+      numberOfResponses: numberOfRespondents,
+    },
   };
 };
 
 // --- COMPONENT 1: Main Chart ---
-export const KnowledgeGapsByDimension = ({
-  onExplore,
-  className,
-}: {
-  onExplore?: () => void;
-  className?: string;
-}) => {
-  const { stats, otherTexts, totalRespondentsWithAnswer, totalEligible, barColor, tickColor } =
-    useKnowledgeGapsData();
-  const { question, description } = useGraphDescription('KnowledgeGapsByDimension');
-
-  const data = useMemo<Data[]>(
-    () => [
-      {
-        type: 'bar',
-        orientation: 'h',
-        x: stats.map((i) => i.value),
-        y: stats.map((i) => i.label),
-        marker: { color: barColor },
-        text: stats.map((i) => i.value.toString()),
-        textposition: 'outside',
-        textfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-        cliponaxis: false,
-        hoverinfo: 'none',
-      },
-    ],
-    [stats, barColor, tickColor]
-  );
-
+export const KnowledgeGapsByDimension = ({ onExplore }: { onExplore?: () => void }) => {
   const layout = useMemo<Partial<Layout>>(
     () => ({
       margin: { t: 50, r: 40, b: 60, l: 120 }, // Preserved margin
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        title: {
-          text: 'Number of Respondents',
-          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        },
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-      yaxis: {
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-        automargin: true,
-        ticks: 'outside',
-        ticklen: 10,
-        tickcolor: 'rgba(0,0,0,0)',
-      },
     }),
-    [tickColor]
+    []
   );
 
-  const responseRate = totalEligible > 0 ? (totalRespondentsWithAnswer / totalEligible) * 100 : 0;
-
   return (
-    <SurveyChart
-      className={className}
-      question={question}
-      description={description}
-      numberOfResponses={totalRespondentsWithAnswer}
-      responseRate={responseRate}
-      data={data}
+    <GenericChart
+      graphId="KnowledgeGapsByDimension"
+      processor={knowledgeGapsProcessor}
       layout={layout}
-      hasExploreData={otherTexts.length > 0}
+      exploreComponents={[KnowledgeGapsByDimensionOther]}
       onExplore={onExplore}
     />
   );
@@ -197,30 +130,7 @@ export const KnowledgeGapsByDimension = ({
 
 // --- COMPONENT 2: Detail List ---
 export const KnowledgeGapsByDimensionDetails = ({ onBack }: { onBack: () => void }) => {
-  const { stats, otherTexts } = useKnowledgeGapsData();
-  const { question } = useGraphDescription('KnowledgeGapsByDimension');
-  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
-    'KnowledgeGapsByDimensionDetails'
-  );
-
-  // Calculate rate relative to "Other" checkbox selection
-  const otherStat = stats.find((s) => s.label === 'Other');
-  const numberOfOtherSelections = otherStat ? otherStat.value : 0;
-
-  const responseRate =
-    numberOfOtherSelections > 0 ? (otherTexts.length / numberOfOtherSelections) * 100 : 0;
-
-  return (
-    <SurveyExploreList
-      title={question}
-      items={otherTexts}
-      question={questionDetails}
-      description={descriptionDetails}
-      numberOfResponses={otherTexts.length}
-      responseRate={responseRate}
-      onBack={onBack}
-    />
-  );
+  return <KnowledgeGapsByDimensionOther onBack={onBack} />;
 };
 
 export default KnowledgeGapsByDimension;
