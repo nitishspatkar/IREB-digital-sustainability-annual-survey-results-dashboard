@@ -1,126 +1,80 @@
 import { useMemo } from 'react';
-import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import type { AgeGroupStat } from '../demographicTypes';
-import useThemeColor from '../../../hooks/useThemeColor';
-import GraphWrapper from '../../../components/GraphWrapper';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
+import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
 
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 const DemographicAgeGroup = () => {
-  const chartBarColor = useThemeColor('--color-ireb-berry');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
-  const surveyResponses = useSurveyData();
+  const processor: ChartProcessor = useMemo(
+    () => (responses, palette) => {
+      const counts = new Map<string, number>();
 
-  const ageGroupStats = useMemo<AgeGroupStat[]>(() => {
-    const counts = new Map<string, number>();
+      responses.forEach((response) => {
+        const ageGroup = normalizeAgeGroup(response.raw.ageGroup ?? '');
+        if (ageGroup.length > 0 && ageGroup.toLowerCase() !== 'n/a') {
+          counts.set(ageGroup, (counts.get(ageGroup) ?? 0) + 1);
+        }
+      });
 
-    surveyResponses.forEach((response) => {
-      const ageGroup = normalizeAgeGroup(response.raw.ageGroup ?? '');
-      if (ageGroup.length > 0 && ageGroup.toLowerCase() !== 'n/a') {
-        counts.set(ageGroup, (counts.get(ageGroup) ?? 0) + 1);
-      }
-    });
+      const ageGroupStats = Array.from(counts.entries())
+        .map(([ageGroup, count]) => ({ ageGroup, count }))
+        .sort((a, b) => {
+          const aMatch = a.ageGroup.match(/^(\d+)/);
+          const bMatch = b.ageGroup.match(/^(\d+)/);
 
-    return Array.from(counts.entries())
-      .map(([ageGroup, count]) => ({ ageGroup, count }))
-      .sort((a, b) => b.count - a.count);
-  }, [surveyResponses]);
+          if (aMatch && bMatch) {
+            return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
+          }
 
-  const { question, description } = useGraphDescription('DemographicAgeGroup');
-  const numberOfResponses = ageGroupStats.reduce((sum, stat) => sum + stat.count, 0);
-  const responseRate =
-    surveyResponses.length > 0 ? (numberOfResponses / surveyResponses.length) * 100 : 0;
+          return a.ageGroup.localeCompare(b.ageGroup);
+        });
 
-  const chartData = useMemo<Data[]>(() => {
-    const sortedStats = [...ageGroupStats].sort((a, b) => {
-      const aMatch = a.ageGroup.match(/^(\d+)/);
-      const bMatch = b.ageGroup.match(/^(\d+)/);
+      const numberOfResponses = ageGroupStats.reduce((sum, stat) => sum + stat.count, 0);
 
-      if (aMatch && bMatch) {
-        return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
-      }
-
-      return a.ageGroup.localeCompare(b.ageGroup);
-    });
-
-    return [
-      {
-        x: sortedStats.map((item) => item.ageGroup),
-        y: sortedStats.map((item) => item.count),
-        type: 'bar',
-        marker: {
-          color: chartBarColor,
+      const traces: Data[] = [
+        {
+          x: ageGroupStats.map((item) => item.ageGroup),
+          y: ageGroupStats.map((item) => item.count),
+          type: 'bar',
+          marker: {
+            color: palette.berry,
+          },
+          text: ageGroupStats.map((item) => item.count.toString()),
+          textposition: 'outside',
+          textfont: {
+            family: 'PP Mori, sans-serif',
+            size: 12,
+            color: palette.grey,
+          },
+          cliponaxis: false,
+          hoverinfo: 'none',
         },
-        // --- ADDED TEXT LABELS ---
-        text: sortedStats.map((item) => item.count.toString()),
-        textposition: 'outside',
-        textfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
+      ];
+
+      return {
+        traces,
+        stats: {
+          numberOfResponses,
         },
-        cliponaxis: false,
-        // --- END OF CHANGES ---
-        hoverinfo: 'none',
-      },
-    ];
-  }, [ageGroupStats, chartBarColor, tickColor]); // Added tickColor
+      };
+    },
+    []
+  );
 
   const layout = useMemo<Partial<Layout>>(
     () => ({
-      margin: { t: 50, r: 0, b: 60, l: 40 }, // Adjusted top/bottom margins
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        // --- REMOVED tickangle: -45 ---
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-      },
+      margin: { t: 50, r: 0, b: 60, l: 40 },
       yaxis: {
-        // --- ADDED Y-AXIS TITLE ---
         title: {
           text: 'Number of Respondents',
-          font: {
-            family: 'PP Mori, sans-serif',
-            size: 12,
-            color: tickColor,
-          },
-        },
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
         },
       },
     }),
-    [tickColor]
+    []
   );
 
-  return (
-    <GraphWrapper
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-    >
-      <div className="h-[520px]">
-        <Plot
-          data={chartData}
-          layout={layout}
-          config={{ displayModeBar: false, responsive: true }}
-          useResizeHandler
-          style={{ width: '100%', height: '100%' }}
-        />
-      </div>
-    </GraphWrapper>
-  );
+  return <GenericChart graphId="DemographicAgeGroup" processor={processor} layout={layout} />;
 };
 
 export default DemographicAgeGroup;
