@@ -1,6 +1,8 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
 import { DemographicOrganizationalRoleOther } from '../../explore-graphs/DemographicOrganizationalRoleOther';
+import { DefinitionAwarenessByRole } from '../../explore-graphs/DefinitionAwarenessByRole.tsx';
+import { DiscussionFrequencyByRole } from '../../explore-graphs/DiscussionFrequencyByRole.tsx';
 
 const normalizeRole = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -60,7 +62,11 @@ export const DemographicOrganizationalRole = ({ onExplore }: { onExplore?: () =>
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
-      exploreComponents={[DemographicOrganizationalRoleOther]}
+      exploreComponents={[
+        DemographicOrganizationalRoleOther,
+        DefinitionAwarenessByRole,
+        DiscussionFrequencyByRole,
+      ]}
       onExplore={onExplore}
     />
   );

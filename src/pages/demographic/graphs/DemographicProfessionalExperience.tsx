@@ -1,5 +1,7 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
+import { DiscussionFrequencyByExperience } from '../../explore-graphs/DiscussionFrequencyByExperience.tsx';
+import { DefinitionAwarenessByExperience } from '../../explore-graphs/DefinitionAwarenessByExperience.tsx';
 
 // Helper to sort experience ranges naturally
 const sortExperience = (a: string, b: string) => {
@@ -59,7 +61,12 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-export function DemographicProfessionalExperience() {
+export const DemographicProfessionalExperience = ({
+  onExplore,
+}: {
+  onExplore?: () => void;
+  className?: string;
+}) => {
   return (
     <GenericChart
       graphId="DemographicProfessionalExperience"
@@ -74,6 +81,8 @@ export function DemographicProfessionalExperience() {
           title: { text: 'Number of Respondents' },
         },
       }}
+      exploreComponents={[DefinitionAwarenessByExperience, DiscussionFrequencyByExperience]}
+      onExplore={onExplore}
     />
   );
-}
+};

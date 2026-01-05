@@ -2,10 +2,12 @@ import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
 import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
+import { DiscussionFrequencyByAge } from '../../explore-graphs/DiscussionFrequencyByAge.tsx';
+import { DefinitionAwarenessByAge } from '../../explore-graphs/DefinitionAwarenessByAge.tsx';
 
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-const DemographicAgeGroup = () => {
+const DemographicAgeGroup = ({ onExplore }: { onExplore?: () => void; className?: string }) => {
   const processor: ChartProcessor = useMemo(
     () => (responses, palette) => {
       const counts = new Map<string, number>();
@@ -74,7 +76,15 @@ const DemographicAgeGroup = () => {
     []
   );
 
-  return <GenericChart graphId="DemographicAgeGroup" processor={processor} layout={layout} />;
+  return (
+    <GenericChart
+      graphId="DemographicAgeGroup"
+      processor={processor}
+      layout={layout}
+      exploreComponents={[DefinitionAwarenessByAge, DiscussionFrequencyByAge]}
+      onExplore={onExplore}
+    />
+  );
 };
 
 export default DemographicAgeGroup;
