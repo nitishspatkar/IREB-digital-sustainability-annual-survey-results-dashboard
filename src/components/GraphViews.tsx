@@ -11,27 +11,8 @@ import { useGraphExplore } from '../contexts/GraphExploreContext';
 
 export type ExploreComponent = React.ComponentType<{ onBack: () => void }>;
 
-interface ExploreViewProps {
-  title: string;
-  components: ExploreComponent[];
-  onBack: () => void;
-}
-
-export const ExploreView = ({ title, components, onBack }: ExploreViewProps) => {
-  return (
-    <div className="space-y-12">
-      <h1 className="text-2xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
-        Explore: {title}
-      </h1>
-      {components.map((Component, index) => (
-        <Component key={index} onBack={onBack} />
-      ))}
-    </div>
-  );
-};
-
-// 1. Define the Palette that will be passed to your logic
-export type ChartPalette = {
+// 1. Define the Palette that will be passed to the processors, which then can use it to style their graphs
+type ChartPalette = {
   berry: string;
   lightBerry: string;
   superLightBerry: string;
@@ -188,7 +169,16 @@ export const GenericChart = ({
 
   // Show explore view if this chart is being explored
   if (activeExploreId === graphId && exploreComponents) {
-    return <ExploreView title={question} components={exploreComponents} onBack={handleBack} />;
+    return (
+      <div className="space-y-12">
+        <h1 className="text-2xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
+          Explore: {question}
+        </h1>
+        {exploreComponents.map((Component, index) => (
+          <Component key={index} onBack={handleBack} />
+        ))}
+      </div>
+    );
   }
 
   // --- List Mode: Render a styled list instead of a chart ---
