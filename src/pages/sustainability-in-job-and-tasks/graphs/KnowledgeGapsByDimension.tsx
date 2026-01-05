@@ -1,11 +1,19 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
-import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
 import { KnowledgeGapsByDimensionOther } from '../../explore-graphs/KnowledgeGapsByDimensionOther';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
-// --- PROCESSOR ---
-const knowledgeGapsProcessor: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const knowledgeGapsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
   let environmental = 0;
@@ -78,17 +86,29 @@ const knowledgeGapsProcessor: ChartProcessor = (responses, palette) => {
     { label: 'Other', value: other },
   ];
 
+  return {
+    items,
+    stats: {
+      numberOfResponses: numberOfRespondents,
+    },
+  };
+};
+
+// --- PROCESSOR ---
+const knowledgeGapsProcessor: ChartProcessor = (responses, palette) => {
+  const data = knowledgeGapsDataExtractor(responses);
+
   // Sort ascending by value for horizontal chart
-  items.sort((a, b) => a.value - b.value);
+  const sortedItems = [...data.items].sort((a, b) => a.value - b.value);
 
   const traces: Data[] = [
     {
       type: 'bar',
       orientation: 'h',
-      x: items.map((i) => i.value),
-      y: items.map((i) => i.label),
+      x: sortedItems.map((i) => i.value),
+      y: sortedItems.map((i) => i.label),
       marker: { color: palette.berry },
-      text: items.map((i) => i.value.toString()),
+      text: sortedItems.map((i) => i.value.toString()),
       textposition: 'outside',
       textfont: {
         family: 'PP Mori, sans-serif',
@@ -102,9 +122,7 @@ const knowledgeGapsProcessor: ChartProcessor = (responses, palette) => {
 
   return {
     traces,
-    stats: {
-      numberOfResponses: numberOfRespondents,
-    },
+    stats: data.stats,
   };
 };
 
@@ -135,6 +153,8 @@ export const KnowledgeGapsByDimension = ({ onExplore }: { onExplore?: () => void
       layout={layout}
       exploreComponents={[KnowledgeGapsByDimensionOther]}
       onExplore={onExplore}
+      dataExtractor={knowledgeGapsDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };
