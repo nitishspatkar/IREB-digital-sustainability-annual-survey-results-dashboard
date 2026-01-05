@@ -1,104 +1,62 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 
-import { SurveyRepository } from '../../../data/data-parsing-logic/SurveyRepository';
-import { useYear } from '../../../data/data-parsing-logic/YearContext';
+import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
+import type { AgeGroupStat } from '../demographicTypes';
 import useThemeColor from '../../../hooks/useThemeColor';
 import GraphWrapper from '../../../components/GraphWrapper';
 import { useGraphDescription } from '../../../hooks/useGraphDescription';
-import ComparisonToggle from '../../../components/ComparisonToggle';
 
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-const ageGroupComparator = (a: string, b: string) => {
-  const aMatch = a.match(/^(\d+)/);
-  const bMatch = b.match(/^(\d+)/);
-
-  if (aMatch && bMatch) {
-    return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
-  }
-  return a.localeCompare(b);
-};
-
 const DemographicAgeGroup = () => {
-  const colorLatest = useThemeColor('--color-ireb-berry');
-  const colorPrevious = useThemeColor('--color-ireb-light-berry');
+  const chartBarColor = useThemeColor('--color-ireb-berry');
   const tickColor = useThemeColor('--color-ireb-grey-01');
+  const surveyResponses = useSurveyData();
 
-  const { question, description } = useGraphDescription('DemographicAgeGroup');
+  const ageGroupStats = useMemo<AgeGroupStat[]>(() => {
+    const counts = new Map<string, number>();
 
-  const activeYear = useYear();
-  const [comparisonYear, setComparisonYear] = useState<string | null>(null);
-
-  const allAvailableYears = useMemo(() => SurveyRepository.getAvailableYears(), []);
-  const otherYears = useMemo(
-    () => allAvailableYears.filter((year) => year !== activeYear),
-    [allAvailableYears, activeYear]
-  );
-
-  // Calculate statistics (Number of Responses, Response Rate) always for the active year
-  const { displayNumberOfResponses, displayResponseRate } = useMemo(() => {
-    const activeYearResponses = SurveyRepository.getSurvey(activeYear);
-    let responsesWithValidAgeGroups = 0;
-
-    activeYearResponses.forEach((response) => {
+    surveyResponses.forEach((response) => {
       const ageGroup = normalizeAgeGroup(response.raw.ageGroup ?? '');
       if (ageGroup.length > 0 && ageGroup.toLowerCase() !== 'n/a') {
-        responsesWithValidAgeGroups++;
+        counts.set(ageGroup, (counts.get(ageGroup) ?? 0) + 1);
       }
     });
 
-    return {
-      displayNumberOfResponses: responsesWithValidAgeGroups,
-      displayResponseRate:
-        activeYearResponses.length > 0
-          ? (responsesWithValidAgeGroups / activeYearResponses.length) * 100
-          : 0,
-    };
-  }, [activeYear]);
+    return Array.from(counts.entries())
+      .map(([ageGroup, count]) => ({ ageGroup, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [surveyResponses]);
 
-  const { chartData } = useMemo(() => {
-    // If comparisonYear is selected, show [activeYear, comparisonYear] (sorted), otherwise just [activeYear]
-    const yearsToDisplay = [activeYear];
-    if (comparisonYear) {
-      yearsToDisplay.push(comparisonYear);
-      yearsToDisplay.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
-    }
+  const { question, description } = useGraphDescription('DemographicAgeGroup');
+  const numberOfResponses = ageGroupStats.reduce((sum, stat) => sum + stat.count, 0);
+  const responseRate =
+    surveyResponses.length > 0 ? (numberOfResponses / surveyResponses.length) * 100 : 0;
 
-    const allGroups = new Set<string>();
-    const yearData = new Map<string, Map<string, number>>();
+  const chartData = useMemo<Data[]>(() => {
+    const sortedStats = [...ageGroupStats].sort((a, b) => {
+      const aMatch = a.ageGroup.match(/^(\d+)/);
+      const bMatch = b.ageGroup.match(/^(\d+)/);
 
-    yearsToDisplay.forEach((year) => {
-      const responses = SurveyRepository.getSurvey(year);
-      const counts = new Map<string, number>();
+      if (aMatch && bMatch) {
+        return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
+      }
 
-      responses.forEach((response) => {
-        const ageGroup = normalizeAgeGroup(response.raw.ageGroup ?? '');
-        if (ageGroup.length > 0 && ageGroup.toLowerCase() !== 'n/a') {
-          counts.set(ageGroup, (counts.get(ageGroup) ?? 0) + 1);
-          allGroups.add(ageGroup);
-        }
-      });
-      yearData.set(year, counts);
+      return a.ageGroup.localeCompare(b.ageGroup);
     });
 
-    const sortedGroups = Array.from(allGroups).sort(ageGroupComparator);
-
-    const data: Data[] = yearsToDisplay.map((year) => {
-      const counts = yearData.get(year);
-      const isActiveYear = year === activeYear;
-
-      return {
-        x: sortedGroups,
-        y: sortedGroups.map((group) => counts?.get(group) ?? 0),
-        name: year,
+    return [
+      {
+        x: sortedStats.map((item) => item.ageGroup),
+        y: sortedStats.map((item) => item.count),
         type: 'bar',
         marker: {
-          // Active year gets the 'latest' (berry) color, comparison year gets 'previous' (light berry)
-          color: isActiveYear ? colorLatest : colorPrevious,
+          color: chartBarColor,
         },
-        text: sortedGroups.map((group) => (counts?.get(group) ?? 0).toString()),
+        // --- ADDED TEXT LABELS ---
+        text: sortedStats.map((item) => item.count.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
@@ -106,22 +64,19 @@ const DemographicAgeGroup = () => {
           color: tickColor,
         },
         cliponaxis: false,
-        hoverinfo: 'name+y',
-      } as unknown as Data;
-    });
-
-    return {
-      chartData: data,
-    };
-  }, [comparisonYear, activeYear, colorLatest, colorPrevious, tickColor]);
+        // --- END OF CHANGES ---
+        hoverinfo: 'none',
+      },
+    ];
+  }, [ageGroupStats, chartBarColor, tickColor]); // Added tickColor
 
   const layout = useMemo<Partial<Layout>>(
     () => ({
-      margin: { t: 50, r: 0, b: 60, l: 40 },
+      margin: { t: 50, r: 0, b: 60, l: 40 }, // Adjusted top/bottom margins
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
-      barmode: comparisonYear ? 'group' : 'relative',
       xaxis: {
+        // --- REMOVED tickangle: -45 ---
         tickfont: {
           family: 'PP Mori, sans-serif',
           size: 12,
@@ -129,6 +84,7 @@ const DemographicAgeGroup = () => {
         },
       },
       yaxis: {
+        // --- ADDED Y-AXIS TITLE ---
         title: {
           text: 'Number of Respondents',
           font: {
@@ -143,38 +99,16 @@ const DemographicAgeGroup = () => {
           color: tickColor,
         },
       },
-      legend: comparisonYear
-        ? {
-            orientation: 'h',
-            y: 1.1,
-            x: 0.5,
-            xanchor: 'center',
-            font: {
-              family: 'PP Mori, sans-serif',
-              size: 12,
-              color: tickColor,
-            },
-          }
-        : undefined,
     }),
-    [tickColor, comparisonYear]
+    [tickColor]
   );
 
   return (
     <GraphWrapper
       question={question}
       description={description}
-      numberOfResponses={displayNumberOfResponses}
-      responseRate={displayResponseRate}
-      customComparisonToggle={
-        otherYears.length > 0 ? (
-          <ComparisonToggle
-            yearsToCompare={otherYears}
-            selectedComparisonYear={comparisonYear}
-            onSelectComparisonYear={setComparisonYear}
-          />
-        ) : undefined
-      }
+      numberOfResponses={numberOfResponses}
+      responseRate={responseRate}
     >
       <div className="h-[520px]">
         <Plot
