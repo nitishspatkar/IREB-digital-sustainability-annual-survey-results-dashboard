@@ -142,6 +142,17 @@ export const HindrancesToIncorporateSustainability = ({
   const layout = useMemo<Partial<Layout>>(
     () => ({
       margin: { t: 50, r: 40, b: 60, l: 300 }, // Preserved wide margin
+      xaxis: {
+        title: {
+          text: 'Number of Respondents',
+        },
+      },
+      yaxis: {
+        automargin: true,
+        ticks: 'outside',
+        ticklen: 10,
+        tickcolor: 'rgba(0,0,0,0)',
+      },
     }),
     []
   );

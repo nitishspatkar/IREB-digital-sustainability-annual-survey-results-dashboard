@@ -101,6 +101,12 @@ export const NoTrainingReasons = ({ onExplore }: { onExplore?: () => void }) => 
             text: 'Number of Respondents',
           },
         },
+        yaxis: {
+          automargin: true,
+          ticks: 'outside',
+          ticklen: 10,
+          tickcolor: 'rgba(0,0,0,0)',
+        },
       }}
       exploreComponents={[NoTrainingReasonsOther]}
       onExplore={onExplore}
