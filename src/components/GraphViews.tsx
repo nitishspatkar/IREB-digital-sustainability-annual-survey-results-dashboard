@@ -218,6 +218,8 @@ interface GenericChartProps {
   layout?: Partial<Layout>; // Unique layout overrides
   onExplore?: () => void;
   exploreComponents?: ExploreComponent[]; // Optional array of explore components
+  isEmbedded?: boolean;
+  onBack?: () => void; // Optional back handler
 }
 
 export const GenericChart = ({
@@ -226,6 +228,8 @@ export const GenericChart = ({
   layout = {},
   onExplore,
   exploreComponents,
+  isEmbedded = false,
+  onBack,
 }: GenericChartProps) => {
   // --- A. Boilerplate Hooks ---
   const { activeExploreId, setActiveExploreId } = useGraphExplore();
@@ -302,7 +306,7 @@ export const GenericChart = ({
   };
 
   // Hide this chart if another chart is being explored
-  if (activeExploreId !== null && activeExploreId !== graphId) {
+  if (!isEmbedded && activeExploreId !== null && activeExploreId !== graphId) {
     return null;
   }
 
@@ -319,8 +323,8 @@ export const GenericChart = ({
         description={description}
         numberOfResponses={stats.numberOfResponses}
         responseRate={responseRate}
-        showExploreButton={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
-        onExplore={handleExplore}
+        showBackButton={!!onBack}
+        onBack={onBack}
       >
         <div className="h-[520px]">
           <ul className="h-full overflow-y-auto" style={{ color: palette.grey }}>
@@ -350,6 +354,8 @@ export const GenericChart = ({
       layout={finalLayout}
       hasExploreData={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
       onExplore={handleExplore}
+      showBackButton={!!onBack}
+      onBack={onBack}
     />
   );
 };

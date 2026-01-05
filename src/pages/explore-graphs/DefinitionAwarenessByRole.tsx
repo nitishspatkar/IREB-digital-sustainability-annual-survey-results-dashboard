@@ -1,56 +1,44 @@
-import useThemeColor from '../../hooks/useThemeColor.ts';
-import { useSurveyData } from '../../data/data-parsing-logic/SurveyContext.tsx';
-import { useMemo } from 'react';
-import type { Data, Layout } from 'plotly.js';
-import { useGraphDescription } from '../../hooks/useGraphDescription.ts';
-import { SurveyChart } from '../../components/GraphViews.tsx';
+import { GenericChart } from '../../components/GraphViews';
+import type { ChartProcessor } from '../../components/GraphViews';
+import type { Layout } from 'plotly.js';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-export const DefinitionAwarenessByRole = ({ onBack }: { onBack: () => void }) => {
-  const yesColor = useThemeColor('--color-ireb-spring');
-  const noColor = useThemeColor('--color-ireb-mandarin');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
-  const responses = useSurveyData();
+const processor: ChartProcessor = (responses, palette) => {
+  const dataMap = new Map<string, { yes: number; no: number; total: number }>();
 
-  const { categories, yesValues, noValues, validResponses } = useMemo(() => {
-    const dataMap = new Map<string, { yes: number; no: number; total: number }>();
+  responses.forEach((r) => {
+    const role = normalize(r.raw.role ?? '');
+    const awareness = normalize(r.raw.heardOfDigitalSustainabilityDefinition ?? '').toLowerCase();
 
-    responses.forEach((r) => {
-      const role = normalize(r.raw.role ?? '');
-      const awareness = normalize(r.raw.heardOfDigitalSustainabilityDefinition ?? '').toLowerCase();
+    if (!role || role.toLowerCase() === 'n/a' || !awareness) return;
 
-      if (!role || role.toLowerCase() === 'n/a' || !awareness) return;
+    if (!dataMap.has(role)) {
+      dataMap.set(role, { yes: 0, no: 0, total: 0 });
+    }
+    const entry = dataMap.get(role)!;
+    entry.total++;
+    if (awareness === 'yes') entry.yes++;
+    else if (awareness === 'no') entry.no++;
+  });
 
-      if (!dataMap.has(role)) {
-        dataMap.set(role, { yes: 0, no: 0, total: 0 });
-      }
-      const entry = dataMap.get(role)!;
-      entry.total++;
-      if (awareness === 'yes') entry.yes++;
-      else if (awareness === 'no') entry.no++;
-    });
+  // Sort ascending by total so the largest bar appears at the top in Plotly horizontal view
+  const sorted = Array.from(dataMap.entries()).sort((a, b) => a[1].total - b[1].total);
 
-    // Sort ascending by total so the largest bar appears at the top in Plotly horizontal view
-    const sorted = Array.from(dataMap.entries()).sort((a, b) => a[1].total - b[1].total);
+  const categories = sorted.map(([role]) => role);
+  const yesValues = sorted.map(([, stats]) => stats.yes);
+  const noValues = sorted.map(([, stats]) => stats.no);
+  const validResponses = sorted.reduce((acc, [, stats]) => acc + stats.total, 0);
 
-    return {
-      categories: sorted.map(([role]) => role),
-      yesValues: sorted.map(([, stats]) => stats.yes),
-      noValues: sorted.map(([, stats]) => stats.no),
-      validResponses: sorted.reduce((acc, [, stats]) => acc + stats.total, 0),
-    };
-  }, [responses]);
-
-  const chartData = useMemo<Data[]>(
-    () => [
+  return {
+    traces: [
       {
-        y: categories, // y is categories for horizontal
-        x: yesValues, // x is values
+        y: categories,
+        x: yesValues,
         name: 'Familiar (Yes)',
         type: 'bar',
         orientation: 'h',
-        marker: { color: yesColor },
+        marker: { color: palette.spring },
         text: yesValues.map((v) => (v > 0 ? v.toString() : '')),
         textposition: 'auto',
         hoverinfo: 'name' as const,
@@ -61,62 +49,46 @@ export const DefinitionAwarenessByRole = ({ onBack }: { onBack: () => void }) =>
         name: 'Not Familiar (No)',
         type: 'bar',
         orientation: 'h',
-        marker: { color: noColor },
+        marker: { color: palette.mandarin },
         text: noValues.map((v) => (v > 0 ? v.toString() : '')),
         textposition: 'auto',
         hoverinfo: 'name' as const,
       },
     ],
-    [categories, yesValues, noValues, yesColor, noColor]
-  );
+    stats: {
+      numberOfResponses: validResponses,
+    },
+  };
+};
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      barmode: 'stack',
-      margin: { t: 40, r: 20, b: 40, l: 200 }, // Increased left margin for Role names
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      legend: {
-        orientation: 'h',
-        y: 1.1,
-        x: 0,
-        font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-      xaxis: {
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        title: {
-          text: 'Number of Respondents',
-          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        },
-      },
-      yaxis: {
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-        automargin: true,
-        ticks: 'outside',
-        ticklen: 10,
-        tickcolor: 'rgba(0,0,0,0)',
-      },
-    }),
-    [tickColor]
-  );
+const layout: Partial<Layout> = {
+  barmode: 'stack',
+  margin: { t: 40, r: 20, b: 40, l: 200 },
+  legend: {
+    orientation: 'h',
+    y: 1.1,
+    x: 0,
+  },
+  xaxis: {
+    title: {
+      text: 'Number of Respondents',
+    },
+  },
+  yaxis: {
+    automargin: true,
+    ticks: 'outside',
+    ticklen: 10,
+    tickcolor: 'rgba(0,0,0,0)',
+  },
+};
 
-  const responseRate = responses.length > 0 ? (validResponses / responses.length) * 100 : 0;
-  const { question, description } = useGraphDescription('DefinitionAwarenessByRole');
-
+export const DefinitionAwarenessByRole = ({ onBack }: { onBack: () => void }) => {
   return (
-    <SurveyChart
-      question={question}
-      description={description}
-      numberOfResponses={validResponses}
-      responseRate={responseRate}
-      data={chartData}
+    <GenericChart
+      graphId="DefinitionAwarenessByRole"
+      processor={processor}
       layout={layout}
-      hasExploreData={false}
-      showBackButton={true}
+      isEmbedded={true}
       onBack={onBack}
     />
   );
