@@ -125,6 +125,7 @@ export const DiscussionFrequencyByRole = ({
       graphId="DiscussionFrequencyByRole"
       processor={processDiscussionFrequency}
       layout={layout}
+      isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
     />
   );
