@@ -77,12 +77,3 @@ export const DiscussionFrequency = ({
     />
   );
 };
-
-export const DiscussionFrequencyDetails = ({ onBack }: { onBack: () => void }) => {
-  return (
-    <div className="space-y-12">
-      <DiscussionFrequencyOther onBack={onBack} />
-      <DiscussionFrequencyByRole onBack={onBack} />
-    </div>
-  );
-};

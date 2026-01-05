@@ -128,9 +128,4 @@ export const KnowledgeGapsByDimension = ({ onExplore }: { onExplore?: () => void
   );
 };
 
-// --- COMPONENT 2: Detail List ---
-export const KnowledgeGapsByDimensionDetails = ({ onBack }: { onBack: () => void }) => {
-  return <KnowledgeGapsByDimensionOther onBack={onBack} />;
-};
-
 export default KnowledgeGapsByDimension;

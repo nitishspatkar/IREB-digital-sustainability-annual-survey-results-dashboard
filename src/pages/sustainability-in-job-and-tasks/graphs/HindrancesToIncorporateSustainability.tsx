@@ -157,13 +157,4 @@ export const HindrancesToIncorporateSustainability = ({
   );
 };
 
-// --- COMPONENT 2: Detail List ---
-export const HindrancesToIncorporateSustainabilityDetails = ({
-  onBack,
-}: {
-  onBack: () => void;
-}) => {
-  return <HindrancesToIncorporateSustainabilityOther onBack={onBack} />;
-};
-
 export default HindrancesToIncorporateSustainability;

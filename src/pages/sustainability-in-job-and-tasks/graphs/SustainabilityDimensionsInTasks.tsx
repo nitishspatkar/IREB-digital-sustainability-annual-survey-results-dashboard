@@ -125,9 +125,4 @@ export const SustainabilityDimensionsInTasks = ({ onExplore }: { onExplore?: () 
   );
 };
 
-// --- COMPONENT 2: Detail List ---
-export const SustainabilityDimensionsInTasksDetails = ({ onBack }: { onBack: () => void }) => {
-  return <SustainabilityDimensionsInTasksOther onBack={onBack} />;
-};
-
 export default SustainabilityDimensionsInTasks;
