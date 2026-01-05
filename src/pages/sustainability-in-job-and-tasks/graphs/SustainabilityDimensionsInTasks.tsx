@@ -1,11 +1,19 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
-import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
 import { SustainabilityDimensionsInTasksOther } from '../../explore-graphs/SustainabilityDimensionsInTasksOther';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
-// --- PROCESSOR ---
-const sustainabilityDimensionsProcessor: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const sustainabilityDimensionsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
   let environmental = 0;
@@ -74,17 +82,30 @@ const sustainabilityDimensionsProcessor: ChartProcessor = (responses, palette) =
     { label: 'Other', value: other },
   ];
 
+  return {
+    items,
+    stats: {
+      numberOfResponses: numberOfRespondents,
+      totalEligible: filteredResponses.length,
+    },
+  };
+};
+
+// --- PROCESSOR ---
+const sustainabilityDimensionsProcessor: ChartProcessor = (responses, palette) => {
+  const data = sustainabilityDimensionsDataExtractor(responses);
+
   // Sort ascending by value for horizontal chart
-  items.sort((a, b) => a.value - b.value);
+  const sortedItems = [...data.items].sort((a, b) => a.value - b.value);
 
   const traces: Data[] = [
     {
       type: 'bar',
       orientation: 'h',
-      x: items.map((i) => i.value),
-      y: items.map((i) => i.label),
+      x: sortedItems.map((i) => i.value),
+      y: sortedItems.map((i) => i.label),
       marker: { color: palette.berry },
-      text: items.map((i) => i.value.toString()),
+      text: sortedItems.map((i) => i.value.toString()),
       textposition: 'outside',
       textfont: {
         family: 'PP Mori, sans-serif',
@@ -98,10 +119,7 @@ const sustainabilityDimensionsProcessor: ChartProcessor = (responses, palette) =
 
   return {
     traces,
-    stats: {
-      numberOfResponses: numberOfRespondents,
-      totalEligible: filteredResponses.length,
-    },
+    stats: data.stats,
   };
 };
 
@@ -121,6 +139,8 @@ export const SustainabilityDimensionsInTasks = ({ onExplore }: { onExplore?: () 
       layout={layout}
       exploreComponents={[SustainabilityDimensionsInTasksOther]}
       onExplore={onExplore}
+      dataExtractor={sustainabilityDimensionsDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };

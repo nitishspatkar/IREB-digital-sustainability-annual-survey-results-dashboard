@@ -1,11 +1,19 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
-import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
 import { DriversToIncorporateSustainabilityOther } from '../../explore-graphs/DriversToIncorporateSustainabilityOther';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
-// --- PROCESSOR ---
-const driversProcessor: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const driversDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const normalize = (v: string) => v?.trim().toLowerCase() ?? '';
 
   let orgPolicies = 0;
@@ -74,17 +82,30 @@ const driversProcessor: ChartProcessor = (responses, palette) => {
     { label: 'Other', value: other },
   ];
 
+  return {
+    items,
+    stats: {
+      numberOfResponses: respondentsWithAnyAnswer,
+      totalEligible: filteredResponses.length,
+    },
+  };
+};
+
+// --- PROCESSOR ---
+const driversProcessor: ChartProcessor = (responses, palette) => {
+  const data = driversDataExtractor(responses);
+
   // Sort ascending by value
-  items.sort((a, b) => a.value - b.value);
+  const sortedItems = [...data.items].sort((a, b) => a.value - b.value);
 
   const traces: Data[] = [
     {
       type: 'bar',
       orientation: 'h',
-      x: items.map((i) => i.value),
-      y: items.map((i) => i.label),
+      x: sortedItems.map((i) => i.value),
+      y: sortedItems.map((i) => i.label),
       marker: { color: palette.berry },
-      text: items.map((i) => i.value.toString()),
+      text: sortedItems.map((i) => i.value.toString()),
       textposition: 'outside',
       textfont: {
         family: 'PP Mori, sans-serif',
@@ -98,10 +119,7 @@ const driversProcessor: ChartProcessor = (responses, palette) => {
 
   return {
     traces,
-    stats: {
-      numberOfResponses: respondentsWithAnyAnswer,
-      totalEligible: filteredResponses.length,
-    },
+    stats: data.stats,
   };
 };
 
@@ -121,6 +139,8 @@ export const DriversToIncorporateSustainability = ({ onExplore }: { onExplore?: 
       layout={layout}
       exploreComponents={[DriversToIncorporateSustainabilityOther]}
       onExplore={onExplore}
+      dataExtractor={driversDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };
