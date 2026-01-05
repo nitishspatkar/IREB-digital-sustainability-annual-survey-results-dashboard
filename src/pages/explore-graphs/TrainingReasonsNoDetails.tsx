@@ -1,7 +1,5 @@
-import { useMemo } from 'react';
-import { useSurveyData } from '../../data/data-parsing-logic/SurveyContext';
-import { useGraphDescription } from '../../hooks/useGraphDescription';
-import { SurveyExploreList } from '../../components/GraphViews';
+import { GenericChart } from '../../components/GraphViews';
+import type { ChartProcessor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
 
 // --- SHARED DATA LOGIC ---
@@ -102,27 +100,26 @@ export const getTrainingReasonsStats = (responses: readonly SurveyResponse[]) =>
   };
 };
 
-export const TrainingReasonsNoDetails = ({ onBack }: { onBack: () => void }) => {
-  const responses = useSurveyData();
-  const { stats, otherTexts } = useMemo(() => getTrainingReasonsStats(responses), [responses]);
-
-  const questionHeaderOther = useGraphDescription('TrainingReasonsNoDetails').question;
-
-  const mainQuestion = useGraphDescription('TrainingReasonsNo').question;
+const processor: ChartProcessor = (responses) => {
+  const { stats, otherTexts } = getTrainingReasonsStats(responses);
   const otherStat = stats.find((s) => s.key === 'trainingOtherReason');
   const numberOfOtherSelections = otherStat ? otherStat.count : 0;
 
-  const responseRate =
-    numberOfOtherSelections > 0 ? (otherTexts.length / numberOfOtherSelections) * 100 : 0;
+  return {
+    items: otherTexts,
+    stats: {
+      numberOfResponses: otherTexts.length,
+      totalEligible: numberOfOtherSelections,
+    },
+  };
+};
 
+export const TrainingReasonsNoDetails = ({ onBack }: { onBack: () => void }) => {
   return (
-    <SurveyExploreList
-      title={mainQuestion}
-      items={otherTexts}
-      question={questionHeaderOther ?? mainQuestion}
-      description={useGraphDescription('TrainingReasonsNoDetails').description}
-      numberOfResponses={otherTexts.length}
-      responseRate={responseRate}
+    <GenericChart
+      graphId="TrainingReasonsNoDetails"
+      processor={processor}
+      isEmbedded={true}
       onBack={onBack}
     />
   );
