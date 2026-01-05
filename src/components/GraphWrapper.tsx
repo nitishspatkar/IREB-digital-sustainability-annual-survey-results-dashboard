@@ -10,6 +10,10 @@ interface GraphWrapperProps {
   showExploreButton?: boolean;
   onBack?: () => void;
   showBackButton?: boolean;
+  // Comparison support
+  compareYear?: string | null;
+  onCompareYearChange?: (year: string | null) => void;
+  availableCompareYears?: readonly string[];
 }
 
 const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
@@ -24,6 +28,9 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
       showExploreButton = false,
       onBack,
       showBackButton = false,
+      compareYear,
+      onCompareYearChange,
+      availableCompareYears = [],
     },
     ref
   ) => {
@@ -71,7 +78,7 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
         </div>
 
         {/* Action buttons */}
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center flex-wrap">
           <button className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-berry text-white border-ireb-berry shadow-card">
             Results
           </button>
@@ -90,6 +97,35 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
             >
               <span className="pr-2">←</span> Back to Overview
             </button>
+          )}
+
+          {/* Comparison controls */}
+          {availableCompareYears.length > 0 && onCompareYearChange && (
+            <div className="flex items-center gap-3 ml-auto">
+              <span className="font-mori font-bold text-ireb-berry">Compare:</span>
+              <label className="flex items-center gap-2 cursor-pointer font-mori">
+                <input
+                  type="radio"
+                  name={`compare-${question}`}
+                  checked={compareYear === null}
+                  onChange={() => onCompareYearChange(null)}
+                  className="w-4 h-4 text-ireb-berry border-ireb-berry focus:ring-ireb-berry"
+                />
+                <span className="text-ireb-berry">None</span>
+              </label>
+              {availableCompareYears.map((year) => (
+                <label key={year} className="flex items-center gap-2 cursor-pointer font-mori">
+                  <input
+                    type="radio"
+                    name={`compare-${question}`}
+                    checked={compareYear === year}
+                    onChange={() => onCompareYearChange(year)}
+                    className="w-4 h-4 text-ireb-berry border-ireb-berry focus:ring-ireb-berry"
+                  />
+                  <span className="text-ireb-berry">{year}</span>
+                </label>
+              ))}
+            </div>
           )}
         </div>
       </div>

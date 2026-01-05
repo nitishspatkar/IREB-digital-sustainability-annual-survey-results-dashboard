@@ -2,8 +2,10 @@ import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from './GraphWrapper';
 import useThemeColor from '../hooks/useThemeColor';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useSurveyData } from '../data/data-parsing-logic/SurveyContext';
+import { useYear } from '../data/data-parsing-logic/YearContext';
+import { SurveyRepository } from '../data/data-parsing-logic/SurveyRepository';
 import type { SurveyResponse } from '../data/data-parsing-logic/SurveyResponse';
 import { useGraphDescription } from '../hooks/useGraphDescription';
 import type { GraphId } from '../hooks/useGraphDescription';
@@ -12,7 +14,7 @@ import { useGraphExplore } from '../contexts/GraphExploreContext';
 export type ExploreComponent = React.ComponentType<{ onBack: () => void }>;
 
 // 1. Define the Palette that will be passed to the processors, which then can use it to style their graphs
-type ChartPalette = {
+export type ChartPalette = {
   berry: string;
   lightBerry: string;
   superLightBerry: string;
@@ -69,7 +71,21 @@ export type ChartProcessor = (
   palette: ChartPalette
 ) => ChartProcessorResult;
 
-interface GenericChartProps {
+// 4. Comparison Support Types
+
+// Data Extractor: Extracts normalized data from responses (chart-specific)
+export type DataExtractor<T> = (responses: readonly SurveyResponse[]) => T;
+
+// Comparison Strategy: Takes extracted data from two years and generates comparison visualization (reusable)
+export type ComparisonStrategy<T> = (
+  currentYearData: T,
+  compareYearData: T,
+  currentYear: string,
+  compareYear: string,
+  palette: ChartPalette
+) => ChartProcessorResult;
+
+interface GenericChartProps<T = never> {
   graphId: GraphId; // ID for text lookup
   processor: ChartProcessor; // The unique logic function
   layout?: Partial<Layout>; // Unique layout overrides
@@ -77,9 +93,12 @@ interface GenericChartProps {
   exploreComponents?: ExploreComponent[]; // Optional array of explore components
   isEmbedded?: boolean;
   onBack?: () => void; // Optional back handler
+  // Comparison support (optional)
+  dataExtractor?: DataExtractor<T>;
+  comparisonStrategy?: ComparisonStrategy<T>;
 }
 
-export const GenericChart = ({
+export const GenericChart = <T,>({
   graphId,
   processor,
   layout = {},
@@ -87,18 +106,27 @@ export const GenericChart = ({
   exploreComponents,
   isEmbedded = false,
   onBack,
-}: GenericChartProps) => {
+  dataExtractor,
+  comparisonStrategy,
+}: GenericChartProps<T>) => {
   // --- A. Boilerplate Hooks ---
   const { activeExploreId, setActiveExploreId } = useGraphExplore();
   const responses = useSurveyData();
+  const currentYear = useYear();
   const { question, description } = useGraphDescription(graphId);
+
+  // --- Comparison State ---
+  const [compareYear, setCompareYear] = useState<string | null>(null);
+  const availableYears = useMemo(() => {
+    return SurveyRepository.getAvailableYears().filter((year) => year !== currentYear);
+  }, [currentYear]);
 
   // --- Scroll position tracking ---
   const graphRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef<number>(0);
 
   // --- B. Fetch Theme Colors once ---
-  const palette: ChartPalette = {
+  const palette = {
     berry: useThemeColor('--color-ireb-berry'),
     lightBerry: useThemeColor('--color-ireb-light-berry'),
     superLightBerry: useThemeColor('--color-ireb-superlight-berry'),
@@ -110,49 +138,45 @@ export const GenericChart = ({
   };
 
   // --- C. Execute the unique logic ---
-  const { traces, items, stats } = useMemo(
-    () => processor(responses, palette),
+  // Use comparison strategy if compare year is selected and both extractor and strategy are provided
+  const { traces, items, stats } = useMemo(() => {
+    if (compareYear && dataExtractor && comparisonStrategy) {
+      // Comparison mode
+      const compareResponses = SurveyRepository.getSurvey(compareYear);
+      const currentYearData = dataExtractor(responses);
+      const compareYearData = dataExtractor(compareResponses);
+      return comparisonStrategy(
+        currentYearData,
+        compareYearData,
+        currentYear,
+        compareYear,
+        palette
+      );
+    } else {
+      // Normal mode
+      return processor(responses, palette);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      responses,
-      processor,
-      palette.berry,
-      palette.grey,
-      palette.grey02,
-      palette.spring,
-      palette.darkSpring,
-      palette.mandarin,
-      palette.lightBerry,
-      palette.superLightBerry,
-    ]
-  );
+  }, [
+    responses,
+    processor,
+    compareYear,
+    dataExtractor,
+    comparisonStrategy,
+    currentYear,
+    palette.berry,
+    palette.grey,
+    palette.grey02,
+    palette.spring,
+    palette.darkSpring,
+    palette.mandarin,
+    palette.lightBerry,
+    palette.superLightBerry,
+  ]);
 
   // --- D. Calculate Rates ---
   const denominator = stats.totalEligible ?? responses.length;
   const responseRate = denominator > 0 ? (stats.numberOfResponses / denominator) * 100 : 0;
-
-  // --- E. Merge Layouts ---
-  const defaultLayout: Partial<Layout> = {
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    font: { family: 'PP Mori, sans-serif', color: palette.grey },
-    xaxis: {
-      tickfont: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey },
-      title: { font: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey } },
-    },
-    yaxis: {
-      tickfont: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey },
-      title: { font: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey } },
-    },
-  };
-
-  // Deep merge for nested layout properties
-  const finalLayout: Partial<Layout> = {
-    ...defaultLayout,
-    ...layout,
-    xaxis: { ...defaultLayout.xaxis, ...layout.xaxis },
-    yaxis: { ...defaultLayout.yaxis, ...layout.yaxis },
-  };
 
   const handleExplore = () => {
     // Store current scroll position before exploring
@@ -207,6 +231,9 @@ export const GenericChart = ({
         responseRate={responseRate}
         showBackButton={!!onBack}
         onBack={onBack}
+        compareYear={compareYear}
+        onCompareYearChange={dataExtractor && comparisonStrategy ? setCompareYear : undefined}
+        availableCompareYears={dataExtractor && comparisonStrategy ? availableYears : []}
       >
         <div className="h-[520px]">
           <ul className="h-full overflow-y-auto" style={{ color: palette.grey }}>
@@ -237,11 +264,14 @@ export const GenericChart = ({
       onExplore={handleExplore}
       showBackButton={!!onBack}
       onBack={onBack}
+      compareYear={compareYear}
+      onCompareYearChange={dataExtractor && comparisonStrategy ? setCompareYear : undefined}
+      availableCompareYears={dataExtractor && comparisonStrategy ? availableYears : []}
     >
       <div className="h-[520px]">
         <Plot
           data={traces as Data[]}
-          layout={finalLayout}
+          layout={layout}
           config={{ displayModeBar: false, responsive: true }}
           useResizeHandler
           style={{ width: '100%', height: '100%' }}
