@@ -4,6 +4,8 @@ import type { Data, Layout } from 'plotly.js';
 import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
 import { DiscussionFrequencyByRole } from '../../explore-graphs/DiscussionFrequencyByRole.tsx';
 import { DiscussionFrequencyOther } from '../../explore-graphs/DiscussionFrequencyOther';
+import { DiscussionFrequencyByAge } from '../../explore-graphs/DiscussionFrequencyByAge.tsx';
+import { DiscussionFrequencyByExperience } from '../../explore-graphs/DiscussionFrequencyByExperience.tsx';
 
 const normalizeFrequency = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -72,7 +74,12 @@ export const DiscussionFrequency = ({
       graphId="DiscussionFrequency"
       processor={discussionFrequencyProcessor}
       layout={layout}
-      exploreComponents={[DiscussionFrequencyOther, DiscussionFrequencyByRole]}
+      exploreComponents={[
+        DiscussionFrequencyOther,
+        DiscussionFrequencyByRole,
+        DiscussionFrequencyByAge,
+        DiscussionFrequencyByExperience,
+      ]}
       onExplore={onExplore}
     />
   );

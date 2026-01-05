@@ -65,6 +65,14 @@
     "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
     "description": "Shows the discussion frequency of digital sustainability discussions among respondents by role."
   },
+  "DiscussionFrequencyByAge": {
+    "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
+    "description": "Shows the discussion frequency of digital sustainability discussions among respondents by age group."
+  },
+  "DiscussionFrequencyByExperience": {
+    "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
+    "description": "Shows the discussion frequency of digital sustainability discussions among respondents by professional experience."
+  },
   "DiscussionFrequencyDetails": {
     "title": "How often do you discuss digital sustainability in your professional environment?",
     "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment? [Other]",
