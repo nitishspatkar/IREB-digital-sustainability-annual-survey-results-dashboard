@@ -69,7 +69,7 @@ export type ChartProcessorResult = ChartModeResult | ListModeResult;
 export type ChartProcessor = (
   responses: readonly SurveyResponse[],
   palette: ChartPalette
-) => ChartProcessorResult;
+) => ChartProcessorResult | null;
 
 // 4. Comparison Support Types
 
@@ -83,7 +83,7 @@ export type ComparisonStrategy<T> = (
   currentYear: string,
   compareYear: string,
   palette: ChartPalette
-) => ChartProcessorResult;
+) => ChartProcessorResult | null;
 
 interface GenericChartProps<T = never> {
   graphId: GraphId; // ID for text lookup
@@ -139,7 +139,8 @@ export const GenericChart = <T,>({
 
   // --- C. Execute the unique logic ---
   // Use comparison strategy if compare year is selected and both extractor and strategy are provided
-  const { traces, items, stats } = useMemo(() => {
+  // We capture the whole result object (or null) instead of destructuring immediately
+  const processorResult = useMemo(() => {
     if (compareYear && dataExtractor && comparisonStrategy) {
       // Comparison mode
       const compareResponses = SurveyRepository.getSurvey(compareYear);
@@ -173,6 +174,14 @@ export const GenericChart = <T,>({
     palette.lightBerry,
     palette.superLightBerry,
   ]);
+
+  // --- CHECK: If no data exists, do not render anything ---
+  if (!processorResult) {
+    return null;
+  }
+
+  // Now it is safe to destructure
+  const { traces, items, stats } = processorResult;
 
   // --- D. Calculate Rates ---
   const denominator = stats.totalEligible ?? responses.length;

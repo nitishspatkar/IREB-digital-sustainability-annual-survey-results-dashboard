@@ -21,6 +21,11 @@ const processor: ChartProcessor = (responses) => {
     }
   });
 
+  // If no "other" texts exist, return null to prevent rendering
+  if (otherTexts.length === 0) {
+    return null;
+  }
+
   const otherStat = Array.from(counts.entries()).find(([freq]) =>
     freq.toLowerCase().includes('other')
   );
