@@ -1,8 +1,16 @@
-import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
 import { TrainingReasonsNotMoreOther } from '../../explore-graphs/TrainingReasonsNotMoreOther';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
-const processData: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const trainingReasonsNotMoreDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
   // Precondition: Q10 = Yes
@@ -62,29 +70,30 @@ const processData: ChartProcessor = (responses, palette) => {
   });
 
   const items = [
-    {
-      label: 'I was not aware such programs existed',
-      key: 'notMoreTrainingNotAware',
-      count: countAware,
+    { label: 'I was not aware such programs existed', value: countAware },
+    { label: 'My organization does not offer such programs', value: countNoOffer },
+    { label: 'I have not had the opportunity to attend', value: countNoOpp },
+    { label: "I don't see the need for such training", value: countNoNeed },
+    { label: 'The cost is too high', value: countExpensive },
+    { label: 'Other', value: countOther },
+  ];
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: withAnswer,
+      totalEligible: filteredResponses.length,
     },
-    {
-      label: 'My organization does not offer such programs',
-      key: 'notMoreTrainingNoOrganization',
-      count: countNoOffer,
-    },
-    {
-      label: 'I have not had the opportunity to attend',
-      key: 'notMoreTrainingNoOpportunity',
-      count: countNoOpp,
-    },
-    {
-      label: "I don't see the need for such training",
-      key: 'notMoreTrainingNoNeed',
-      count: countNoNeed,
-    },
-    { label: 'The cost is too high', key: 'notMoreTrainingTooExpensive', count: countExpensive },
-    { label: 'Other', key: 'notMoreTrainingOther', count: countOther },
-  ].sort((a, b) => a.count - b.count);
+  };
+};
+
+// --- PROCESSOR ---
+const processData: ChartProcessor = (responses, palette) => {
+  const data = trainingReasonsNotMoreDataExtractor(responses);
+
+  const items = data.items
+    .map((item) => ({ label: item.label, count: item.value }))
+    .sort((a, b) => a.count - b.count);
 
   return {
     traces: [
@@ -101,10 +110,7 @@ const processData: ChartProcessor = (responses, palette) => {
         hoverinfo: 'none',
       },
     ],
-    stats: {
-      numberOfResponses: withAnswer,
-      totalEligible: filteredResponses.length,
-    },
+    stats: data.stats,
   };
 };
 
@@ -129,6 +135,8 @@ export const TrainingReasonsNotMore = ({ onExplore }: { onExplore?: () => void }
       }}
       exploreComponents={[TrainingReasonsNotMoreOther]}
       onExplore={onExplore}
+      dataExtractor={trainingReasonsNotMoreDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };

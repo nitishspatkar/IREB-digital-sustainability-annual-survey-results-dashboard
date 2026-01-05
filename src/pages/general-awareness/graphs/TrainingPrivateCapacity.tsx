@@ -1,5 +1,12 @@
-import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // Define the categories and their search terms
 const capacityOptions = [
@@ -13,9 +20,8 @@ const capacityOptions = [
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-// The Logic (Pure Function)
-// Precondition: Q10 = Yes (participatedInTraining)
-const processData: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const trainingPrivateCapacityDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const counts = new Map<string, number>();
   capacityOptions.forEach((opt) => counts.set(opt.label, 0));
 
@@ -43,6 +49,21 @@ const processData: ChartProcessor = (responses, palette) => {
   const total = stats.reduce((sum, s) => sum + s.count, 0);
 
   return {
+    items: stats.map((s) => ({ label: s.label, value: s.count })),
+    stats: {
+      numberOfResponses: total,
+      totalEligible: participants.length,
+    },
+  };
+};
+
+// --- PROCESSOR ---
+const processData: ChartProcessor = (responses, palette) => {
+  const data = trainingPrivateCapacityDataExtractor(responses);
+
+  const stats = data.items.map((item) => ({ label: item.label, count: item.value }));
+
+  return {
     traces: [
       {
         type: 'bar',
@@ -67,10 +88,7 @@ const processData: ChartProcessor = (responses, palette) => {
         hoverinfo: 'none',
       },
     ],
-    stats: {
-      numberOfResponses: total,
-      totalEligible: participants.length,
-    },
+    stats: data.stats,
   };
 };
 
@@ -90,6 +108,8 @@ const TrainingPrivateCapacity = () => {
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
+      dataExtractor={trainingPrivateCapacityDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };

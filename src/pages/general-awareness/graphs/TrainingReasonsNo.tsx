@@ -1,5 +1,8 @@
-import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
 import {
   getTrainingReasonsStats,
   TrainingReasonsNoDetails,
@@ -7,10 +10,28 @@ import {
 import { TrainingReasonsNoByAge } from '../../explore-graphs/TrainingReasonsNoByAge.tsx';
 import { TrainingReasonsNoByExperience } from '../../explore-graphs/TrainingReasonsNoByExperience.tsx';
 import { TrainingReasonsNoByRole } from '../../explore-graphs/TrainingReasonsNoByRole.tsx';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+
+// --- DATA EXTRACTOR ---
+const trainingReasonsNoDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const { stats, respondentsWithAnyAnswer, totalEligible } = getTrainingReasonsStats(responses);
+
+  return {
+    items: stats.map((stat) => ({ label: stat.label, value: stat.count })),
+    stats: {
+      numberOfResponses: respondentsWithAnyAnswer,
+      totalEligible: totalEligible,
+    },
+  };
+};
 
 // --- PROCESSOR ---
 const processData: ChartProcessor = (responses, palette) => {
-  const { stats, respondentsWithAnyAnswer, totalEligible } = getTrainingReasonsStats(responses);
+  const data = trainingReasonsNoDataExtractor(responses);
+  const stats = data.items.map((item) => ({ label: item.label, count: item.value }));
 
   return {
     traces: [
@@ -27,10 +48,7 @@ const processData: ChartProcessor = (responses, palette) => {
         hoverinfo: 'none',
       },
     ],
-    stats: {
-      numberOfResponses: respondentsWithAnyAnswer,
-      totalEligible: totalEligible,
-    },
+    stats: data.stats,
   };
 };
 
@@ -61,6 +79,8 @@ export const TrainingReasonsNo = ({ onExplore }: { onExplore?: () => void }) => 
         TrainingReasonsNoByExperience,
       ]}
       onExplore={onExplore}
+      dataExtractor={trainingReasonsNoDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };

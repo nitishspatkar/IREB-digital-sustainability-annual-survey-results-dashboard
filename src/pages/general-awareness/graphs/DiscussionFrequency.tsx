@@ -1,16 +1,24 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
-import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
 import { DiscussionFrequencyByRole } from '../../explore-graphs/DiscussionFrequencyByRole.tsx';
 import { DiscussionFrequencyOther } from '../../explore-graphs/DiscussionFrequencyOther';
 import { DiscussionFrequencyByAge } from '../../explore-graphs/DiscussionFrequencyByAge.tsx';
 import { DiscussionFrequencyByExperience } from '../../explore-graphs/DiscussionFrequencyByExperience.tsx';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalizeFrequency = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-// --- PROCESSOR FOR GENERIC CHART ---
-const discussionFrequencyProcessor: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const discussionFrequencyDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const counts = new Map<string, number>();
 
   responses.forEach((response) => {
@@ -25,6 +33,20 @@ const discussionFrequencyProcessor: ChartProcessor = (responses, palette) => {
     .sort((a, b) => a.count - b.count);
 
   const numberOfResponses = frequencyStats.reduce((sum, stat) => sum + stat.count, 0);
+
+  return {
+    items: frequencyStats.map((stat) => ({ label: stat.frequency, value: stat.count })),
+    stats: {
+      numberOfResponses,
+    },
+  };
+};
+
+// --- PROCESSOR ---
+const discussionFrequencyProcessor: ChartProcessor = (responses, palette) => {
+  const data = discussionFrequencyDataExtractor(responses);
+
+  const frequencyStats = data.items.map((item) => ({ frequency: item.label, count: item.value }));
 
   const traces: Data[] = [
     {
@@ -49,9 +71,7 @@ const discussionFrequencyProcessor: ChartProcessor = (responses, palette) => {
 
   return {
     traces,
-    stats: {
-      numberOfResponses,
-    },
+    stats: data.stats,
   };
 };
 
@@ -92,6 +112,8 @@ export const DiscussionFrequency = ({
         DiscussionFrequencyByExperience,
       ]}
       onExplore={onExplore}
+      dataExtractor={discussionFrequencyDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };
