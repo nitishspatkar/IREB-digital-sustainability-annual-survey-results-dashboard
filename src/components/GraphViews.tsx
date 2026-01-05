@@ -2,7 +2,7 @@ import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from './GraphWrapper';
 import useThemeColor from '../hooks/useThemeColor';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useSurveyData } from '../data/data-parsing-logic/SurveyContext';
 import type { SurveyResponse } from '../data/data-parsing-logic/SurveyResponse';
 import { useGraphDescription } from '../hooks/useGraphDescription';
@@ -93,6 +93,10 @@ export const GenericChart = ({
   const responses = useSurveyData();
   const { question, description } = useGraphDescription(graphId);
 
+  // --- Scroll position tracking ---
+  const graphRef = useRef<HTMLDivElement>(null);
+  const scrollPositionRef = useRef<number>(0);
+
   // --- B. Fetch Theme Colors once ---
   const palette: ChartPalette = {
     berry: useThemeColor('--color-ireb-berry'),
@@ -151,15 +155,26 @@ export const GenericChart = ({
   };
 
   const handleExplore = () => {
+    // Store current scroll position before exploring
+    scrollPositionRef.current = window.scrollY;
+
     if (onExplore) {
       onExplore();
     } else if (exploreComponents && exploreComponents.length > 0) {
       setActiveExploreId(graphId);
+      // Scroll to top of the graph
+      setTimeout(() => {
+        graphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
     }
   };
 
   const handleBack = () => {
     setActiveExploreId(null);
+    // Restore scroll position after a brief delay to allow render
+    setTimeout(() => {
+      window.scrollTo({ top: scrollPositionRef.current, behavior: 'smooth' });
+    }, 100);
   };
 
   // Hide this chart if another chart is being explored
@@ -170,7 +185,7 @@ export const GenericChart = ({
   // Show explore view if this chart is being explored
   if (activeExploreId === graphId && exploreComponents) {
     return (
-      <div className="space-y-12">
+      <div ref={graphRef} className="space-y-12">
         <h1 className="text-2xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
           Explore: {question}
         </h1>
@@ -185,6 +200,7 @@ export const GenericChart = ({
   if (items) {
     return (
       <GraphWrapper
+        ref={graphRef}
         question={question}
         description={description}
         numberOfResponses={stats.numberOfResponses}
@@ -212,6 +228,7 @@ export const GenericChart = ({
   // --- Chart Mode: Render standard Plotly chart ---
   return (
     <GraphWrapper
+      ref={graphRef}
       question={question}
       description={description}
       numberOfResponses={stats.numberOfResponses}

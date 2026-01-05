@@ -1,42 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { useSurveyData } from '../../data/data-parsing-logic/SurveyContext';
 
-// Deine Diagramm-Imports
 import DemographicAgeGroup from './graphs/DemographicAgeGroup';
 import DemographicChoropleth from './graphs/DemographicChoropleth';
 import DemographicCountryTable from './graphs/DemographicCountryTable';
 import DemographicOrganizationType from './graphs/DemographicOrganizationType';
 import { DemographicProfessionalExperience } from './graphs/DemographicProfessionalExperience';
 import { DemographicApplicationDomain } from './graphs/DemographicApplicationDomain';
-import { DemographicApplicationDomainOther } from '../explore-graphs/DemographicApplicationDomainOther.tsx';
 import { DemographicOrganizationalRole } from './graphs/DemographicOrganizationalRole';
-import { DemographicOrganizationalRoleOther } from '../explore-graphs/DemographicOrganizationalRoleOther.tsx';
 import type { RespondentStat } from './demographicTypes';
 import DemographicRegionDistribution from './graphs/DemographicRegionDistribution.tsx';
 
-// Hilfs-Komponente für den Anker (spart Schreibarbeit im JSX)
-const GraphAnchor = ({ id, children }: { id: string; children: React.ReactNode }) => (
-  <div id={id}>{children}</div>
-);
-
-// Definition der Views (Mapping)
-const EXPLORE_VIEWS = {
-  org_role: {
-    Component: DemographicOrganizationalRoleOther,
-    anchorId: 'graph-org-role',
-  },
-  app_domain: {
-    Component: DemographicApplicationDomainOther,
-    anchorId: 'graph-app-domain',
-  },
-} as const;
-
-type ExploreViewId = keyof typeof EXPLORE_VIEWS;
-
 const Demographic = () => {
   const surveyResponses = useSurveyData();
-  const [activeView, setActiveView] = useState<ExploreViewId | null>(null);
 
   // --- Data Logic (gekürzt für Übersicht) ---
   const normalizeCountry = (val: string) => val.replace(/\s+/g, ' ').trim();
@@ -57,21 +34,6 @@ const Demographic = () => {
   const totalRespondents = surveyResponses.length;
   const totalCountries = respondentStats.length;
 
-  // --- Back Logic ---
-  const handleBack = (anchorId: string) => {
-    setActiveView(null);
-    setTimeout(() => {
-      document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
-  };
-
-  // 1. RENDER EXPLORE VIEW (Dynamisch basierend auf dem Mapping oben)
-  if (activeView) {
-    const { Component, anchorId } = EXPLORE_VIEWS[activeView];
-    return <Component onBack={() => handleBack(anchorId)} />;
-  }
-
-  // 2. RENDER DASHBOARD (Explizites JSX = bessere Lesbarkeit)
   return (
     <div className="space-y-6">
       <header>
@@ -90,13 +52,9 @@ const Demographic = () => {
         <DemographicChoropleth respondentStats={respondentStats} />
         <DemographicAgeGroup />
         <DemographicProfessionalExperience />
-        <GraphAnchor id="graph-org-role">
-          <DemographicOrganizationalRole onExplore={() => setActiveView('org_role')} />
-        </GraphAnchor>
+        <DemographicOrganizationalRole />
         <DemographicOrganizationType />
-        <GraphAnchor id="graph-app-domain">
-          <DemographicApplicationDomain onExplore={() => setActiveView('app_domain')} />
-        </GraphAnchor>
+        <DemographicApplicationDomain />
       </div>
     </div>
   );
