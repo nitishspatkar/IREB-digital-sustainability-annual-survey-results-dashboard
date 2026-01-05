@@ -5,7 +5,7 @@ import CustomerNotRequestingReasons from './graphs/CustomerNotRequestingReasons'
 import CustomerRequirementFrequency from './graphs/CustomerRequirementFrequency';
 // Updated Imports
 import { NoTrainingReasons } from './graphs/NoTrainingReasons';
-import { NoTrainingReasonsOther } from './graphs/NoTrainingReasonsOther';
+import { NoTrainingReasonsOther } from '../explore-graphs/NoTrainingReasonsOther';
 import OrganizationDepartmentCoordination from './graphs/OrganizationDepartmentCoordination';
 import OrganizationHasGoals from './graphs/OrganizationHasGoals';
 import OrganizationHasSustainabilityTeam from './graphs/OrganizationHasSustainabilityTeam';
@@ -14,7 +14,7 @@ import OrganizationOffersTraining from './graphs/OrganizationOffersTraining';
 import OrganizationReportsOnSustainability from './graphs/OrganizationReportsOnSustainability';
 import OrganizationTrainingDescriptionList from './graphs/OrganizationTrainingDescriptionList';
 import { SustainabilityDimensions } from './graphs/SustainabilityDimensions';
-import { SustainabilityDimensionsOther } from './graphs/SustainabilityDimensionsOther';
+import { SustainabilityDimensionsOther } from '../explore-graphs/SustainabilityDimensionsOther';
 
 // --- HELPER COMPONENT ---
 const GraphAnchor = ({ id, children }: { id: string; children: React.ReactNode }) => (

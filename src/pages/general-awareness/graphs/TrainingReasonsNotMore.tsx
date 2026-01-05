@@ -1,6 +1,6 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
-import { TrainingReasonsNotMoreOther } from './TrainingReasonsNotMoreOther';
+import { TrainingReasonsNotMoreOther } from '../../explore-graphs/TrainingReasonsNotMoreOther';
 
 const processData: ChartProcessor = (responses, palette) => {
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';

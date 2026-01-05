@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
-import { SurveyExploreList } from '../../../components/GraphViews';
+import { useSurveyData } from '../../data/data-parsing-logic/SurveyContext';
+import { useGraphDescription } from '../../hooks/useGraphDescription';
+import { SurveyExploreList } from '../../components/GraphViews';
 
-export const NoTrainingReasonsOther = ({ onBack }: { onBack: () => void }) => {
+export const DriversToIncorporateSustainabilityOther = ({ onBack }: { onBack: () => void }) => {
   const surveyResponses = useSurveyData();
-  const { question: mainQuestion } = useGraphDescription('NoTrainingReasons');
+  const { question: mainQuestion } = useGraphDescription('DriversToIncorporateSustainability');
   const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
-    'NoTrainingReasonsDetails'
+    'DriversToIncorporateSustainabilityDetails'
   );
 
   const { otherTexts, numberOfOtherSelections } = useMemo(() => {
@@ -15,11 +15,16 @@ export const NoTrainingReasonsOther = ({ onBack }: { onBack: () => void }) => {
     let otherCount = 0;
     const texts: string[] = [];
 
-    surveyResponses.forEach((response) => {
-      const otherVal = normalize(response.raw.orgNoTrainingOther);
-      if (otherVal.length > 0 && otherVal !== 'n/a') {
+    // Filter for Q28 = Yes
+    const filteredResponses = surveyResponses.filter(
+      (r) => normalize(r.raw.personIncorporatesSustainability) === 'yes'
+    );
+
+    filteredResponses.forEach((response) => {
+      const otherVal = normalize(response.raw.driveOther);
+      if (otherVal.length > 0 && otherVal !== 'n/a' && otherVal !== 'yes') {
         otherCount++;
-        texts.push(response.raw.orgNoTrainingOther?.trim() ?? '');
+        texts.push(response.raw.driveOther?.trim() ?? '');
       }
     });
 

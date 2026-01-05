@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
-import { SurveyExploreList } from '../../../components/GraphViews';
+import { useSurveyData } from '../../data/data-parsing-logic/SurveyContext';
+import { useGraphDescription } from '../../hooks/useGraphDescription';
+import { SurveyExploreList } from '../../components/GraphViews';
 
-export const SustainabilityDimensionsOther = ({ onBack }: { onBack: () => void }) => {
+export const NoTrainingReasonsOther = ({ onBack }: { onBack: () => void }) => {
   const surveyResponses = useSurveyData();
-  const { question: mainQuestion } = useGraphDescription('SustainabilityDimensions');
+  const { question: mainQuestion } = useGraphDescription('NoTrainingReasons');
   const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
-    'SustainabilityDimensionsDetails'
+    'NoTrainingReasonsDetails'
   );
 
   const { otherTexts, numberOfOtherSelections } = useMemo(() => {
@@ -16,10 +16,10 @@ export const SustainabilityDimensionsOther = ({ onBack }: { onBack: () => void }
     const texts: string[] = [];
 
     surveyResponses.forEach((response) => {
-      const otherVal = normalize(response.raw.considerOther);
+      const otherVal = normalize(response.raw.orgNoTrainingOther);
       if (otherVal.length > 0 && otherVal !== 'n/a') {
         otherCount++;
-        texts.push(response.raw.considerOther?.trim() ?? '');
+        texts.push(response.raw.orgNoTrainingOther?.trim() ?? '');
       }
     });
 

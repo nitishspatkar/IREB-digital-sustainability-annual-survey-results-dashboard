@@ -1,6 +1,6 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
-import { SustainabilityDimensionsOther } from './SustainabilityDimensionsOther';
+import { SustainabilityDimensionsOther } from '../../explore-graphs/SustainabilityDimensionsOther';
 
 const processData: ChartProcessor = (responses, palette) => {
   const normalize = (v: string) => v?.trim().toLowerCase() ?? '';

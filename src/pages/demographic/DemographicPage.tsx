@@ -9,9 +9,9 @@ import DemographicCountryTable from './graphs/DemographicCountryTable';
 import DemographicOrganizationType from './graphs/DemographicOrganizationType';
 import { DemographicProfessionalExperience } from './graphs/DemographicProfessionalExperience';
 import { DemographicApplicationDomain } from './graphs/DemographicApplicationDomain';
-import { DemographicApplicationDomainOther } from './graphs/DemographicApplicationDomainOther';
+import { DemographicApplicationDomainOther } from '../explore-graphs/DemographicApplicationDomainOther.tsx';
 import { DemographicOrganizationalRole } from './graphs/DemographicOrganizationalRole';
-import { DemographicOrganizationalRoleOther } from './graphs/DemographicOrganizationalRoleOther';
+import { DemographicOrganizationalRoleOther } from '../explore-graphs/DemographicOrganizationalRoleOther.tsx';
 import type { RespondentStat } from './demographicTypes';
 import DemographicRegionDistribution from './graphs/DemographicRegionDistribution.tsx';
 

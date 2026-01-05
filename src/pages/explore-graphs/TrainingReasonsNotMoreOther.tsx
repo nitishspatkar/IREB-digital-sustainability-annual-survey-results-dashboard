@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
-import { SurveyExploreList } from '../../../components/GraphViews';
+import { useSurveyData } from '../../data/data-parsing-logic/SurveyContext';
+import { useGraphDescription } from '../../hooks/useGraphDescription';
+import { SurveyExploreList } from '../../components/GraphViews';
 
 export const TrainingReasonsNotMoreOther = ({ onBack }: { onBack: () => void }) => {
   const responses = useSurveyData();

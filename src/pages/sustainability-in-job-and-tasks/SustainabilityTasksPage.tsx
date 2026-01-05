@@ -7,7 +7,7 @@ import {
   AdditionalSupportResourcesDetails,
 } from './graphs/AdditionalSupportResources';
 import { DriversToIncorporateSustainability } from './graphs/DriversToIncorporateSustainability';
-import { DriversToIncorporateSustainabilityOther } from './graphs/DriversToIncorporateSustainabilityOther';
+import { DriversToIncorporateSustainabilityOther } from '../explore-graphs/DriversToIncorporateSustainabilityOther';
 import {
   HindrancesToIncorporateSustainability,
   HindrancesToIncorporateSustainabilityDetails,
@@ -18,7 +18,7 @@ import {
 } from './graphs/KnowledgeGapsByDimension';
 import PersonIncorporatesSustainability from './graphs/PersonIncorporatesSustainability';
 import { SustainabilityDimensionsInTasks } from './graphs/SustainabilityDimensionsInTasks';
-import { SustainabilityDimensionsInTasksOther } from './graphs/SustainabilityDimensionsInTasksOther';
+import { SustainabilityDimensionsInTasksOther } from '../explore-graphs/SustainabilityDimensionsInTasksOther';
 import ToolsDescriptionList from './graphs/ToolsDescriptionList';
 import UsesTools from './graphs/UsesTools';
 

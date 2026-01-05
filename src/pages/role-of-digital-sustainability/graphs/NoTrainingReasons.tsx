@@ -1,6 +1,6 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
-import { NoTrainingReasonsOther } from './NoTrainingReasonsOther';
+import { NoTrainingReasonsOther } from '../../explore-graphs/NoTrainingReasonsOther';
 
 const processChartData: ChartProcessor = (responses, palette) => {
   const counts: Record<string, number> = {

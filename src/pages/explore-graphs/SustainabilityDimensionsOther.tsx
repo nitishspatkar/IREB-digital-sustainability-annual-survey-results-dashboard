@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
-import { SurveyExploreList } from '../../../components/GraphViews';
+import { useSurveyData } from '../../data/data-parsing-logic/SurveyContext';
+import { useGraphDescription } from '../../hooks/useGraphDescription';
+import { SurveyExploreList } from '../../components/GraphViews';
 
-export const DriversToIncorporateSustainabilityOther = ({ onBack }: { onBack: () => void }) => {
+export const SustainabilityDimensionsOther = ({ onBack }: { onBack: () => void }) => {
   const surveyResponses = useSurveyData();
-  const { question: mainQuestion } = useGraphDescription('DriversToIncorporateSustainability');
+  const { question: mainQuestion } = useGraphDescription('SustainabilityDimensions');
   const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
-    'DriversToIncorporateSustainabilityDetails'
+    'SustainabilityDimensionsDetails'
   );
 
   const { otherTexts, numberOfOtherSelections } = useMemo(() => {
@@ -15,16 +15,11 @@ export const DriversToIncorporateSustainabilityOther = ({ onBack }: { onBack: ()
     let otherCount = 0;
     const texts: string[] = [];
 
-    // Filter for Q28 = Yes
-    const filteredResponses = surveyResponses.filter(
-      (r) => normalize(r.raw.personIncorporatesSustainability) === 'yes'
-    );
-
-    filteredResponses.forEach((response) => {
-      const otherVal = normalize(response.raw.driveOther);
-      if (otherVal.length > 0 && otherVal !== 'n/a' && otherVal !== 'yes') {
+    surveyResponses.forEach((response) => {
+      const otherVal = normalize(response.raw.considerOther);
+      if (otherVal.length > 0 && otherVal !== 'n/a') {
         otherCount++;
-        texts.push(response.raw.driveOther?.trim() ?? '');
+        texts.push(response.raw.considerOther?.trim() ?? '');
       }
     });
 

@@ -1,6 +1,6 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
-import { DemographicOrganizationalRoleOther } from './DemographicOrganizationalRoleOther';
+import { DemographicOrganizationalRoleOther } from '../../explore-graphs/DemographicOrganizationalRoleOther';
 
 const normalizeRole = (value: string) => value.replace(/\s+/g, ' ').trim();
 

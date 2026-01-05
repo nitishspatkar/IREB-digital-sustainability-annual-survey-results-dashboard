@@ -8,7 +8,7 @@ import TrainingPrivateCapacity from './graphs/TrainingPrivateCapacity';
 import TrainingProgramsCount from './graphs/TrainingProgramsCount';
 import { TrainingReasonsNo, TrainingReasonsNoDetails } from './graphs/TrainingReasonsNo';
 import { TrainingReasonsNotMore } from './graphs/TrainingReasonsNotMore';
-import { TrainingReasonsNotMoreOther } from './graphs/TrainingReasonsNotMoreOther';
+import { TrainingReasonsNotMoreOther } from '../explore-graphs/TrainingReasonsNotMoreOther';
 import TrainingSatisfaction from './graphs/TrainingSatisfaction';
 
 // --- HELPER COMPONENT (DRY) ---
