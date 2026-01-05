@@ -167,6 +167,24 @@ export type ChartPalette = {
 };
 
 // 2. Define what your logic function must return
+//
+// ChartProcessorResult is a discriminated union that enforces mutual exclusivity:
+// - A processor returns EITHER traces (for Plotly charts) OR items (for text lists), never both.
+// - TypeScript enforces this at compile time via the `never` type on the excluded property.
+//
+// traces: Data[] - Plotly.js trace objects for rendering interactive charts (bar, pie, line, etc.)
+//         Used when the visualization requires a graph/chart.
+//
+// items: string[] - Plain text entries for rendering as a styled scrollable list.
+//        Used for open-ended survey responses (e.g., "Describe your training").
+//
+// stats: Required metadata for the GraphWrapper header display:
+//   - numberOfResponses: Count of valid data points (shown as "Number of responses: X")
+//   - totalEligible: Optional denominator for response rate calculation.
+//                    Defaults to total survey count if omitted.
+//                    Example: If 50 people said "Yes" to Q10 (eligible), and 30 provided descriptions,
+//                    totalEligible=50 yields a 60% response rate.
+
 type ChartProcessorStats = {
   numberOfResponses: number;
   totalEligible?: number; // Optional, defaults to total survey count
