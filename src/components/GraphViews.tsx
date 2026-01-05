@@ -2,69 +2,12 @@ import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from './GraphWrapper';
 import useThemeColor from '../hooks/useThemeColor';
-
-interface BaseProps {
-  question: string;
-  description?: string;
-  numberOfResponses: number;
-  responseRate: number;
-  className?: string;
-}
-
-interface ChartProps extends BaseProps {
-  data: Data[];
-  layout: Partial<Layout>;
-  hasExploreData: boolean;
-  showBackButton?: boolean;
-  showExploreTitle?: boolean;
-  onExplore?: () => void;
-  onBack?: () => void;
-}
-
-const SurveyChart = ({
-  question,
-  description,
-  numberOfResponses,
-  responseRate,
-  data,
-  layout,
-  hasExploreData,
-  showBackButton,
-  showExploreTitle,
-  onExplore,
-  className,
-  onBack,
-}: ChartProps) => {
-  return (
-    <div className={`space-y-6 ${className ?? ''}`}>
-      {showExploreTitle && (
-        <h1 className="text-2xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
-          Explore: {question}
-        </h1>
-      )}
-      <GraphWrapper
-        question={question}
-        description={description}
-        numberOfResponses={numberOfResponses}
-        responseRate={responseRate}
-        showExploreButton={hasExploreData}
-        onExplore={onExplore}
-        showBackButton={showBackButton}
-        onBack={onBack}
-      >
-        <div className="h-[520px]">
-          <Plot
-            data={data}
-            layout={layout}
-            config={{ displayModeBar: false, responsive: true }}
-            useResizeHandler
-            style={{ width: '100%', height: '100%' }}
-          />
-        </div>
-      </GraphWrapper>
-    </div>
-  );
-};
+import { useMemo } from 'react';
+import { useSurveyData } from '../data/data-parsing-logic/SurveyContext';
+import type { SurveyResponse } from '../data/data-parsing-logic/SurveyResponse';
+import { useGraphDescription } from '../hooks/useGraphDescription';
+import type { GraphId } from '../hooks/useGraphDescription';
+import { useGraphExplore } from '../contexts/GraphExploreContext';
 
 export type ExploreComponent = React.ComponentType<{ onBack: () => void }>;
 
@@ -86,14 +29,6 @@ export const ExploreView = ({ title, components, onBack }: ExploreViewProps) => 
     </div>
   );
 };
-
-// --- VIEW 4: GENERIC CHART (Flexible Chart View) ---
-import { useMemo } from 'react';
-import { useSurveyData } from '../data/data-parsing-logic/SurveyContext';
-import type { SurveyResponse } from '../data/data-parsing-logic/SurveyResponse';
-import { useGraphDescription } from '../hooks/useGraphDescription';
-import type { GraphId } from '../hooks/useGraphDescription';
-import { useGraphExplore } from '../contexts/GraphExploreContext';
 
 // 1. Define the Palette that will be passed to your logic
 export type ChartPalette = {
@@ -286,17 +221,25 @@ export const GenericChart = ({
 
   // --- Chart Mode: Render standard Plotly chart ---
   return (
-    <SurveyChart
+    <GraphWrapper
       question={question}
       description={description}
       numberOfResponses={stats.numberOfResponses}
       responseRate={responseRate}
-      data={traces as Data[]}
-      layout={finalLayout}
-      hasExploreData={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
+      showExploreButton={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
       onExplore={handleExplore}
       showBackButton={!!onBack}
       onBack={onBack}
-    />
+    >
+      <div className="h-[520px]">
+        <Plot
+          data={traces as Data[]}
+          layout={finalLayout}
+          config={{ displayModeBar: false, responsive: true }}
+          useResizeHandler
+          style={{ width: '100%', height: '100%' }}
+        />
+      </div>
+    </GraphWrapper>
   );
 };
