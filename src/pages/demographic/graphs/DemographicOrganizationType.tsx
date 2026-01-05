@@ -1,12 +1,15 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // Helper function to normalize organization type strings
 const normalizeOrganizationType = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-// 1. The Logic (Pure Function)
-// It receives data and colors. It returns Traces and Stats.
-const processData: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const organizationTypeDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const counts = new Map<string, number>();
 
   responses.forEach((response) => {
@@ -16,19 +19,34 @@ const processData: ChartProcessor = (responses, palette) => {
     }
   });
 
+  const items = Array.from(counts.entries()).map(([label, value]) => ({ label, value }));
+  const total = items.reduce((sum, item) => sum + item.value, 0);
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: total,
+    },
+  };
+};
+
+// 1. The Logic (Pure Function)
+// It receives data and colors. It returns Traces and Stats.
+const processData: ChartProcessor = (responses, palette) => {
+  const data = organizationTypeDataExtractor(responses);
+
   // Sort ascending by count so highest bar is at the top
-  const sorted = Array.from(counts.entries()).sort((a, b) => a[1] - b[1]);
-  const total = sorted.reduce((sum, [, count]) => sum + count, 0);
+  const sorted = [...data.items].sort((a, b) => a.value - b.value);
 
   return {
     traces: [
       {
         type: 'bar',
         orientation: 'h',
-        x: sorted.map(([, count]) => count),
-        y: sorted.map(([label]) => label),
+        x: sorted.map((item) => item.value),
+        y: sorted.map((item) => item.label),
         marker: { color: palette.berry },
-        text: sorted.map(([, count]) => count.toString()),
+        text: sorted.map((item) => item.value.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
@@ -39,9 +57,7 @@ const processData: ChartProcessor = (responses, palette) => {
         hoverinfo: 'none',
       },
     ],
-    stats: {
-      numberOfResponses: total,
-    },
+    stats: data.stats,
   };
 };
 
@@ -61,6 +77,8 @@ const DemographicOrganizationType = () => {
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
+      dataExtractor={organizationTypeDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };

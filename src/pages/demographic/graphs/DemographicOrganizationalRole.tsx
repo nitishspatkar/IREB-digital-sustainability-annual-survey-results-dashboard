@@ -1,12 +1,17 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 import { DemographicOrganizationalRoleOther } from '../../explore-graphs/DemographicOrganizationalRoleOther';
 import { DefinitionAwarenessByRole } from '../../explore-graphs/DefinitionAwarenessByRole.tsx';
 import { DiscussionFrequencyByRole } from '../../explore-graphs/DiscussionFrequencyByRole.tsx';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalizeRole = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-const processData: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const organizationalRoleDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const counts = new Map<string, number>();
 
   responses.forEach((response) => {
@@ -16,11 +21,24 @@ const processData: ChartProcessor = (responses, palette) => {
     }
   });
 
-  const roleStats = Array.from(counts.entries())
-    .map(([role, count]) => ({ role, count }))
-    .sort((a, b) => a.count - b.count);
+  const items = Array.from(counts.entries()).map(([label, value]) => ({ label, value }));
+  const numberOfResponses = items.reduce((sum, item) => sum + item.value, 0);
 
-  const numberOfResponses = roleStats.reduce((sum, stat) => sum + stat.count, 0);
+  return {
+    items,
+    stats: {
+      numberOfResponses,
+    },
+  };
+};
+
+const processData: ChartProcessor = (responses, palette) => {
+  const data = organizationalRoleDataExtractor(responses);
+
+  // Sort ascending by count
+  const roleStats = [...data.items]
+    .map(({ label, value }) => ({ role: label, count: value }))
+    .sort((a, b) => a.count - b.count);
 
   return {
     traces: [
@@ -37,9 +55,7 @@ const processData: ChartProcessor = (responses, palette) => {
         hoverinfo: 'none',
       },
     ],
-    stats: {
-      numberOfResponses,
-    },
+    stats: data.stats,
   };
 };
 
@@ -68,6 +84,8 @@ export const DemographicOrganizationalRole = ({ onExplore }: { onExplore?: () =>
         DiscussionFrequencyByRole,
       ]}
       onExplore={onExplore}
+      dataExtractor={organizationalRoleDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };

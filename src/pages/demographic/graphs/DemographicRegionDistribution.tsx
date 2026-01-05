@@ -2,8 +2,16 @@ import { useMemo, useCallback } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
 import useThemeColor from '../../../hooks/useThemeColor';
-import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
 import type { RespondentStat } from '../demographicTypes';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 type DemographicRegionDistributionProps = {
   respondentStats: RespondentStat[];
@@ -93,6 +101,30 @@ const DemographicRegionDistribution = ({ respondentStats }: DemographicRegionDis
   const tickColor = useThemeColor('--color-ireb-grey-01');
   const whiteText = '#ffffff'; // For inside darker bars
   const darkText = useThemeColor('--color-ireb-grey-01'); // For inside lighter bars
+
+  // --- DATA EXTRACTOR ---
+  const dataExtractor = useCallback<DataExtractor<HorizontalBarData>>(() => {
+    // Aggregate by region, showing total for each region
+    const regionMap = new Map<string, number>();
+
+    respondentStats.forEach((stat) => {
+      const region = getRegion(stat.country);
+      regionMap.set(region, (regionMap.get(region) ?? 0) + stat.count);
+    });
+
+    const items = Array.from(regionMap.entries())
+      .filter(([, count]) => count > 0)
+      .map(([label, value]) => ({ label, value }));
+
+    const numberOfResponses = respondentStats.reduce((sum, stat) => sum + stat.count, 0);
+
+    return {
+      items,
+      stats: {
+        numberOfResponses,
+      },
+    };
+  }, [respondentStats]);
 
   const processor = useCallback<ChartProcessor>(
     (responses, palette) => {
@@ -239,7 +271,15 @@ const DemographicRegionDistribution = ({ respondentStats }: DemographicRegionDis
     [tickColor]
   );
 
-  return <GenericChart graphId="DemographicByRegion" processor={processor} layout={layout} />;
+  return (
+    <GenericChart
+      graphId="DemographicByRegion"
+      processor={processor}
+      layout={layout}
+      dataExtractor={dataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
+    />
+  );
 };
 
 export default DemographicRegionDistribution;

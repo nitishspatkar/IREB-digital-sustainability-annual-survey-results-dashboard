@@ -1,10 +1,15 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 import { DemographicApplicationDomainOther } from '../../explore-graphs/DemographicApplicationDomainOther';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (val: string) => val.replace(/\s+/g, ' ').trim();
 
-const processData: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const applicationDomainDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const counts = new Map<string, number>();
 
   responses.forEach((r) => {
@@ -14,11 +19,24 @@ const processData: ChartProcessor = (responses, palette) => {
     }
   });
 
-  const stats = Array.from(counts.entries())
-    .map(([domain, count]) => ({ domain, count }))
-    .sort((a, b) => b.count - a.count);
+  const items = Array.from(counts.entries()).map(([label, value]) => ({ label, value }));
+  const numResp = items.reduce((sum, item) => sum + item.value, 0);
 
-  const numResp = stats.reduce((acc, curr) => acc + curr.count, 0);
+  return {
+    items,
+    stats: {
+      numberOfResponses: numResp,
+    },
+  };
+};
+
+const processData: ChartProcessor = (responses, palette) => {
+  const data = applicationDomainDataExtractor(responses);
+
+  // Sort descending by count (reversed for display)
+  const stats = [...data.items]
+    .map(({ label, value }) => ({ domain: label, count: value }))
+    .sort((a, b) => b.count - a.count);
 
   return {
     traces: [
@@ -34,9 +52,7 @@ const processData: ChartProcessor = (responses, palette) => {
         textfont: { color: palette.grey },
       },
     ],
-    stats: {
-      numberOfResponses: numResp,
-    },
+    stats: data.stats,
   };
 };
 
@@ -64,6 +80,8 @@ export const DemographicApplicationDomain = ({ onExplore }: { onExplore?: () => 
       }}
       exploreComponents={[DemographicApplicationDomainOther]}
       onExplore={onExplore}
+      dataExtractor={applicationDomainDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };
