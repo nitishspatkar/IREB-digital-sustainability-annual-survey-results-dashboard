@@ -102,6 +102,18 @@
     "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before? [Other]",
     "description": "Lists the free-text reasons supplied under the Other option."
   },
+  "TrainingReasonsNoByAge": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
+    "description": "Reasons why respondents haven't participated in digital sustainability training by age group."
+  },
+  "TrainingReasonsNoByExperience": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
+    "description": "Reasons why respondents haven't participated in digital sustainability training by professional experience."
+  },
+  "TrainingReasonsNoByRole": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
+    "description": "Reasons why respondents haven't participated in digital sustainability training by organizational role."
+  },
   "TrainingReasonsNotMore": {
     "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?",
     "description": "Reasons why respondents haven't participated in more digital sustainability training."

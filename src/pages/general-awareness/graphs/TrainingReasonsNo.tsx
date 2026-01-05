@@ -4,6 +4,9 @@ import {
   getTrainingReasonsStats,
   TrainingReasonsNoDetails,
 } from '../../explore-graphs/TrainingReasonsNoDetails';
+import { TrainingReasonsNoByAge } from '../../explore-graphs/TrainingReasonsNoByAge.tsx';
+import { TrainingReasonsNoByExperience } from '../../explore-graphs/TrainingReasonsNoByExperience.tsx';
+import { TrainingReasonsNoByRole } from '../../explore-graphs/TrainingReasonsNoByRole.tsx';
 
 // --- PROCESSOR ---
 const processData: ChartProcessor = (responses, palette) => {
@@ -51,7 +54,12 @@ export const TrainingReasonsNo = ({ onExplore }: { onExplore?: () => void }) => 
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
-      exploreComponents={[TrainingReasonsNoDetails]}
+      exploreComponents={[
+        TrainingReasonsNoDetails,
+        TrainingReasonsNoByRole,
+        TrainingReasonsNoByAge,
+        TrainingReasonsNoByExperience,
+      ]}
       onExplore={onExplore}
     />
   );
