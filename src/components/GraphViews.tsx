@@ -168,7 +168,8 @@ export type ChartPalette = {
 
 // 2. Define what your logic function must return
 export type ChartProcessorResult = {
-  traces: Data[]; // The ready-to-use Plotly data array
+  traces?: Data[]; // The ready-to-use Plotly data array (optional for list mode)
+  items?: string[]; // Text items for list mode (optional for chart mode)
   stats: {
     numberOfResponses: number;
     totalEligible?: number; // Optional, defaults to total survey count
@@ -214,7 +215,7 @@ export const GenericChart = ({
   };
 
   // --- C. Execute the unique logic ---
-  const { traces, stats } = useMemo(
+  const { traces, items, stats } = useMemo(
     () => processor(responses, palette),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -280,13 +281,42 @@ export const GenericChart = ({
     return <ExploreView title={question} components={exploreComponents} onBack={handleBack} />;
   }
 
+  // --- List Mode: Render a styled list instead of a chart ---
+  if (items) {
+    return (
+      <GraphWrapper
+        question={question}
+        description={description}
+        numberOfResponses={stats.numberOfResponses}
+        responseRate={responseRate}
+        showExploreButton={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
+        onExplore={handleExplore}
+      >
+        <div className="h-[520px]">
+          <ul className="h-full overflow-y-auto" style={{ color: palette.grey }}>
+            {items.map((item, index) => (
+              <li
+                key={index}
+                className="border-b px-2 py-3 text-sm"
+                style={{ borderColor: palette.grey }}
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </GraphWrapper>
+    );
+  }
+
+  // --- Chart Mode: Render standard Plotly chart ---
   return (
     <SurveyChart
       question={question}
       description={description}
       numberOfResponses={stats.numberOfResponses}
       responseRate={responseRate}
-      data={traces}
+      data={traces as Data[]}
       layout={finalLayout}
       hasExploreData={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
       onExplore={handleExplore}
