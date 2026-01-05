@@ -1,8 +1,16 @@
-import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
 import { SustainabilityDimensionsOther } from '../../explore-graphs/SustainabilityDimensionsOther';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
-const processData: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const sustainabilityDimensionsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const normalize = (v: string) => v?.trim().toLowerCase() ?? '';
 
   let environmental = 0;
@@ -84,6 +92,20 @@ const processData: ChartProcessor = (responses, palette) => {
   items.sort((a, b) => a.value - b.value);
 
   return {
+    items,
+    stats: {
+      numberOfResponses: respondentsWithAnyAnswer,
+      totalEligible: eligibleParticipants,
+    },
+  };
+};
+
+// --- PROCESSOR ---
+const processData: ChartProcessor = (responses, palette) => {
+  const data = sustainabilityDimensionsDataExtractor(responses);
+  const items = data.items;
+
+  return {
     traces: [
       {
         type: 'bar',
@@ -102,10 +124,7 @@ const processData: ChartProcessor = (responses, palette) => {
         hoverinfo: 'none',
       },
     ],
-    stats: {
-      numberOfResponses: respondentsWithAnyAnswer,
-      totalEligible: eligibleParticipants,
-    },
+    stats: data.stats,
   };
 };
 
@@ -130,6 +149,8 @@ export const SustainabilityDimensions = ({ onExplore }: { onExplore?: () => void
       }}
       exploreComponents={[SustainabilityDimensionsOther]}
       onExplore={onExplore}
+      dataExtractor={sustainabilityDimensionsDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };

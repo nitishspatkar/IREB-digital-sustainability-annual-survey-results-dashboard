@@ -1,8 +1,16 @@
-import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
 import { NoTrainingReasonsOther } from '../../explore-graphs/NoTrainingReasonsOther';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
-const processChartData: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const noTrainingReasonsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const counts: Record<string, number> = {
     'Lack of awareness': 0,
     'Lack of understanding': 0,
@@ -65,6 +73,19 @@ const processChartData: ChartProcessor = (responses, palette) => {
   items.sort((a, b) => a.value - b.value);
 
   return {
+    items,
+    stats: {
+      numberOfResponses: totalResponses,
+    },
+  };
+};
+
+// --- PROCESSOR ---
+const processChartData: ChartProcessor = (responses, palette) => {
+  const data = noTrainingReasonsDataExtractor(responses);
+  const items = data.items;
+
+  return {
     traces: [
       {
         type: 'bar',
@@ -83,9 +104,7 @@ const processChartData: ChartProcessor = (responses, palette) => {
         hoverinfo: 'none',
       },
     ],
-    stats: {
-      numberOfResponses: totalResponses,
-    },
+    stats: data.stats,
   };
 };
 
@@ -110,6 +129,8 @@ export const NoTrainingReasons = ({ onExplore }: { onExplore?: () => void }) => 
       }}
       exploreComponents={[NoTrainingReasonsOther]}
       onExplore={onExplore}
+      dataExtractor={noTrainingReasonsDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };

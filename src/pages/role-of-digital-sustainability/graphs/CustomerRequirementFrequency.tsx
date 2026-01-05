@@ -1,5 +1,12 @@
-import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import {
+  GenericChart,
+  type ChartProcessor,
+  type DataExtractor,
+} from '../../../components/GraphViews';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // Define the logical order of answers
 const frequencyOrder = [
@@ -12,8 +19,8 @@ const frequencyOrder = [
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-// The Logic (Pure Function)
-const processData: ChartProcessor = (responses, palette) => {
+// --- DATA EXTRACTOR ---
+const customerRequirementDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const counts = new Map<string, number>();
   frequencyOrder.forEach((label) => counts.set(label, 0));
 
@@ -32,14 +39,27 @@ const processData: ChartProcessor = (responses, palette) => {
   const total = sorted.reduce((sum, s) => sum + s.count, 0);
 
   return {
+    items: sorted.map((s) => ({ label: s.label, value: s.count })),
+    stats: {
+      numberOfResponses: total,
+    },
+  };
+};
+
+// --- PROCESSOR ---
+const processData: ChartProcessor = (responses, palette) => {
+  const data = customerRequirementDataExtractor(responses);
+  const sorted = data.items;
+
+  return {
     traces: [
       {
         type: 'bar',
         orientation: 'h',
-        x: sorted.map((s) => s.count),
+        x: sorted.map((s) => s.value),
         y: sorted.map((s) => s.label),
         marker: { color: palette.berry },
-        text: sorted.map((s) => s.count.toString()),
+        text: sorted.map((s) => s.value.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
@@ -50,9 +70,7 @@ const processData: ChartProcessor = (responses, palette) => {
         hoverinfo: 'none',
       },
     ],
-    stats: {
-      numberOfResponses: total,
-    },
+    stats: data.stats,
   };
 };
 
@@ -72,6 +90,8 @@ const CustomerRequirementFrequency = () => {
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
+      dataExtractor={customerRequirementDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };
