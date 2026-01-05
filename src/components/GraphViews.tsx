@@ -167,14 +167,26 @@ export type ChartPalette = {
 };
 
 // 2. Define what your logic function must return
-export type ChartProcessorResult = {
-  traces?: Data[]; // The ready-to-use Plotly data array (optional for list mode)
-  items?: string[]; // Text items for list mode (optional for chart mode)
-  stats: {
-    numberOfResponses: number;
-    totalEligible?: number; // Optional, defaults to total survey count
-  };
+type ChartProcessorStats = {
+  numberOfResponses: number;
+  totalEligible?: number; // Optional, defaults to total survey count
 };
+
+// Chart mode: returns Plotly traces
+type ChartModeResult = {
+  traces: Data[];
+  items?: never;
+  stats: ChartProcessorStats;
+};
+
+// List mode: returns string items
+type ListModeResult = {
+  traces?: never;
+  items: string[];
+  stats: ChartProcessorStats;
+};
+
+export type ChartProcessorResult = ChartModeResult | ListModeResult;
 
 // 3. The Processor Function Signature
 export type ChartProcessor = (
