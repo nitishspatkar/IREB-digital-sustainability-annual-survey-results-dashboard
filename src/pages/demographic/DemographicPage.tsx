@@ -8,14 +8,10 @@ import DemographicChoropleth from './graphs/DemographicChoropleth';
 import DemographicCountryTable from './graphs/DemographicCountryTable';
 import DemographicOrganizationType from './graphs/DemographicOrganizationType';
 import { DemographicProfessionalExperience } from './graphs/DemographicProfessionalExperience';
-import {
-  DemographicApplicationDomain,
-  DemographicApplicationDomainDetails,
-} from './graphs/DemographicApplicationDomain';
-import {
-  DemographicOrganizationalRole,
-  DemographicOrganizationalRoleDetails,
-} from './graphs/DemographicOrganizationalRole';
+import { DemographicApplicationDomain } from './graphs/DemographicApplicationDomain';
+import { DemographicApplicationDomainOther } from './graphs/DemographicApplicationDomainOther';
+import { DemographicOrganizationalRole } from './graphs/DemographicOrganizationalRole';
+import { DemographicOrganizationalRoleOther } from './graphs/DemographicOrganizationalRoleOther';
 import type { RespondentStat } from './demographicTypes';
 import DemographicRegionDistribution from './graphs/DemographicRegionDistribution.tsx';
 
@@ -27,11 +23,11 @@ const GraphAnchor = ({ id, children }: { id: string; children: React.ReactNode }
 // Definition der Views (Mapping)
 const EXPLORE_VIEWS = {
   org_role: {
-    Component: DemographicOrganizationalRoleDetails,
+    Component: DemographicOrganizationalRoleOther,
     anchorId: 'graph-org-role',
   },
   app_domain: {
-    Component: DemographicApplicationDomainDetails,
+    Component: DemographicApplicationDomainOther,
     anchorId: 'graph-app-domain',
   },
 } as const;

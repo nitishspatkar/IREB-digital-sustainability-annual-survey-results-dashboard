@@ -7,10 +7,8 @@ import TrainingParticipation from './graphs/TrainingParticipation';
 import TrainingPrivateCapacity from './graphs/TrainingPrivateCapacity';
 import TrainingProgramsCount from './graphs/TrainingProgramsCount';
 import { TrainingReasonsNo, TrainingReasonsNoDetails } from './graphs/TrainingReasonsNo';
-import {
-  TrainingReasonsNotMore,
-  TrainingReasonsNotMoreDetails,
-} from './graphs/TrainingReasonsNotMore';
+import { TrainingReasonsNotMore } from './graphs/TrainingReasonsNotMore';
+import { TrainingReasonsNotMoreOther } from './graphs/TrainingReasonsNotMoreOther';
 import TrainingSatisfaction from './graphs/TrainingSatisfaction';
 
 // --- HELPER COMPONENT (DRY) ---
@@ -29,7 +27,7 @@ const EXPLORE_VIEWS = {
     anchorId: 'graph-training-reasons-no',
   },
   training_reasons_not_more: {
-    Component: TrainingReasonsNotMoreDetails,
+    Component: TrainingReasonsNotMoreOther,
     anchorId: 'graph-training-reasons-not-more',
   },
 } as const;

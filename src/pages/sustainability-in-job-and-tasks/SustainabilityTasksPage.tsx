@@ -6,10 +6,8 @@ import {
   AdditionalSupportResources,
   AdditionalSupportResourcesDetails,
 } from './graphs/AdditionalSupportResources';
-import {
-  DriversToIncorporateSustainability,
-  DriversToIncorporateSustainabilityDetails,
-} from './graphs/DriversToIncorporateSustainability';
+import { DriversToIncorporateSustainability } from './graphs/DriversToIncorporateSustainability';
+import { DriversToIncorporateSustainabilityOther } from './graphs/DriversToIncorporateSustainabilityOther';
 import {
   HindrancesToIncorporateSustainability,
   HindrancesToIncorporateSustainabilityDetails,
@@ -19,10 +17,8 @@ import {
   KnowledgeGapsByDimensionDetails,
 } from './graphs/KnowledgeGapsByDimension';
 import PersonIncorporatesSustainability from './graphs/PersonIncorporatesSustainability';
-import {
-  SustainabilityDimensionsInTasks,
-  SustainabilityDimensionsInTasksDetails,
-} from './graphs/SustainabilityDimensionsInTasks';
+import { SustainabilityDimensionsInTasks } from './graphs/SustainabilityDimensionsInTasks';
+import { SustainabilityDimensionsInTasksOther } from './graphs/SustainabilityDimensionsInTasksOther';
 import ToolsDescriptionList from './graphs/ToolsDescriptionList';
 import UsesTools from './graphs/UsesTools';
 
@@ -34,11 +30,11 @@ const GraphAnchor = ({ id, children }: { id: string; children: React.ReactNode }
 // --- CONFIGURATION ---
 const EXPLORE_VIEWS = {
   drivers_incorporate: {
-    Component: DriversToIncorporateSustainabilityDetails,
+    Component: DriversToIncorporateSustainabilityOther,
     anchorId: 'graph-drivers-incorporate',
   },
   sustainability_dims_tasks: {
-    Component: SustainabilityDimensionsInTasksDetails,
+    Component: SustainabilityDimensionsInTasksOther,
     anchorId: 'graph-sustainability-dims-tasks',
   },
   hindrances_incorporate: {

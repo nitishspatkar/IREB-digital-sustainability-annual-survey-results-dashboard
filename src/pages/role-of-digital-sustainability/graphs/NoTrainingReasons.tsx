@@ -1,223 +1,109 @@
-import { useMemo } from 'react';
-import type { Data, Layout } from 'plotly.js';
+import { GenericChart } from '../../../components/GraphViews';
+import type { ChartProcessor } from '../../../components/GraphViews';
+import { NoTrainingReasonsOther } from './NoTrainingReasonsOther';
 
-import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
-import { useGraphDescription } from '../../../hooks/useGraphDescription';
+const processChartData: ChartProcessor = (responses, palette) => {
+  const counts: Record<string, number> = {
+    'Lack of awareness': 0,
+    'Lack of understanding': 0,
+    'No demand from employees': 0,
+    'Limited budget/resources': 0,
+    'Not a priority': 0,
+    'Not sure': 0,
+    Other: 0,
+  };
 
-// --- SHARED DATA LOGIC ---
-const useNoTrainingReasonsData = () => {
-  const surveyResponses = useSurveyData();
-  const barColor = useThemeColor('--color-ireb-berry');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
+  let totalResponses = 0;
 
-  const { stats, otherTexts, eligibleResponses, totalRespondentsWithAnswer } = useMemo(() => {
-    const normalize = (v: string) => v?.trim().toLowerCase() ?? '';
+  const normalize = (v: string) => v?.trim().toLowerCase() ?? '';
 
-    // 2. Count Logic
-    let lackAwareness = 0;
-    let lackUnderstanding = 0;
-    let noDemand = 0;
-    let limitedBudget = 0;
-    let notPriority = 0;
-    let notSure = 0;
-    let other = 0;
-    let numberOfRespondents = 0;
+  responses.forEach((response) => {
+    const raw = response.raw;
+    let hasSelection = false;
 
-    surveyResponses.forEach((response) => {
-      const raw = response.raw;
-      let hasAnswer = false;
+    if (normalize(raw.orgNoTrainingLackAwareness) === 'yes') {
+      counts['Lack of awareness']++;
+      hasSelection = true;
+    }
+    if (normalize(raw.orgNoTrainingLackUnderstanding) === 'yes') {
+      counts['Lack of understanding']++;
+      hasSelection = true;
+    }
+    if (normalize(raw.orgNoTrainingNoDemand) === 'yes') {
+      counts['No demand from employees']++;
+      hasSelection = true;
+    }
+    if (normalize(raw.orgNoTrainingLimitedBudget) === 'yes') {
+      counts['Limited budget/resources']++;
+      hasSelection = true;
+    }
+    if (normalize(raw.orgNoTrainingNotPriority) === 'yes') {
+      counts['Not a priority']++;
+      hasSelection = true;
+    }
+    if (normalize(raw.orgNoTrainingNotSure) === 'yes') {
+      counts['Not sure']++;
+      hasSelection = true;
+    }
 
-      if (normalize(raw.orgNoTrainingLackAwareness) === 'yes') {
-        lackAwareness += 1;
-        hasAnswer = true;
-      }
-      if (normalize(raw.orgNoTrainingLackUnderstanding) === 'yes') {
-        lackUnderstanding += 1;
-        hasAnswer = true;
-      }
-      if (normalize(raw.orgNoTrainingNoDemand) === 'yes') {
-        noDemand += 1;
-        hasAnswer = true;
-      }
-      if (normalize(raw.orgNoTrainingLimitedBudget) === 'yes') {
-        limitedBudget += 1;
-        hasAnswer = true;
-      }
-      if (normalize(raw.orgNoTrainingNotPriority) === 'yes') {
-        notPriority += 1;
-        hasAnswer = true;
-      }
-      if (normalize(raw.orgNoTrainingNotSure) === 'yes') {
-        notSure += 1;
-        hasAnswer = true;
-      }
+    const otherVal = normalize(raw.orgNoTrainingOther);
+    if (otherVal.length > 0 && otherVal !== 'n/a') {
+      counts['Other']++;
+      hasSelection = true;
+    }
 
-      if (
-        normalize(raw.orgNoTrainingLackAwareness) === 'no' &&
-        normalize(raw.orgNoTrainingLackUnderstanding) === 'no' &&
-        normalize(raw.orgNoTrainingNoDemand) === 'no' &&
-        normalize(raw.orgNoTrainingLimitedBudget) === 'no' &&
-        normalize(raw.orgNoTrainingNotPriority) === 'no' &&
-        normalize(raw.orgNoTrainingNotSure) === 'no'
-      )
-        hasAnswer = true;
+    if (hasSelection) {
+      totalResponses++;
+    }
+  });
 
-      const otherVal = normalize(raw.orgNoTrainingOther);
-      if (otherVal.length > 0 && otherVal !== 'n/a') {
-        other += 1;
-        hasAnswer = true;
-      }
+  const labels = Object.keys(counts);
+  const values = Object.values(counts);
 
-      if (hasAnswer) numberOfRespondents += 1;
-    });
-
-    const items = [
-      { label: 'Lack of awareness', value: lackAwareness },
-      { label: 'Lack of understanding', value: lackUnderstanding },
-      { label: 'No demand from employees', value: noDemand },
-      { label: 'Limited budget/resources', value: limitedBudget },
-      { label: 'Not a priority', value: notPriority },
-      { label: 'Not sure', value: notSure },
-      { label: 'Other', value: other },
-    ];
-
-    // Sort ascending by value
-    items.sort((a, b) => a.value - b.value);
-
-    // 3. Extract Other Texts
-    const texts = surveyResponses
-      .map((r) => (r.raw.orgNoTrainingOther ?? '').trim())
-      .filter((value) => {
-        if (!value) return false;
-        const lower = value.toLowerCase();
-        return lower.length > 0 && lower !== 'n/a';
-      });
-
-    return {
-      stats: items,
-      otherTexts: texts,
-      eligibleResponses: surveyResponses,
-      totalRespondentsWithAnswer: numberOfRespondents,
-    };
-  }, [surveyResponses]);
+  // Sort by value ascending
+  const items = labels.map((label, i) => ({ label, value: values[i] }));
+  items.sort((a, b) => a.value - b.value);
 
   return {
-    stats,
-    otherTexts,
-    eligibleResponses,
-    totalRespondentsWithAnswer,
-    barColor,
-    tickColor,
-  };
-};
-
-// --- COMPONENT 1: Main Chart ---
-export const NoTrainingReasons = ({
-  onExplore,
-  className,
-}: {
-  onExplore?: () => void;
-  className?: string;
-}) => {
-  const { stats, otherTexts, eligibleResponses, totalRespondentsWithAnswer, barColor, tickColor } =
-    useNoTrainingReasonsData();
-  const { question, description } = useGraphDescription('NoTrainingReasons');
-
-  const data = useMemo<Data[]>(
-    () => [
+    traces: [
       {
         type: 'bar',
         orientation: 'h',
-        x: stats.map((i) => i.value),
-        y: stats.map((i) => i.label),
-        marker: { color: barColor },
-        text: stats.map((i) => i.value.toString()),
+        x: items.map((i) => i.value),
+        y: items.map((i) => i.label),
+        marker: { color: palette.berry },
+        text: items.map((i) => i.value.toString()),
         textposition: 'outside',
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 12,
-          color: tickColor,
+          color: palette.grey,
         },
         cliponaxis: false,
         hoverinfo: 'none',
       },
     ],
-    [stats, barColor, tickColor]
-  );
+    stats: {
+      numberOfResponses: totalResponses,
+    },
+  };
+};
 
-  const layout = useMemo<Partial<Layout>>(
-    () => ({
-      margin: { t: 50, r: 40, b: 40, l: 200 },
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        title: {
-          text: 'Number of Respondents',
-          font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-        },
-        tickfont: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
-      },
-      yaxis: {
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-        automargin: true,
-        ticks: 'outside',
-        ticklen: 10,
-        tickcolor: 'rgba(0,0,0,0)',
-      },
-    }),
-    [tickColor]
-  );
-
-  const totalEligible = eligibleResponses.length;
-  const responseRate = totalEligible > 0 ? (totalRespondentsWithAnswer / totalEligible) * 100 : 0;
-
+export const NoTrainingReasons = ({ onExplore }: { onExplore?: () => void }) => {
   return (
-    <SurveyChart
-      className={className}
-      question={question}
-      description={description}
-      numberOfResponses={totalRespondentsWithAnswer}
-      responseRate={responseRate}
-      data={data}
-      layout={layout}
-      hasExploreData={otherTexts.length > 0}
+    <GenericChart
+      graphId="NoTrainingReasons"
+      processor={processChartData}
+      layout={{
+        margin: { t: 50, r: 40, b: 40, l: 200 },
+        xaxis: {
+          title: {
+            text: 'Number of Respondents',
+          },
+        },
+      }}
+      exploreComponents={[NoTrainingReasonsOther]}
       onExplore={onExplore}
     />
   );
 };
-
-// --- COMPONENT 2: Detail List ---
-export const NoTrainingReasonsDetails = ({ onBack }: { onBack: () => void }) => {
-  const { stats, otherTexts } = useNoTrainingReasonsData();
-  const { question } = useGraphDescription('NoTrainingReasons');
-  const { question: questionDetails, description: descriptionDetails } = useGraphDescription(
-    'NoTrainingReasonsDetails'
-  );
-
-  // Calculate rate relative to how many people selected "Other" checkbox
-  const otherStat = stats.find((s) => s.label === 'Other');
-  const numberOfOtherSelections = otherStat ? otherStat.value : 0;
-
-  const responseRate =
-    numberOfOtherSelections > 0 ? (otherTexts.length / numberOfOtherSelections) * 100 : 0;
-
-  return (
-    <SurveyExploreList
-      title={question}
-      items={otherTexts}
-      question={questionDetails}
-      description={descriptionDetails}
-      numberOfResponses={otherTexts.length}
-      responseRate={responseRate}
-      onBack={onBack}
-    />
-  );
-};
-
-export default NoTrainingReasons;

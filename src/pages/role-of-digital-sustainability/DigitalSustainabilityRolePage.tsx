@@ -4,7 +4,8 @@ import { useState } from 'react';
 import CustomerNotRequestingReasons from './graphs/CustomerNotRequestingReasons';
 import CustomerRequirementFrequency from './graphs/CustomerRequirementFrequency';
 // Updated Imports
-import { NoTrainingReasons, NoTrainingReasonsDetails } from './graphs/NoTrainingReasons';
+import { NoTrainingReasons } from './graphs/NoTrainingReasons';
+import { NoTrainingReasonsOther } from './graphs/NoTrainingReasonsOther';
 import OrganizationDepartmentCoordination from './graphs/OrganizationDepartmentCoordination';
 import OrganizationHasGoals from './graphs/OrganizationHasGoals';
 import OrganizationHasSustainabilityTeam from './graphs/OrganizationHasSustainabilityTeam';
@@ -12,10 +13,8 @@ import OrganizationIncorporatesPractices from './graphs/OrganizationIncorporates
 import OrganizationOffersTraining from './graphs/OrganizationOffersTraining';
 import OrganizationReportsOnSustainability from './graphs/OrganizationReportsOnSustainability';
 import OrganizationTrainingDescriptionList from './graphs/OrganizationTrainingDescriptionList';
-import {
-  SustainabilityDimensions,
-  SustainabilityDimensionsDetails,
-} from './graphs/SustainabilityDimensions';
+import { SustainabilityDimensions } from './graphs/SustainabilityDimensions';
+import { SustainabilityDimensionsOther } from './graphs/SustainabilityDimensionsOther';
 
 // --- HELPER COMPONENT ---
 const GraphAnchor = ({ id, children }: { id: string; children: React.ReactNode }) => (
@@ -25,11 +24,11 @@ const GraphAnchor = ({ id, children }: { id: string; children: React.ReactNode }
 // --- CONFIGURATION ---
 const EXPLORE_VIEWS = {
   sustainability_dims: {
-    Component: SustainabilityDimensionsDetails,
+    Component: SustainabilityDimensionsOther,
     anchorId: 'graph-sustainability-dims',
   },
   no_training_reasons: {
-    Component: NoTrainingReasonsDetails,
+    Component: NoTrainingReasonsOther,
     anchorId: 'graph-no-training-reasons',
   },
 } as const;
