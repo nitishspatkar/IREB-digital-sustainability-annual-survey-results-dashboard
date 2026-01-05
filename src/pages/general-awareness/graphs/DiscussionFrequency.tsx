@@ -2,9 +2,11 @@ import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
 import { useSurveyData } from '../../../data/data-parsing-logic/SurveyContext';
-import useThemeColor from '../../../hooks/useThemeColor';
-// Import der neuen generischen Views
-import { SurveyChart, SurveyExploreList } from '../../../components/GraphViews';
+import {
+  SurveyExploreList,
+  GenericChart,
+  type ChartProcessor,
+} from '../../../components/GraphViews';
 import { useGraphDescription } from '../../../hooks/useGraphDescription';
 import { DiscussionFrequencyByRole } from '../../explore-graphs/DiscussionFrequencyByRole.tsx';
 
@@ -15,12 +17,55 @@ type DiscussionFrequencyStat = {
 
 const normalizeFrequency = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-// --- SHARED DATA LOGIC ---
+// --- PROCESSOR FOR GENERIC CHART ---
+const discussionFrequencyProcessor: ChartProcessor = (responses, palette) => {
+  const counts = new Map<string, number>();
+
+  responses.forEach((response) => {
+    const frequency = normalizeFrequency(response.raw.discussionFrequency ?? '');
+    if (frequency.length > 0 && frequency.toLowerCase() !== 'n/a') {
+      counts.set(frequency, (counts.get(frequency) ?? 0) + 1);
+    }
+  });
+
+  const frequencyStats = Array.from(counts.entries())
+    .map(([frequency, count]) => ({ frequency, count }))
+    .sort((a, b) => a.count - b.count);
+
+  const numberOfResponses = frequencyStats.reduce((sum, stat) => sum + stat.count, 0);
+
+  const traces: Data[] = [
+    {
+      type: 'bar',
+      orientation: 'h',
+      x: frequencyStats.map((item) => item.count),
+      y: frequencyStats.map((item) => item.frequency),
+      marker: {
+        color: palette.berry,
+      },
+      text: frequencyStats.map((item) => item.count.toString()),
+      textposition: 'outside',
+      textfont: {
+        family: 'PP Mori, sans-serif',
+        size: 12,
+        color: palette.grey,
+      },
+      cliponaxis: false,
+      hoverinfo: 'none',
+    },
+  ];
+
+  return {
+    traces,
+    stats: {
+      numberOfResponses,
+    },
+  };
+};
+
+// --- SHARED DATA LOGIC (Kept for Explore Views) ---
 const useDiscussionFrequencyData = () => {
   const surveyResponses = useSurveyData();
-  const chartBarColor = useThemeColor('--color-ireb-berry');
-  const tickColor = useThemeColor('--color-ireb-grey-01');
-  const titleColor = useThemeColor('--color-ireb-grey-01');
 
   const frequencyStats = useMemo<DiscussionFrequencyStat[]>(() => {
     const counts = new Map<string, number>();
@@ -53,102 +98,28 @@ const useDiscussionFrequencyData = () => {
   return {
     frequencyStats,
     otherFrequencyTexts,
-    chartBarColor,
-    tickColor,
-    titleColor,
-    surveyResponses,
   };
 };
 
 // --- COMPONENT 1: Main Chart (Dashboard) ---
 export const DiscussionFrequency = ({
   onExplore,
-  className,
 }: {
   onExplore: () => void;
   className?: string;
 }) => {
-  const { frequencyStats, chartBarColor, tickColor, surveyResponses } =
-    useDiscussionFrequencyData();
-
-  // Stats Logic
-  const numberOfResponses = frequencyStats.reduce((sum, stat) => sum + stat.count, 0);
-  const responseRate =
-    surveyResponses.length > 0 ? (numberOfResponses / surveyResponses.length) * 100 : 0;
-
-  // Chart Configuration
-  const chartData = useMemo<Data[]>(() => {
-    return [
-      {
-        type: 'bar',
-        orientation: 'h',
-        x: frequencyStats.map((item) => item.count),
-        y: frequencyStats.map((item) => item.frequency),
-        marker: {
-          color: chartBarColor,
-        },
-        text: frequencyStats.map((item) => item.count.toString()),
-        textposition: 'outside',
-        textfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-        cliponaxis: false,
-        hoverinfo: 'none',
-      },
-    ];
-  }, [frequencyStats, chartBarColor, tickColor]);
-
   const layout = useMemo<Partial<Layout>>(
     () => ({
       margin: { t: 50, r: 40, b: 60, l: 240 }, // specific margins preserved
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: {
-        title: {
-          text: 'Number of Respondents',
-          font: {
-            family: 'PP Mori, sans-serif',
-            size: 12,
-            color: tickColor,
-          },
-        },
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-      },
-      yaxis: {
-        tickfont: {
-          family: 'PP Mori, sans-serif',
-          size: 12,
-          color: tickColor,
-        },
-        automargin: true,
-        ticks: 'outside',
-        ticklen: 10,
-        tickcolor: 'rgba(0,0,0,0)',
-      },
     }),
-    [tickColor]
+    []
   );
 
-  const graphDesc = useGraphDescription('DiscussionFrequency');
-  const question = graphDesc.question;
-  const description = graphDesc.description;
-
   return (
-    <SurveyChart
-      className={className}
-      question={question}
-      description={description}
-      numberOfResponses={numberOfResponses}
-      responseRate={responseRate}
-      data={chartData}
+    <GenericChart
+      graphId="DiscussionFrequency"
+      processor={discussionFrequencyProcessor}
       layout={layout}
-      hasExploreData={true}
       onExplore={onExplore}
     />
   );
