@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { navigationSections } from '../constants/navigation';
 import irebLogo from '../assets/IREB_RGB.png';
+import { useGraphExplore } from '../contexts/GraphExploreContext';
 
 type SidebarProps = {
   activeYear: string;
@@ -9,6 +10,7 @@ type SidebarProps = {
 
 function Sidebar({ activeYear }: SidebarProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { setActiveExploreId } = useGraphExplore();
   return (
     <>
       <button
@@ -71,6 +73,7 @@ function Sidebar({ activeYear }: SidebarProps) {
           to="/"
           onClick={() => {
             setIsSidebarOpen(false);
+            setActiveExploreId(null);
           }}
           className="mt-8 w-64 max-w-full cursor-pointer border-none bg-transparent p-0 text-left md:mt-0"
         >
@@ -90,7 +93,10 @@ function Sidebar({ activeYear }: SidebarProps) {
                 <li key={section.id}>
                   <NavLink
                     to={section.path}
-                    onClick={() => setIsSidebarOpen(false)}
+                    onClick={() => {
+                      setIsSidebarOpen(false);
+                      setActiveExploreId(null);
+                    }}
                     className={({ isActive }) => `
                       flex w-full items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50
                       ${

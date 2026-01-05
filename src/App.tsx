@@ -42,19 +42,19 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen bg-transparent text-ink-900">
-        <Sidebar activeYear={activeYear} />
-        <main className="flex flex-1 flex-col px-4 pb-12 pt-20 md:p-12 bg-ireb-superlight-berry">
-          <div className="w-full">
-            <YearSwitcher
-              availableYears={availableYears}
-              activeYear={activeYear}
-              setActiveYear={setActiveYear}
-            />
+      <YearProvider value={activeYear}>
+        <SurveyProvider value={surveyData}>
+          <GraphExploreProvider>
+            <div className="flex min-h-screen bg-transparent text-ink-900">
+              <Sidebar activeYear={activeYear} />
+              <main className="flex flex-1 flex-col px-4 pb-12 pt-20 md:p-12 bg-ireb-superlight-berry">
+                <div className="w-full">
+                  <YearSwitcher
+                    availableYears={availableYears}
+                    activeYear={activeYear}
+                    setActiveYear={setActiveYear}
+                  />
 
-            <YearProvider value={activeYear}>
-              <SurveyProvider value={surveyData}>
-                <GraphExploreProvider>
                   <Suspense fallback={<PageLoader />}>
                     <Routes>
                       <Route path="/" element={<Navigate to="/demographics" replace />} />
@@ -68,12 +68,12 @@ function App() {
                       <Route path="*" element={<Navigate to="/demographics" replace />} />
                     </Routes>
                   </Suspense>
-                </GraphExploreProvider>
-              </SurveyProvider>
-            </YearProvider>
-          </div>
-        </main>
-      </div>
+                </div>
+              </main>
+            </div>
+          </GraphExploreProvider>
+        </SurveyProvider>
+      </YearProvider>
     </BrowserRouter>
   );
 }
