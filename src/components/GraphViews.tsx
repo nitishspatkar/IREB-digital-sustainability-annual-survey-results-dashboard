@@ -98,7 +98,7 @@ export const GenericChart = ({
   const scrollPositionRef = useRef<number>(0);
 
   // --- B. Fetch Theme Colors once ---
-  const palette: ChartPalette = {
+  const palette = {
     berry: useThemeColor('--color-ireb-berry'),
     lightBerry: useThemeColor('--color-ireb-light-berry'),
     superLightBerry: useThemeColor('--color-ireb-superlight-berry'),
@@ -130,29 +130,6 @@ export const GenericChart = ({
   // --- D. Calculate Rates ---
   const denominator = stats.totalEligible ?? responses.length;
   const responseRate = denominator > 0 ? (stats.numberOfResponses / denominator) * 100 : 0;
-
-  // --- E. Merge Layouts ---
-  const defaultLayout: Partial<Layout> = {
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    font: { family: 'PP Mori, sans-serif', color: palette.grey },
-    xaxis: {
-      tickfont: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey },
-      title: { font: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey } },
-    },
-    yaxis: {
-      tickfont: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey },
-      title: { font: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey } },
-    },
-  };
-
-  // Deep merge for nested layout properties
-  const finalLayout: Partial<Layout> = {
-    ...defaultLayout,
-    ...layout,
-    xaxis: { ...defaultLayout.xaxis, ...layout.xaxis },
-    yaxis: { ...defaultLayout.yaxis, ...layout.yaxis },
-  };
 
   const handleExplore = () => {
     // Store current scroll position before exploring
@@ -241,7 +218,7 @@ export const GenericChart = ({
       <div className="h-[520px]">
         <Plot
           data={traces as Data[]}
-          layout={finalLayout}
+          layout={layout}
           config={{ displayModeBar: false, responsive: true }}
           useResizeHandler
           style={{ width: '100%', height: '100%' }}
