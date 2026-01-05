@@ -1,10 +1,8 @@
-// src/components/GraphViews.tsx
 import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
-import GraphWrapper from './GraphWrapper'; // Importiert den Wrapper aus dem gleichen Ordner
-import useThemeColor from '../hooks/useThemeColor'; // Pfad ggf. anpassen
+import GraphWrapper from './GraphWrapper';
+import useThemeColor from '../hooks/useThemeColor';
 
-// --- GEMEINSAME TYPEN ---
 interface BaseProps {
   question: string;
   description?: string;
@@ -13,7 +11,6 @@ interface BaseProps {
   className?: string;
 }
 
-// --- VIEW 1: STANDARD DIAGRAMM (Chart View) ---
 interface ChartProps extends BaseProps {
   data: Data[];
   layout: Partial<Layout>;
@@ -24,7 +21,7 @@ interface ChartProps extends BaseProps {
   onBack?: () => void;
 }
 
-export const SurveyChart = ({
+const SurveyChart = ({
   question,
   description,
   numberOfResponses,
@@ -69,62 +66,6 @@ export const SurveyChart = ({
   );
 };
 
-// --- VIEW 2: DETAIL LISTE (Explore View) ---
-interface ExploreListProps extends BaseProps {
-  title: string; // Der Titel der Seite (meist die Hauptfrage)
-  items: string[];
-  onBack: () => void;
-}
-
-export const SurveyExploreList = ({
-  title,
-  items,
-  question,
-  description,
-  numberOfResponses,
-  responseRate,
-  onBack,
-  className,
-}: ExploreListProps) => {
-  const tickColor = useThemeColor('--color-ireb-grey-01');
-  const borderColor = useThemeColor('--color-ireb-grey-01');
-
-  return (
-    <div className={`space-y-6 ${className ?? ''}`}>
-      {/* 2. Page Title */}
-      <h1 className="text-2xl font-semibold tracking-tight text-ireb-berry font-pressura font-bold">
-        Explore: {title}
-      </h1>
-
-      {/* 3. Content Wrapper */}
-      <GraphWrapper
-        question={question}
-        description={description}
-        numberOfResponses={numberOfResponses}
-        responseRate={responseRate}
-        showExploreButton={false}
-        showBackButton={true} // Neu
-        onBack={onBack}
-      >
-        <div className="h-[520px] overflow-y-auto">
-          <ul style={{ color: tickColor }}>
-            {items.map((text, index) => (
-              <li
-                key={index}
-                className="border-b px-2 py-3 text-sm"
-                style={{ borderColor: borderColor }}
-              >
-                {text}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </GraphWrapper>
-    </div>
-  );
-};
-
-// --- VIEW 3: EXPLORE VIEW (Multiple Charts Page) ---
 export type ExploreComponent = React.ComponentType<{ onBack: () => void }>;
 
 interface ExploreViewProps {
