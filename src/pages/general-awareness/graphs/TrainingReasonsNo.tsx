@@ -10,6 +10,7 @@ import {
 import { TrainingReasonsNoByAge } from '../../explore-graphs/TrainingReasonsNoByAge.tsx';
 import { TrainingReasonsNoByExperience } from '../../explore-graphs/TrainingReasonsNoByExperience.tsx';
 import { TrainingReasonsNoByRole } from '../../explore-graphs/TrainingReasonsNoByRole.tsx';
+import { TrainingReasonsNoByRegion } from '../../explore-graphs/TrainingReasonsNoByRegion.tsx';
 import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
@@ -75,6 +76,7 @@ export const TrainingReasonsNo = ({ onExplore }: { onExplore?: () => void }) => 
       exploreComponents={[
         TrainingReasonsNoDetails,
         TrainingReasonsNoByRole,
+        TrainingReasonsNoByRegion,
         TrainingReasonsNoByAge,
         TrainingReasonsNoByExperience,
       ]}

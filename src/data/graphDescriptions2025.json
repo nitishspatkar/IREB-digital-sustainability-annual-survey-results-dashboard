@@ -86,6 +86,14 @@
     "question": "Have you participated in one or more training or educational programs on digital sustainability?",
     "description": "Shows whether respondents have participated in digital sustainability training programs."
   },
+  "TrainingParticipationByRole": {
+    "question": "Have you participated in one or more training or educational programs on digital sustainability?",
+    "description": "Shows whether respondents have participated in digital sustainability training programs by role."
+  },
+  "TrainingParticipationByRegion": {
+    "question": "Have you participated in one or more training or educational programs on digital sustainability?",
+    "description": "Shows whether respondents have participated in digital sustainability training programs by region."
+  },
   "TrainingPrivateCapacity": {
     "question": "Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)?",
     "description": "Shows whether respondents attended training on their own or through their organization."
@@ -93,6 +101,14 @@
   "TrainingProgramsCount": {
     "question": "How many training(s) or educational program(s) on digital sustainability did you participate in?",
     "description": "Distribution of the number of training programs attended by respondents."
+  },
+  "TrainingProgramsCountByRegion": {
+    "question": "How many training(s) or educational program(s) on digital sustainability did you participate in?",
+    "description": "Distribution of the number of training programs attended by respondents by region."
+  },
+  "TrainingProgramsCountByRole": {
+    "question": "How many training(s) or educational program(s) on digital sustainability did you participate in?",
+    "description": "Distribution of the number of training programs attended by respondents by organizational role."
   },
   "TrainingReasonsNo": {
     "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
@@ -113,6 +129,10 @@
   "TrainingReasonsNoByRole": {
     "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
     "description": "Reasons why respondents haven't participated in digital sustainability training by organizational role."
+  },
+  "TrainingReasonsNoByRegion": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
+    "description": "Reasons why respondents haven't participated in digital sustainability training by region."
   },
   "TrainingReasonsNotMore": {
     "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?",

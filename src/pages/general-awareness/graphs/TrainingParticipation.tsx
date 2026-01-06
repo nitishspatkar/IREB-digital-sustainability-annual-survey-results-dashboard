@@ -1,5 +1,7 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
+import { TrainingParticipationByRole } from '../../explore-graphs/TrainingParticipationByRole';
+import { TrainingParticipationByRegion } from '../../explore-graphs/TrainingParticipationByRegion';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -51,7 +53,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const TrainingParticipation = () => {
+const TrainingParticipation = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="TrainingParticipation"
@@ -60,6 +62,8 @@ const TrainingParticipation = () => {
         margin: { t: 60, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
+      exploreComponents={[TrainingParticipationByRole, TrainingParticipationByRegion]}
+      onExplore={onExplore}
     />
   );
 };

@@ -1,6 +1,9 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
 
+import { TrainingProgramsCountByRole } from '../../explore-graphs/TrainingProgramsCountByRole';
+import { TrainingProgramsCountByRegion } from '../../explore-graphs/TrainingProgramsCountByRegion';
+
 type CountStat = {
   label: string;
   sortKey: number;
@@ -104,7 +107,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const TrainingProgramsCount = () => {
+const TrainingProgramsCount = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="TrainingProgramsCount"
@@ -117,6 +120,8 @@ const TrainingProgramsCount = () => {
         },
         yaxis: { title: { text: 'Number of respondents' } },
       }}
+      exploreComponents={[TrainingProgramsCountByRole, TrainingProgramsCountByRegion]}
+      onExplore={onExplore}
     />
   );
 };
