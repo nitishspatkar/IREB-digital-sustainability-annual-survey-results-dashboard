@@ -1,5 +1,10 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
+import { TrainingSatisfactionByRole } from '../../explore-graphs/TrainingSatisfactionByRole.tsx';
+import { TrainingSatisfactionByAge } from '../../explore-graphs/TrainingSatisfactionByAge.tsx';
+import { TrainingSatisfactionByExperience } from '../../explore-graphs/TrainingSatisfactionByExperience.tsx';
+import { TrainingSatisfactionByOrgType } from '../../explore-graphs/TrainingSatisfactionByOrgType.tsx';
+import { TrainingSatisfactionByRegion } from '../../explore-graphs/TrainingSatisfactionByRegion.tsx';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -59,7 +64,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const TrainingSatisfaction = () => {
+const TrainingSatisfaction = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="TrainingSatisfaction"
@@ -68,6 +73,14 @@ const TrainingSatisfaction = () => {
         margin: { t: 50, r: 0, b: 60, l: 40 },
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
+      exploreComponents={[
+        TrainingSatisfactionByRole,
+        TrainingSatisfactionByRegion,
+        TrainingSatisfactionByAge,
+        TrainingSatisfactionByExperience,
+        TrainingSatisfactionByOrgType,
+      ]}
+      onExplore={onExplore}
     />
   );
 };

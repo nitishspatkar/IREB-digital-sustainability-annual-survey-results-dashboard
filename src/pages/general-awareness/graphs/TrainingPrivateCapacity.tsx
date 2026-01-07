@@ -7,6 +7,8 @@ import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
 } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { TrainingPrivateCapacityByRole } from '../../explore-graphs/TrainingPrivateCapacityByRole.tsx';
+import { TrainingPrivateCapacityByRegion } from '../../explore-graphs/TrainingPrivateCapacityByRegion.tsx';
 
 // Define the categories and their search terms
 const capacityOptions = [
@@ -93,7 +95,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const TrainingPrivateCapacity = () => {
+const TrainingPrivateCapacity = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="TrainingPrivateCapacity"
@@ -108,6 +110,8 @@ const TrainingPrivateCapacity = () => {
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
+      exploreComponents={[TrainingPrivateCapacityByRole, TrainingPrivateCapacityByRegion]}
+      onExplore={onExplore}
       dataExtractor={trainingPrivateCapacityDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}
     />

@@ -98,6 +98,14 @@
     "question": "Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)?",
     "description": "Shows whether respondents attended training on their own or through their organization."
   },
+  "TrainingPrivateCapacityByRole": {
+    "question": "Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)?",
+    "description": "Shows whether respondents attended training on their own or through their organization by organizational role."
+  },
+  "TrainingPrivateCapacityByRegion": {
+    "question": "Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)?",
+    "description": "Shows whether respondents attended training on their own or through their organization by region."
+  },
   "TrainingProgramsCount": {
     "question": "How many training(s) or educational program(s) on digital sustainability did you participate in?",
     "description": "Distribution of the number of training programs attended by respondents."
@@ -145,6 +153,26 @@
   "TrainingSatisfaction": {
     "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
     "description": "Shows satisfaction levels with digital sustainability training programs."
+  },
+  "TrainingSatisfactionByRole": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by organizational role."
+  },
+  "TrainingSatisfactionByRegion": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by region."
+  },
+  "TrainingSatisfactionByAge": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by age group."
+  },
+  "TrainingSatisfactionByExperience": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by professional experience."
+  },
+  "TrainingSatisfactionByOrgType": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by organizational type."
   },
   "CustomerNotRequestingReasons": {
     "question": "Why do you think that your customers and users have not asked explicitly to build sustainable digital solutions?",
