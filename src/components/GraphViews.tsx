@@ -96,6 +96,7 @@ interface GenericChartProps<T = never> {
   // Comparison support (optional)
   dataExtractor?: DataExtractor<T>;
   comparisonStrategy?: ComparisonStrategy<T>;
+  enableInteractions?: boolean;
 }
 
 export const GenericChart = <T,>({
@@ -108,6 +109,7 @@ export const GenericChart = <T,>({
   onBack,
   dataExtractor,
   comparisonStrategy,
+  enableInteractions = false,
 }: GenericChartProps<T>) => {
   // --- A. Boilerplate Hooks ---
   const { activeExploreId, setActiveExploreId } = useGraphExplore();
@@ -280,8 +282,32 @@ export const GenericChart = <T,>({
       <div className="h-[520px]">
         <Plot
           data={traces as Data[]}
-          layout={layout}
-          config={{ displayModeBar: false, responsive: true }}
+          layout={
+            enableInteractions
+              ? layout
+              : {
+                  ...layout,
+                  dragmode: false,
+                  xaxis: {
+                    ...(layout?.xaxis || {}),
+                    fixedrange: true,
+                  },
+                  yaxis: {
+                    ...(layout?.yaxis || {}),
+                    fixedrange: true,
+                  },
+                }
+          }
+          config={
+            enableInteractions
+              ? { displayModeBar: false, responsive: true }
+              : {
+                  displayModeBar: false,
+                  responsive: true,
+                  scrollZoom: false,
+                  doubleClick: false,
+                }
+          }
           useResizeHandler
           style={{ width: '100%', height: '100%' }}
         />

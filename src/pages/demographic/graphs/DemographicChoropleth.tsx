@@ -77,7 +77,14 @@ const DemographicChoropleth = ({ respondentStats }: DemographicChoroplethProps) 
     [landColor, coastlineColor, lakeColor]
   );
 
-  return <GenericChart graphId="DemographicChoropleth" processor={processor} layout={layout} />;
+  return (
+    <GenericChart
+      graphId="DemographicChoropleth"
+      processor={processor}
+      layout={layout}
+      enableInteractions={true}
+    />
+  );
 };
 
 export default DemographicChoropleth;
