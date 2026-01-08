@@ -2,6 +2,9 @@ import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
 import { DiscussionFrequencyByExperience } from '../../explore-graphs/DiscussionFrequencyByExperience.tsx';
 import { DefinitionAwarenessByExperience } from '../../explore-graphs/DefinitionAwarenessByExperience.tsx';
+import { TrainingReasonsNoByExperience } from '../../explore-graphs/TrainingReasonsNoByExperience.tsx';
+import { TrainingReasonsNotMoreByExperience } from '../../explore-graphs/TrainingReasonsNotMoreByExperience.tsx';
+import { TrainingSatisfactionByExperience } from '../../explore-graphs/TrainingSatisfactionByExperience.tsx';
 
 // Helper to sort experience ranges naturally
 const sortExperience = (a: string, b: string) => {
@@ -81,7 +84,13 @@ export const DemographicProfessionalExperience = ({
           title: { text: 'Number of Respondents' },
         },
       }}
-      exploreComponents={[DefinitionAwarenessByExperience, DiscussionFrequencyByExperience]}
+      exploreComponents={[
+        DefinitionAwarenessByExperience,
+        DiscussionFrequencyByExperience,
+        TrainingReasonsNoByExperience,
+        TrainingReasonsNotMoreByExperience,
+        TrainingSatisfactionByExperience,
+      ]}
       onExplore={onExplore}
     />
   );

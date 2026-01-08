@@ -7,6 +7,11 @@ import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
 } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { TrainingParticipationByRole } from '../../explore-graphs/TrainingParticipationByRole.tsx';
+import { TrainingPrivateCapacityByRole } from '../../explore-graphs/TrainingPrivateCapacityByRole.tsx';
+import { TrainingProgramsCountByRole } from '../../explore-graphs/TrainingProgramsCountByRole.tsx';
+import { TrainingReasonsNoByRole } from '../../explore-graphs/TrainingReasonsNoByRole.tsx';
+import { TrainingSatisfactionByRole } from '../../explore-graphs/TrainingSatisfactionByRole.tsx';
 
 const normalizeRole = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -82,6 +87,11 @@ export const DemographicOrganizationalRole = ({ onExplore }: { onExplore?: () =>
         DemographicOrganizationalRoleOther,
         DefinitionAwarenessByRole,
         DiscussionFrequencyByRole,
+        TrainingParticipationByRole,
+        TrainingPrivateCapacityByRole,
+        TrainingProgramsCountByRole,
+        TrainingReasonsNoByRole,
+        TrainingSatisfactionByRole,
       ]}
       onExplore={onExplore}
       dataExtractor={organizationalRoleDataExtractor}

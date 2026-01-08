@@ -4,6 +4,9 @@ import type { Data, Layout } from 'plotly.js';
 import { GenericChart, type ChartProcessor } from '../../../components/GraphViews';
 import { DiscussionFrequencyByAge } from '../../explore-graphs/DiscussionFrequencyByAge.tsx';
 import { DefinitionAwarenessByAge } from '../../explore-graphs/DefinitionAwarenessByAge.tsx';
+import { TrainingReasonsNoByAge } from '../../explore-graphs/TrainingReasonsNoByAge.tsx';
+import { TrainingReasonsNotMoreByAge } from '../../explore-graphs/TrainingReasonsNotMoreByAge.tsx';
+import { TrainingSatisfactionByAge } from '../../explore-graphs/TrainingSatisfactionByAge.tsx';
 
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -81,7 +84,13 @@ const DemographicAgeGroup = ({ onExplore }: { onExplore?: () => void; className?
       graphId="DemographicAgeGroup"
       processor={processor}
       layout={layout}
-      exploreComponents={[DefinitionAwarenessByAge, DiscussionFrequencyByAge]}
+      exploreComponents={[
+        DefinitionAwarenessByAge,
+        DiscussionFrequencyByAge,
+        TrainingReasonsNoByAge,
+        TrainingSatisfactionByAge,
+        TrainingReasonsNotMoreByAge,
+      ]}
       onExplore={onExplore}
     />
   );

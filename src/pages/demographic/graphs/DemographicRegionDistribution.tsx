@@ -12,6 +12,11 @@ import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
 } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { TrainingParticipationByRegion } from '../../explore-graphs/TrainingParticipationByRegion';
+import { TrainingPrivateCapacityByRegion } from '../../explore-graphs/TrainingPrivateCapacityByRegion';
+import { TrainingProgramsCountByRegion } from '../../explore-graphs/TrainingProgramsCountByRegion';
+import { TrainingReasonsNoByRegion } from '../../explore-graphs/TrainingReasonsNoByRegion';
+import { TrainingSatisfactionByRegion } from '../../explore-graphs/TrainingSatisfactionByRegion';
 
 type DemographicRegionDistributionProps = {
   respondentStats: RespondentStat[];
@@ -278,6 +283,13 @@ const DemographicRegionDistribution = ({ respondentStats }: DemographicRegionDis
       layout={layout}
       dataExtractor={dataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}
+      exploreComponents={[
+        TrainingParticipationByRegion,
+        TrainingPrivateCapacityByRegion,
+        TrainingProgramsCountByRegion,
+        TrainingReasonsNoByRegion,
+        TrainingSatisfactionByRegion,
+      ]}
     />
   );
 };

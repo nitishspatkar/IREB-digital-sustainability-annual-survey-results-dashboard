@@ -4,6 +4,7 @@ import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
 } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { TrainingSatisfactionByOrgType } from '../../explore-graphs/TrainingSatisfactionByOrgType.tsx';
 
 // Helper function to normalize organization type strings
 const normalizeOrganizationType = (value: string) => value.replace(/\s+/g, ' ').trim();
@@ -62,7 +63,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // 2. The Component
-const DemographicOrganizationType = () => {
+const DemographicOrganizationType = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="DemographicOrganizationType"
@@ -77,6 +78,8 @@ const DemographicOrganizationType = () => {
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
+      exploreComponents={[TrainingSatisfactionByOrgType]}
+      onExplore={onExplore}
       dataExtractor={organizationTypeDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}
     />
