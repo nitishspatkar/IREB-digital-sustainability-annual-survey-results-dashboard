@@ -150,6 +150,14 @@
     "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability? [Other]",
     "description": "Lists the free-text reasons supplied under the Other option."
   },
+  "TrainingReasonsNotMoreByAge": {
+    "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?",
+    "description": "Reasons why respondents haven't participated in more digital sustainability training by age group."
+  },
+  "TrainingReasonsNotMoreByExperience": {
+    "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?",
+    "description": "Reasons why respondents haven't participated in more digital sustainability training by professional experience."
+  },
   "TrainingSatisfaction": {
     "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
     "description": "Shows satisfaction levels with digital sustainability training programs."

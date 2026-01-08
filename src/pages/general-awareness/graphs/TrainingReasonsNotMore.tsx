@@ -8,6 +8,8 @@ import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
 } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { TrainingReasonsNotMoreByAge } from '../../explore-graphs/TrainingReasonsNotMoreByAge.tsx';
+import { TrainingReasonsNotMoreByExperience } from '../../explore-graphs/TrainingReasonsNotMoreByExperience.tsx';
 
 // --- DATA EXTRACTOR ---
 const trainingReasonsNotMoreDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -133,7 +135,11 @@ export const TrainingReasonsNotMore = ({ onExplore }: { onExplore?: () => void }
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
-      exploreComponents={[TrainingReasonsNotMoreOther]}
+      exploreComponents={[
+        TrainingReasonsNotMoreOther,
+        TrainingReasonsNotMoreByAge,
+        TrainingReasonsNotMoreByExperience,
+      ]}
       onExplore={onExplore}
       dataExtractor={trainingReasonsNotMoreDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}
