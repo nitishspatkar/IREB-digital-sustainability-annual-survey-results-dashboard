@@ -29,9 +29,36 @@ const sortAgeGroups = (a: string, b: string) => {
 // --- The Processor Logic ---
 const processTrainingReasonsNotMoreByAge: ChartProcessor = (responses, palette) => {
   const ageGroupReasonsStats = new Map<string, Map<string, number>>();
-  const ageGroupTotals = new Map<string, number>();
+  const ageGroupEligibleTotals = new Map<string, number>(); // Eligible: Participated in training
+  const ageGroupAnsweredTotals = new Map<string, number>(); // Answered: Selected at least one reason
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  // Helper to check if respondent gave a valid answer
+  const hasValidAnswer = (r: any) => {
+    const raw = r.raw;
+    if (norm(raw.notMoreTrainingNotAware) === 'yes') return true;
+    if (norm(raw.notMoreTrainingNoOrganization) === 'yes') return true;
+    if (norm(raw.notMoreTrainingNoOpportunity) === 'yes') return true;
+    if (norm(raw.notMoreTrainingNoNeed) === 'yes') return true;
+    if (norm(raw.notMoreTrainingTooExpensive) === 'yes') return true;
+
+    // Explicit "No" to all specific options counts as an answer (valid 'none')
+    if (
+      norm(raw.notMoreTrainingNotAware) === 'no' &&
+      norm(raw.notMoreTrainingNoOrganization) === 'no' &&
+      norm(raw.notMoreTrainingNoOpportunity) === 'no' &&
+      norm(raw.notMoreTrainingNoNeed) === 'no' &&
+      norm(raw.notMoreTrainingTooExpensive) === 'no'
+    ) {
+      return true;
+    }
+
+    const oVal = norm(raw.notMoreTrainingOther);
+    if (oVal.length > 0 && oVal !== 'n/a') return true;
+
+    return false;
+  };
 
   // 1. Parse Data
   // Filter for respondents who *have* participated in training
@@ -45,9 +72,17 @@ const processTrainingReasonsNotMoreByAge: ChartProcessor = (responses, palette) 
 
     if (!ageGroupReasonsStats.has(ageGroup)) {
       ageGroupReasonsStats.set(ageGroup, new Map());
-      ageGroupTotals.set(ageGroup, 0);
+      ageGroupEligibleTotals.set(ageGroup, 0);
+      ageGroupAnsweredTotals.set(ageGroup, 0);
     }
-    ageGroupTotals.set(ageGroup, (ageGroupTotals.get(ageGroup) ?? 0) + 1); // Count eligible respondents per age group
+
+    // Increment eligible
+    ageGroupEligibleTotals.set(ageGroup, (ageGroupEligibleTotals.get(ageGroup) ?? 0) + 1);
+
+    // Check if answered
+    if (hasValidAnswer(r)) {
+      ageGroupAnsweredTotals.set(ageGroup, (ageGroupAnsweredTotals.get(ageGroup) ?? 0) + 1);
+    }
 
     const reasons = ageGroupReasonsStats.get(ageGroup)!;
 
@@ -67,7 +102,7 @@ const processTrainingReasonsNotMoreByAge: ChartProcessor = (responses, palette) 
   });
 
   // 2. Sort & Filter
-  const sortedAgeGroups = Array.from(ageGroupTotals.keys()).sort(sortAgeGroups);
+  const sortedAgeGroups = Array.from(ageGroupEligibleTotals.keys()).sort(sortAgeGroups);
   const displayReasonLabels = TRAINING_REASONS_NOT_MORE_TEMPLATE.map((d) => d.label);
 
   // 3. Build Matrices
@@ -84,7 +119,9 @@ const processTrainingReasonsNotMoreByAge: ChartProcessor = (responses, palette) 
   );
 
   const maxZ = Math.max(...zValues.flat());
-  const validResponses = Array.from(ageGroupTotals.values()).reduce((a, b) => a + b, 0);
+
+  const totalEligible = Array.from(ageGroupEligibleTotals.values()).reduce((a, b) => a + b, 0);
+  const totalAnswered = Array.from(ageGroupAnsweredTotals.values()).reduce((a, b) => a + b, 0);
 
   // 4. Calculate Text Colors (Dynamic contrast)
   // Original textColors: textColors[ageGroupIndex][reasonLabelIndex]
@@ -120,7 +157,10 @@ const processTrainingReasonsNotMoreByAge: ChartProcessor = (responses, palette) 
   };
 
   return {
-    stats: { numberOfResponses: validResponses },
+    stats: {
+      numberOfResponses: totalAnswered,
+      totalEligible: totalEligible,
+    },
     traces: [trace],
   };
 };

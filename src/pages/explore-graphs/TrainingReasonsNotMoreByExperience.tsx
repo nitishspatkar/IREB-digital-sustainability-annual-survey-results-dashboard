@@ -28,9 +28,36 @@ const sortProfessionalExperience = (a: string, b: string) => {
 // --- The Processor Logic ---
 const processTrainingReasonsNotMoreByExperience: ChartProcessor = (responses, palette) => {
   const experienceGroupReasonsStats = new Map<string, Map<string, number>>();
-  const experienceGroupTotals = new Map<string, number>();
+  const experienceGroupEligibleTotals = new Map<string, number>(); // Eligible: Participated in training
+  const experienceGroupAnsweredTotals = new Map<string, number>(); // Answered: Selected at least one reason
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  // Helper to check if respondent gave a valid answer
+  const hasValidAnswer = (r: any) => {
+    const raw = r.raw;
+    if (norm(raw.notMoreTrainingNotAware) === 'yes') return true;
+    if (norm(raw.notMoreTrainingNoOrganization) === 'yes') return true;
+    if (norm(raw.notMoreTrainingNoOpportunity) === 'yes') return true;
+    if (norm(raw.notMoreTrainingNoNeed) === 'yes') return true;
+    if (norm(raw.notMoreTrainingTooExpensive) === 'yes') return true;
+
+    // Explicit "No" to all specific options counts as an answer (valid 'none')
+    if (
+      norm(raw.notMoreTrainingNotAware) === 'no' &&
+      norm(raw.notMoreTrainingNoOrganization) === 'no' &&
+      norm(raw.notMoreTrainingNoOpportunity) === 'no' &&
+      norm(raw.notMoreTrainingNoNeed) === 'no' &&
+      norm(raw.notMoreTrainingTooExpensive) === 'no'
+    ) {
+      return true;
+    }
+
+    const oVal = norm(raw.notMoreTrainingOther);
+    if (oVal.length > 0 && oVal !== 'n/a') return true;
+
+    return false;
+  };
 
   // 1. Parse Data
   // Filter for respondents who *have* participated in training
@@ -48,12 +75,23 @@ const processTrainingReasonsNotMoreByExperience: ChartProcessor = (responses, pa
 
     if (!experienceGroupReasonsStats.has(experienceGroup)) {
       experienceGroupReasonsStats.set(experienceGroup, new Map());
-      experienceGroupTotals.set(experienceGroup, 0);
+      experienceGroupEligibleTotals.set(experienceGroup, 0);
+      experienceGroupAnsweredTotals.set(experienceGroup, 0);
     }
-    experienceGroupTotals.set(
+
+    // Increment eligible
+    experienceGroupEligibleTotals.set(
       experienceGroup,
-      (experienceGroupTotals.get(experienceGroup) ?? 0) + 1
-    ); // Count eligible respondents per experience group
+      (experienceGroupEligibleTotals.get(experienceGroup) ?? 0) + 1
+    );
+
+    // Check if answered
+    if (hasValidAnswer(r)) {
+      experienceGroupAnsweredTotals.set(
+        experienceGroup,
+        (experienceGroupAnsweredTotals.get(experienceGroup) ?? 0) + 1
+      );
+    }
 
     const reasons = experienceGroupReasonsStats.get(experienceGroup)!;
 
@@ -73,7 +111,7 @@ const processTrainingReasonsNotMoreByExperience: ChartProcessor = (responses, pa
   });
 
   // 2. Sort & Filter
-  const sortedExperienceGroups = Array.from(experienceGroupTotals.keys()).sort(
+  const sortedExperienceGroups = Array.from(experienceGroupEligibleTotals.keys()).sort(
     sortProfessionalExperience
   );
   const displayReasonLabels = TRAINING_REASONS_NOT_MORE_TEMPLATE.map((d) => d.label);
@@ -94,7 +132,15 @@ const processTrainingReasonsNotMoreByExperience: ChartProcessor = (responses, pa
   );
 
   const maxZ = Math.max(...zValues.flat());
-  const validResponses = Array.from(experienceGroupTotals.values()).reduce((a, b) => a + b, 0);
+
+  const totalEligible = Array.from(experienceGroupEligibleTotals.values()).reduce(
+    (a, b) => a + b,
+    0
+  );
+  const totalAnswered = Array.from(experienceGroupAnsweredTotals.values()).reduce(
+    (a, b) => a + b,
+    0
+  );
 
   // 4. Calculate Text Colors (Dynamic contrast)
   // Original textColors: textColors[experienceGroupIndex][reasonLabelIndex]
@@ -132,7 +178,10 @@ const processTrainingReasonsNotMoreByExperience: ChartProcessor = (responses, pa
   };
 
   return {
-    stats: { numberOfResponses: validResponses },
+    stats: {
+      numberOfResponses: totalAnswered,
+      totalEligible: totalEligible,
+    },
     traces: [trace],
   };
 };
