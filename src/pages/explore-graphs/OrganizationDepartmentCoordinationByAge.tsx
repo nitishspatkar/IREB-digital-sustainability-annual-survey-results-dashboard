@@ -102,7 +102,10 @@ const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (response
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: filteredResponses.length,
+    },
     traces: traces,
   };
 };

@@ -95,7 +95,10 @@ const processOrganizationDepartmentCoordinationByRole: ChartProcessor = (respons
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: filteredResponses.length,
+    },
     traces: traces,
   };
 };
