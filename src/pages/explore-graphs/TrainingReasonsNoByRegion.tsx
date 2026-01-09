@@ -13,8 +13,6 @@ const TRAINING_REASONS_TEMPLATE = [
   { key: 'trainingOtherReason', label: 'Other' },
 ];
 
-const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
-
 // Local helper to check if a valid reason was provided
 const hasValidTrainingReasonAnswer = (r: SurveyResponse): boolean => {
   const raw = r.raw;
