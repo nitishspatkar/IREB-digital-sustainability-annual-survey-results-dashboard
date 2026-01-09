@@ -120,7 +120,8 @@ function categorizeCount(rawValue: string): { label: string; sortKey: number } |
 // --- The Processor Logic ---
 const processTrainingProgramsCountByRegion: ChartProcessor = (responses, palette) => {
   const regionCountsMap = new Map<string, Map<string, number>>();
-  const regionTotals = new Map<string, number>();
+  const regionTotals = new Map<string, number>(); // This is actually 'answered' count
+  const regionEligibleTotals = new Map<string, number>(); // This is 'eligible' count
   const uniqueCountLabels = new Map<string, number>();
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
@@ -138,13 +139,20 @@ const processTrainingProgramsCountByRegion: ChartProcessor = (responses, palette
     }
 
     const region = getRegion(country);
-    const countCat = categorizeCount(r.raw.trainingCount ?? '');
-    if (!countCat) return;
 
     if (!regionCountsMap.has(region)) {
       regionCountsMap.set(region, new Map());
       regionTotals.set(region, 0);
+      regionEligibleTotals.set(region, 0);
     }
+
+    // Increment eligible count (Denominator)
+    regionEligibleTotals.set(region, (regionEligibleTotals.get(region) ?? 0) + 1);
+
+    const countCat = categorizeCount(r.raw.trainingCount ?? '');
+    if (!countCat) return;
+
+    // Increment answered count (Numerator)
     regionTotals.set(region, (regionTotals.get(region) ?? 0) + 1);
 
     const counts = regionCountsMap.get(region)!;
@@ -156,11 +164,12 @@ const processTrainingProgramsCountByRegion: ChartProcessor = (responses, palette
   });
 
   // 2. Sort Regions (by total respondents)
-  const sortedRegions = Array.from(regionTotals.entries())
+  const sortedRegions = Array.from(regionEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([region]) => region);
 
   const totalRespondents = Array.from(regionTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(regionEligibleTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Sort Count Labels
   const sortedCountLabels = Array.from(uniqueCountLabels.entries())
@@ -204,7 +213,10 @@ const processTrainingProgramsCountByRegion: ChartProcessor = (responses, palette
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };

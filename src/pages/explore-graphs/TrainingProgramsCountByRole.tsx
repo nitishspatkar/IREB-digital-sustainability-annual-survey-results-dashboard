@@ -54,7 +54,8 @@ function categorizeCount(rawValue: string): { label: string; sortKey: number } |
 // --- The Processor Logic ---
 const processTrainingProgramsCountByRole: ChartProcessor = (responses, palette) => {
   const roleCountsMap = new Map<string, Map<string, number>>();
-  const roleTotals = new Map<string, number>();
+  const roleTotals = new Map<string, number>(); // Answered count
+  const roleEligibleTotals = new Map<string, number>(); // Eligible count
   // To keep track of all unique count labels encountered, to build traces
   const uniqueCountLabels = new Map<string, number>(); // Label -> SortKey
 
@@ -72,13 +73,19 @@ const processTrainingProgramsCountByRole: ChartProcessor = (responses, palette) 
       return;
     }
 
-    const countCat = categorizeCount(r.raw.trainingCount ?? '');
-    if (!countCat) return;
-
     if (!roleCountsMap.has(role)) {
       roleCountsMap.set(role, new Map());
       roleTotals.set(role, 0);
+      roleEligibleTotals.set(role, 0);
     }
+
+    // Increment eligible (Denominator)
+    roleEligibleTotals.set(role, (roleEligibleTotals.get(role) ?? 0) + 1);
+
+    const countCat = categorizeCount(r.raw.trainingCount ?? '');
+    if (!countCat) return;
+
+    // Increment answered (Numerator)
     roleTotals.set(role, (roleTotals.get(role) ?? 0) + 1);
 
     const counts = roleCountsMap.get(role)!;
@@ -90,11 +97,12 @@ const processTrainingProgramsCountByRole: ChartProcessor = (responses, palette) 
   });
 
   // 2. Sort Roles (by total respondents)
-  const sortedRoles = Array.from(roleTotals.entries())
+  const sortedRoles = Array.from(roleEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([role]) => role);
 
   const totalRespondents = Array.from(roleTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(roleEligibleTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Sort Count Labels (for consistent stacking)
   const sortedCountLabels = Array.from(uniqueCountLabels.entries())
@@ -140,7 +148,10 @@ const processTrainingProgramsCountByRole: ChartProcessor = (responses, palette) 
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };
