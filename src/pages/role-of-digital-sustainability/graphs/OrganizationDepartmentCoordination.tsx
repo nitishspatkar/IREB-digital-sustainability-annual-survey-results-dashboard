@@ -1,5 +1,8 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
+import { OrganizationDepartmentCoordinationByAge } from '../../explore-graphs/OrganizationDepartmentCoordinationByAge.tsx';
+import { OrganizationDepartmentCoordinationByRole } from '../../explore-graphs/OrganizationDepartmentCoordinationByRole.tsx';
+import { OrganizationDepartmentCoordinationByOrgType } from '../../explore-graphs/OrganizationDepartmentCoordinationByOrgType.tsx';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -65,7 +68,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const OrganizationDepartmentCoordination = () => {
+const OrganizationDepartmentCoordination = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="OrganizationDepartmentCoordination"
@@ -74,6 +77,12 @@ const OrganizationDepartmentCoordination = () => {
         margin: { t: 50, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
+      exploreComponents={[
+        OrganizationDepartmentCoordinationByAge,
+        OrganizationDepartmentCoordinationByRole,
+        OrganizationDepartmentCoordinationByOrgType,
+      ]}
+      onExplore={onExplore}
     />
   );
 };

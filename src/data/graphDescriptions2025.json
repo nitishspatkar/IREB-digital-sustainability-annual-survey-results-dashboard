@@ -285,5 +285,77 @@
   "UsesTools": {
     "question": "Are there specific tools, software, or frameworks that help you incorporate sustainability into your tasks? (E.g., gathering and managing requirements, writing sustainability-focused tests, optimizing code for less energy consumption.)",
     "description": "Shows whether respondents use specific tools or methods for digital sustainability."
+  },
+  "OrganizationHasGoalsByAge": {
+    "question": "Does your organization have specific digital sustainability goals or benchmarks for software development projects?",
+    "description": "Shows whether organizations have specific digital sustainability goals, broken down by age group."
+  },
+  "OrganizationHasGoalsByRole": {
+    "question": "Does your organization have specific digital sustainability goals or benchmarks for software development projects?",
+    "description": "Shows whether organizations have specific digital sustainability goals, broken down by organizational role."
+  },
+  "OrganizationHasGoalsByOrgType": {
+    "question": "Does your organization have specific digital sustainability goals or benchmarks for software development projects?",
+    "description": "Shows whether organizations have specific digital sustainability goals, broken down by organization type."
+  },
+  "OrganizationHasSustainabilityTeamByAge": {
+    "question": "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?",
+    "description": "Shows whether organizations have a sustainability team, broken down by age group."
+  },
+  "OrganizationHasSustainabilityTeamByRole": {
+    "question": "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?",
+    "description": "Shows whether organizations have a sustainability team, broken down by organizational role."
+  },
+  "OrganizationHasSustainabilityTeamByOrgType": {
+    "question": "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?",
+    "description": "Shows whether organizations have a sustainability team, broken down by organization type."
+  },
+  "OrganizationIncorporatesPracticesByAge": {
+    "question": "Does your organization incorporate sustainable development practices?",
+    "description": "Shows whether organizations incorporate sustainable practices in their software development, broken down by age group."
+  },
+  "OrganizationIncorporatesPracticesByRole": {
+    "question": "Does your organization incorporate sustainable development practices?",
+    "description": "Shows whether organizations incorporate sustainable practices in their software development, broken down by organizational role."
+  },
+  "OrganizationIncorporatesPracticesByOrgType": {
+    "question": "Does your organization incorporate sustainable development practices?",
+    "description": "Shows whether organizations incorporate sustainable practices in their software development, broken down by organization type."
+  },
+  "OrganizationDepartmentCoordinationByAge": {
+    "question": "Do different departments in your organization coordinate on sustainability for software development projects?",
+    "description": "Shows whether organizations coordinate between departments on sustainability goals, broken down by age group."
+  },
+  "OrganizationDepartmentCoordinationByRole": {
+    "question": "Do different departments in your organization coordinate on sustainability for software development projects?",
+    "description": "Shows whether organizations coordinate between departments on sustainability goals, broken down by organizational role."
+  },
+  "OrganizationDepartmentCoordinationByOrgType": {
+    "question": "Do different departments in your organization coordinate on sustainability for software development projects?",
+    "description": "Shows whether organizations coordinate between departments on sustainability goals, broken down by organization type."
+  },
+  "OrganizationReportsOnSustainabilityByAge": {
+    "question": "Does your organization report on sustainability practices?",
+    "description": "Shows whether organizations report on their sustainability efforts, broken down by age group."
+  },
+  "OrganizationReportsOnSustainabilityByRole": {
+    "question": "Does your organization report on sustainability practices?",
+    "description": "Shows whether organizations report on their sustainability efforts, broken down by organizational role."
+  },
+  "OrganizationReportsOnSustainabilityByOrgType": {
+    "question": "Does your organization report on sustainability practices?",
+    "description": "Shows whether organizations report on their sustainability efforts, broken down by organization type."
+  },
+  "OrganizationOffersTrainingByAge": {
+    "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
+    "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by age group."
+  },
+  "OrganizationOffersTrainingByRole": {
+    "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
+    "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by organizational role."
+  },
+  "OrganizationOffersTrainingByOrgType": {
+    "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
+    "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by organization type."
   }
 }

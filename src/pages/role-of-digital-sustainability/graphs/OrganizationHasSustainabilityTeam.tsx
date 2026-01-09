@@ -1,5 +1,8 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
+import { OrganizationHasSustainabilityTeamByAge } from '../../explore-graphs/OrganizationHasSustainabilityTeamByAge.tsx';
+import { OrganizationHasSustainabilityTeamByRole } from '../../explore-graphs/OrganizationHasSustainabilityTeamByRole.tsx';
+import { OrganizationHasSustainabilityTeamByOrgType } from '../../explore-graphs/OrganizationHasSustainabilityTeamByOrgType.tsx';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -58,7 +61,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const OrganizationHasSustainabilityTeam = () => {
+const OrganizationHasSustainabilityTeam = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="OrganizationHasSustainabilityTeam"
@@ -67,6 +70,12 @@ const OrganizationHasSustainabilityTeam = () => {
         margin: { t: 50, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
+      exploreComponents={[
+        OrganizationHasSustainabilityTeamByAge,
+        OrganizationHasSustainabilityTeamByRole,
+        OrganizationHasSustainabilityTeamByOrgType,
+      ]}
+      onExplore={onExplore}
     />
   );
 };

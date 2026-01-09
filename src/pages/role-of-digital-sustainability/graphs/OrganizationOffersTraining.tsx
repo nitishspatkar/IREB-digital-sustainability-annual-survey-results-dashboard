@@ -1,5 +1,8 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
+import { OrganizationOffersTrainingByAge } from '../../explore-graphs/OrganizationOffersTrainingByAge.tsx';
+import { OrganizationOffersTrainingByRole } from '../../explore-graphs/OrganizationOffersTrainingByRole.tsx';
+import { OrganizationOffersTrainingByOrgType } from '../../explore-graphs/OrganizationOffersTrainingByOrgType.tsx';
 
 // The Logic (Pure Function)
 const processData: ChartProcessor = (responses, palette) => {
@@ -62,7 +65,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const OrganizationOffersTraining = () => {
+const OrganizationOffersTraining = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="OrganizationOffersTraining"
@@ -71,6 +74,12 @@ const OrganizationOffersTraining = () => {
         margin: { t: 50, r: 0, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of respondents' } },
       }}
+      exploreComponents={[
+        OrganizationOffersTrainingByAge,
+        OrganizationOffersTrainingByRole,
+        OrganizationOffersTrainingByOrgType,
+      ]}
+      onExplore={onExplore}
     />
   );
 };

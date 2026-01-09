@@ -1,5 +1,8 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
+import { OrganizationIncorporatesPracticesByAge } from '../../explore-graphs/OrganizationIncorporatesPracticesByAge.tsx';
+import { OrganizationIncorporatesPracticesByRole } from '../../explore-graphs/OrganizationIncorporatesPracticesByRole.tsx';
+import { OrganizationIncorporatesPracticesByOrgType } from '../../explore-graphs/OrganizationIncorporatesPracticesByOrgType.tsx';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -58,7 +61,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const OrganizationIncorporatesPractices = () => {
+const OrganizationIncorporatesPractices = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="OrganizationIncorporatesPractices"
@@ -67,6 +70,12 @@ const OrganizationIncorporatesPractices = () => {
         margin: { t: 50, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
+      exploreComponents={[
+        OrganizationIncorporatesPracticesByAge,
+        OrganizationIncorporatesPracticesByRole,
+        OrganizationIncorporatesPracticesByOrgType,
+      ]}
+      onExplore={onExplore}
     />
   );
 };
