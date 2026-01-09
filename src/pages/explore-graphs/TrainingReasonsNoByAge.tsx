@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
 
 // --- Constants & Helpers ---
 const TRAINING_REASONS_TEMPLATE = [
@@ -26,10 +27,41 @@ const sortAgeGroups = (a: string, b: string) => {
   return a.localeCompare(b);
 };
 
+// Local helper to check if a valid reason was provided
+const hasValidTrainingReasonAnswer = (r: SurveyResponse): boolean => {
+  const raw = r.raw;
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  if (norm(raw.trainingNotAware) === 'yes') return true;
+  if (norm(raw.trainingNoOrganizationOffer) === 'yes') return true;
+  if (norm(raw.trainingNoOpportunity) === 'yes') return true;
+  if (norm(raw.trainingNoNeed) === 'yes') return true;
+  if (norm(raw.trainingTooExpensive) === 'yes') return true;
+
+  const oVal = norm(raw.trainingOtherReason);
+  if (oVal.length > 0 && oVal !== 'n/a') return true;
+
+  // Explicit 'no' to all options is also a valid answer (though effectively "None of the above" if captured that way)
+  // However, usually 'numberOfResponses' counts those who engaged.
+  // Matching TrainingReasonsNoDetails logic:
+  if (
+    norm(raw.trainingNotAware) === 'no' &&
+    norm(raw.trainingNoOrganizationOffer) == 'no' &&
+    norm(raw.trainingNoOpportunity) === 'no' &&
+    norm(raw.trainingNoNeed) === 'no' &&
+    norm(raw.trainingTooExpensive) === 'no'
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
 // --- The Processor Logic ---
 const processTrainingReasonsNoByAge: ChartProcessor = (responses, palette) => {
   const ageGroupReasonsStats = new Map<string, Map<string, number>>();
-  const ageGroupTotals = new Map<string, number>();
+  const ageGroupEligibleTotals = new Map<string, number>();
+  const ageGroupAnsweredTotals = new Map<string, number>();
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -44,29 +76,37 @@ const processTrainingReasonsNoByAge: ChartProcessor = (responses, palette) => {
 
     if (!ageGroupReasonsStats.has(ageGroup)) {
       ageGroupReasonsStats.set(ageGroup, new Map());
-      ageGroupTotals.set(ageGroup, 0);
+      ageGroupEligibleTotals.set(ageGroup, 0);
+      ageGroupAnsweredTotals.set(ageGroup, 0);
     }
-    ageGroupTotals.set(ageGroup, (ageGroupTotals.get(ageGroup) ?? 0) + 1); // Count eligible respondents per age group
 
-    const reasons = ageGroupReasonsStats.get(ageGroup)!;
+    // Count as eligible (denominator)
+    ageGroupEligibleTotals.set(ageGroup, (ageGroupEligibleTotals.get(ageGroup) ?? 0) + 1);
 
-    TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
-      let isReasonSelected = false;
-      if (reasonDef.key === 'trainingOtherReason') {
-        const otherValue = norm(r.raw.trainingOtherReason);
-        isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
-      } else {
-        isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
-      }
+    // Only process reasons and count as answered if valid
+    if (hasValidTrainingReasonAnswer(r)) {
+      ageGroupAnsweredTotals.set(ageGroup, (ageGroupAnsweredTotals.get(ageGroup) ?? 0) + 1);
 
-      if (isReasonSelected) {
-        reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
-      }
-    });
+      const reasons = ageGroupReasonsStats.get(ageGroup)!;
+
+      TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
+        let isReasonSelected = false;
+        if (reasonDef.key === 'trainingOtherReason') {
+          const otherValue = norm(r.raw.trainingOtherReason);
+          isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
+        } else {
+          isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
+        }
+
+        if (isReasonSelected) {
+          reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
+        }
+      });
+    }
   });
 
   // 2. Sort & Filter
-  const sortedAgeGroups = Array.from(ageGroupTotals.keys()).sort(sortAgeGroups);
+  const sortedAgeGroups = Array.from(ageGroupEligibleTotals.keys()).sort(sortAgeGroups);
   const displayReasonLabels = TRAINING_REASONS_TEMPLATE.map((d) => d.label);
 
   // 3. Build Matrices
@@ -83,7 +123,9 @@ const processTrainingReasonsNoByAge: ChartProcessor = (responses, palette) => {
   );
 
   const maxZ = Math.max(...zValues.flat());
-  const validResponses = Array.from(ageGroupTotals.values()).reduce((a, b) => a + b, 0);
+
+  const totalEligible = Array.from(ageGroupEligibleTotals.values()).reduce((a, b) => a + b, 0);
+  const totalAnswered = Array.from(ageGroupAnsweredTotals.values()).reduce((a, b) => a + b, 0);
 
   // 4. Calculate Text Colors (Dynamic contrast)
   // Original textColors: textColors[ageGroupIndex][reasonLabelIndex]
@@ -119,7 +161,10 @@ const processTrainingReasonsNoByAge: ChartProcessor = (responses, palette) => {
   };
 
   return {
-    stats: { numberOfResponses: validResponses },
+    stats: {
+      numberOfResponses: totalAnswered,
+      totalEligible: totalEligible,
+    },
     traces: [trace],
   };
 };

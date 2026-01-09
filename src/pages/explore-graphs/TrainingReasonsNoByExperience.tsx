@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
 
 // --- Constants & Helpers ---
 const TRAINING_REASONS_TEMPLATE = [
@@ -30,10 +31,38 @@ const sortExperience = (a: string, b: string) => {
   return a.localeCompare(b);
 };
 
+// Local helper to check if a valid reason was provided
+const hasValidTrainingReasonAnswer = (r: SurveyResponse): boolean => {
+  const raw = r.raw;
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  if (norm(raw.trainingNotAware) === 'yes') return true;
+  if (norm(raw.trainingNoOrganizationOffer) === 'yes') return true;
+  if (norm(raw.trainingNoOpportunity) === 'yes') return true;
+  if (norm(raw.trainingNoNeed) === 'yes') return true;
+  if (norm(raw.trainingTooExpensive) === 'yes') return true;
+
+  const oVal = norm(raw.trainingOtherReason);
+  if (oVal.length > 0 && oVal !== 'n/a') return true;
+
+  if (
+    norm(raw.trainingNotAware) === 'no' &&
+    norm(raw.trainingNoOrganizationOffer) == 'no' &&
+    norm(raw.trainingNoOpportunity) === 'no' &&
+    norm(raw.trainingNoNeed) === 'no' &&
+    norm(raw.trainingTooExpensive) === 'no'
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
 // --- The Processor Logic ---
 const processTrainingReasonsNoByExperience: ChartProcessor = (responses, palette) => {
   const experienceReasonsStats = new Map<string, Map<string, number>>();
-  const experienceTotals = new Map<string, number>();
+  const experienceEligibleTotals = new Map<string, number>();
+  const experienceAnsweredTotals = new Map<string, number>();
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -48,29 +77,37 @@ const processTrainingReasonsNoByExperience: ChartProcessor = (responses, palette
 
     if (!experienceReasonsStats.has(experience)) {
       experienceReasonsStats.set(experience, new Map());
-      experienceTotals.set(experience, 0);
+      experienceEligibleTotals.set(experience, 0);
+      experienceAnsweredTotals.set(experience, 0);
     }
-    experienceTotals.set(experience, (experienceTotals.get(experience) ?? 0) + 1); // Count eligible respondents per experience group
 
-    const reasons = experienceReasonsStats.get(experience)!;
+    // Eligible (Denominator)
+    experienceEligibleTotals.set(experience, (experienceEligibleTotals.get(experience) ?? 0) + 1);
 
-    TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
-      let isReasonSelected = false;
-      if (reasonDef.key === 'trainingOtherReason') {
-        const otherValue = norm(r.raw.trainingOtherReason);
-        isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
-      } else {
-        isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
-      }
+    // Answered (Numerator) & Reasons
+    if (hasValidTrainingReasonAnswer(r)) {
+      experienceAnsweredTotals.set(experience, (experienceAnsweredTotals.get(experience) ?? 0) + 1);
 
-      if (isReasonSelected) {
-        reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
-      }
-    });
+      const reasons = experienceReasonsStats.get(experience)!;
+
+      TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
+        let isReasonSelected = false;
+        if (reasonDef.key === 'trainingOtherReason') {
+          const otherValue = norm(r.raw.trainingOtherReason);
+          isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
+        } else {
+          isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
+        }
+
+        if (isReasonSelected) {
+          reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
+        }
+      });
+    }
   });
 
   // 2. Sort & Filter
-  const sortedExperiences = Array.from(experienceTotals.keys()).sort(sortExperience);
+  const sortedExperiences = Array.from(experienceEligibleTotals.keys()).sort(sortExperience);
   const displayReasonLabels = TRAINING_REASONS_TEMPLATE.map((d) => d.label);
 
   // 3. Build Matrices
@@ -87,7 +124,9 @@ const processTrainingReasonsNoByExperience: ChartProcessor = (responses, palette
   );
 
   const maxZ = Math.max(...zValues.flat());
-  const validResponses = Array.from(experienceTotals.values()).reduce((a, b) => a + b, 0);
+
+  const totalEligible = Array.from(experienceEligibleTotals.values()).reduce((a, b) => a + b, 0);
+  const totalAnswered = Array.from(experienceAnsweredTotals.values()).reduce((a, b) => a + b, 0);
 
   // 4. Calculate Text Colors (Dynamic contrast)
   // Original textColors: textColors[experienceIndex][reasonLabelIndex]
@@ -123,7 +162,10 @@ const processTrainingReasonsNoByExperience: ChartProcessor = (responses, palette
   };
 
   return {
-    stats: { numberOfResponses: validResponses },
+    stats: {
+      numberOfResponses: totalAnswered,
+      totalEligible: totalEligible,
+    },
     traces: [trace],
   };
 };

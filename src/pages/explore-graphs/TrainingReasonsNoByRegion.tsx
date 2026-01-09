@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
 
 // --- Constants & Helpers ---
 const TRAINING_REASONS_TEMPLATE = [
@@ -11,6 +12,35 @@ const TRAINING_REASONS_TEMPLATE = [
   { key: 'trainingTooExpensive', label: 'The cost is too high' },
   { key: 'trainingOtherReason', label: 'Other' },
 ];
+
+const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
+
+// Local helper to check if a valid reason was provided
+const hasValidTrainingReasonAnswer = (r: SurveyResponse): boolean => {
+  const raw = r.raw;
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  if (norm(raw.trainingNotAware) === 'yes') return true;
+  if (norm(raw.trainingNoOrganizationOffer) === 'yes') return true;
+  if (norm(raw.trainingNoOpportunity) === 'yes') return true;
+  if (norm(raw.trainingNoNeed) === 'yes') return true;
+  if (norm(raw.trainingTooExpensive) === 'yes') return true;
+
+  const oVal = norm(raw.trainingOtherReason);
+  if (oVal.length > 0 && oVal !== 'n/a') return true;
+
+  if (
+    norm(raw.trainingNotAware) === 'no' &&
+    norm(raw.trainingNoOrganizationOffer) == 'no' &&
+    norm(raw.trainingNoOpportunity) === 'no' &&
+    norm(raw.trainingNoNeed) === 'no' &&
+    norm(raw.trainingTooExpensive) === 'no'
+  ) {
+    return true;
+  }
+
+  return false;
+};
 
 // Helper to map countries to specific regions (copied from other region components)
 const getRegion = (country: string): string => {
@@ -82,7 +112,8 @@ const getRegion = (country: string): string => {
 // --- The Processor Logic ---
 const processTrainingReasonsNoByRegion: ChartProcessor = (responses, palette) => {
   const regionReasonsStats = new Map<string, Map<string, number>>();
-  const regionTotals = new Map<string, number>();
+  const regionEligibleTotals = new Map<string, number>();
+  const regionAnsweredTotals = new Map<string, number>();
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -103,33 +134,42 @@ const processTrainingReasonsNoByRegion: ChartProcessor = (responses, palette) =>
 
     if (!regionReasonsStats.has(region)) {
       regionReasonsStats.set(region, new Map());
-      regionTotals.set(region, 0);
+      regionEligibleTotals.set(region, 0);
+      regionAnsweredTotals.set(region, 0);
     }
-    regionTotals.set(region, (regionTotals.get(region) ?? 0) + 1);
 
-    const reasons = regionReasonsStats.get(region)!;
+    // Eligible (Denominator)
+    regionEligibleTotals.set(region, (regionEligibleTotals.get(region) ?? 0) + 1);
 
-    TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
-      let isReasonSelected = false;
-      if (reasonDef.key === 'trainingOtherReason') {
-        const otherValue = norm(r.raw.trainingOtherReason);
-        isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
-      } else {
-        isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
-      }
+    // Answered (Numerator) & Reasons
+    if (hasValidTrainingReasonAnswer(r)) {
+      regionAnsweredTotals.set(region, (regionAnsweredTotals.get(region) ?? 0) + 1);
 
-      if (isReasonSelected) {
-        reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
-      }
-    });
+      const reasons = regionReasonsStats.get(region)!;
+
+      TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
+        let isReasonSelected = false;
+        if (reasonDef.key === 'trainingOtherReason') {
+          const otherValue = norm(r.raw.trainingOtherReason);
+          isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
+        } else {
+          isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
+        }
+
+        if (isReasonSelected) {
+          reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
+        }
+      });
+    }
   });
 
   // 2. Sort & Filter
-  const sortedRegions = Array.from(regionTotals.entries())
+  const sortedRegions = Array.from(regionEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([region]) => region);
 
-  const totalRespondents = Array.from(regionTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(regionEligibleTotals.values()).reduce((a, b) => a + b, 0);
+  const totalAnswered = Array.from(regionAnsweredTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Define Colors for Reasons
   const reasonColors: Record<string, string> = {
@@ -170,7 +210,10 @@ const processTrainingReasonsNoByRegion: ChartProcessor = (responses, palette) =>
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalAnswered,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };

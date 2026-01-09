@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
 
 // --- Constants & Helpers ---
 const TRAINING_REASONS_TEMPLATE = [
@@ -14,10 +15,38 @@ const TRAINING_REASONS_TEMPLATE = [
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
+// Local helper to check if a valid reason was provided
+const hasValidTrainingReasonAnswer = (r: SurveyResponse): boolean => {
+  const raw = r.raw;
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  if (norm(raw.trainingNotAware) === 'yes') return true;
+  if (norm(raw.trainingNoOrganizationOffer) === 'yes') return true;
+  if (norm(raw.trainingNoOpportunity) === 'yes') return true;
+  if (norm(raw.trainingNoNeed) === 'yes') return true;
+  if (norm(raw.trainingTooExpensive) === 'yes') return true;
+
+  const oVal = norm(raw.trainingOtherReason);
+  if (oVal.length > 0 && oVal !== 'n/a') return true;
+
+  if (
+    norm(raw.trainingNotAware) === 'no' &&
+    norm(raw.trainingNoOrganizationOffer) == 'no' &&
+    norm(raw.trainingNoOpportunity) === 'no' &&
+    norm(raw.trainingNoNeed) === 'no' &&
+    norm(raw.trainingTooExpensive) === 'no'
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
 // --- The Processor Logic ---
 const processTrainingReasonsNoByRole: ChartProcessor = (responses, palette) => {
   const roleReasonsStats = new Map<string, Map<string, number>>();
-  const roleTotals = new Map<string, number>();
+  const roleEligibleTotals = new Map<string, number>();
+  const roleAnsweredTotals = new Map<string, number>();
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -32,33 +61,42 @@ const processTrainingReasonsNoByRole: ChartProcessor = (responses, palette) => {
 
     if (!roleReasonsStats.has(role)) {
       roleReasonsStats.set(role, new Map());
-      roleTotals.set(role, 0);
+      roleEligibleTotals.set(role, 0);
+      roleAnsweredTotals.set(role, 0);
     }
-    roleTotals.set(role, (roleTotals.get(role) ?? 0) + 1);
 
-    const reasons = roleReasonsStats.get(role)!;
+    // Eligible (Denominator)
+    roleEligibleTotals.set(role, (roleEligibleTotals.get(role) ?? 0) + 1);
 
-    TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
-      let isReasonSelected = false;
-      if (reasonDef.key === 'trainingOtherReason') {
-        const otherValue = norm(r.raw.trainingOtherReason);
-        isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
-      } else {
-        isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
-      }
+    // Answered (Numerator) & Reasons
+    if (hasValidTrainingReasonAnswer(r)) {
+      roleAnsweredTotals.set(role, (roleAnsweredTotals.get(role) ?? 0) + 1);
 
-      if (isReasonSelected) {
-        reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
-      }
-    });
+      const reasons = roleReasonsStats.get(role)!;
+
+      TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
+        let isReasonSelected = false;
+        if (reasonDef.key === 'trainingOtherReason') {
+          const otherValue = norm(r.raw.trainingOtherReason);
+          isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
+        } else {
+          isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
+        }
+
+        if (isReasonSelected) {
+          reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
+        }
+      });
+    }
   });
 
   // 2. Sort & Filter
-  const sortedRoles = Array.from(roleTotals.entries())
+  const sortedRoles = Array.from(roleEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([role]) => role);
 
-  const totalRespondents = Array.from(roleTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(roleEligibleTotals.values()).reduce((a, b) => a + b, 0);
+  const totalAnswered = Array.from(roleAnsweredTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Define Colors for Reasons
   const reasonColors: Record<string, string> = {
@@ -97,7 +135,10 @@ const processTrainingReasonsNoByRole: ChartProcessor = (responses, palette) => {
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalAnswered,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };
