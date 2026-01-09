@@ -78,7 +78,8 @@ const getRegion = (country: string): string => {
 // --- The Processor Logic ---
 const processTrainingSatisfactionByRegion: ChartProcessor = (responses, palette) => {
   const regionStats = new Map<string, Map<string, number>>();
-  const regionTotals = new Map<string, number>();
+  const regionTotals = new Map<string, number>(); // Answered totals
+  const regionEligibleTotals = new Map<string, number>(); // Eligible totals
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -95,6 +96,16 @@ const processTrainingSatisfactionByRegion: ChartProcessor = (responses, palette)
     }
 
     const region = getRegion(country);
+
+    if (!regionStats.has(region)) {
+      regionStats.set(region, new Map());
+      regionTotals.set(region, 0);
+      regionEligibleTotals.set(region, 0);
+    }
+
+    // Count eligible (Denominator)
+    regionEligibleTotals.set(region, (regionEligibleTotals.get(region) ?? 0) + 1);
+
     const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
 
     // Only count explicit Yes/No
@@ -102,12 +113,7 @@ const processTrainingSatisfactionByRegion: ChartProcessor = (responses, palette)
       return;
     }
 
-    if (!regionStats.has(region)) {
-      regionStats.set(region, new Map());
-      regionTotals.set(region, 0);
-    }
-
-    // Count total responses per region (filtered by participation and valid satisfaction)
+    // Count total responses per region (Numerator)
     regionTotals.set(region, (regionTotals.get(region) ?? 0) + 1);
 
     const statMap = regionStats.get(region)!;
@@ -116,11 +122,12 @@ const processTrainingSatisfactionByRegion: ChartProcessor = (responses, palette)
   });
 
   // 2. Sort & Filter
-  const sortedRegions = Array.from(regionTotals.entries())
+  const sortedRegions = Array.from(regionEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([region]) => region);
 
   const totalRespondents = Array.from(regionTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(regionEligibleTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Define Colors
   const colors: Record<string, string> = {
@@ -155,7 +162,10 @@ const processTrainingSatisfactionByRegion: ChartProcessor = (responses, palette)
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };

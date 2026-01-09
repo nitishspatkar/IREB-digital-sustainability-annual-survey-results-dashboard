@@ -13,7 +13,8 @@ const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 // --- The Processor Logic ---
 const processTrainingSatisfactionByAge: ChartProcessor = (responses, palette) => {
   const ageStats = new Map<string, Map<string, number>>();
-  const ageTotals = new Map<string, number>();
+  const ageTotals = new Map<string, number>(); // Answered totals
+  const ageEligibleTotals = new Map<string, number>(); // Eligible totals
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -25,22 +26,28 @@ const processTrainingSatisfactionByAge: ChartProcessor = (responses, palette) =>
     }
 
     const ageGroup = normalize(r.raw.ageGroup ?? '');
-    const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
 
     if (!ageGroup || ageGroup.toLowerCase() === 'n/a') {
-      return;
-    }
-
-    // Only count explicit Yes/No
-    if (satisfaction !== 'yes' && satisfaction !== 'no') {
       return;
     }
 
     if (!ageStats.has(ageGroup)) {
       ageStats.set(ageGroup, new Map());
       ageTotals.set(ageGroup, 0);
+      ageEligibleTotals.set(ageGroup, 0);
     }
 
+    // Count eligible (Denominator)
+    ageEligibleTotals.set(ageGroup, (ageEligibleTotals.get(ageGroup) ?? 0) + 1);
+
+    const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
+
+    // Only count explicit Yes/No
+    if (satisfaction !== 'yes' && satisfaction !== 'no') {
+      return;
+    }
+
+    // Count total responses per age group (Numerator)
     ageTotals.set(ageGroup, (ageTotals.get(ageGroup) ?? 0) + 1);
 
     const statMap = ageStats.get(ageGroup)!;
@@ -49,7 +56,7 @@ const processTrainingSatisfactionByAge: ChartProcessor = (responses, palette) =>
   });
 
   // 2. Sort & Filter
-  const sortedAgeGroups = Array.from(ageTotals.entries())
+  const sortedAgeGroups = Array.from(ageEligibleTotals.entries())
     .sort((a, b) => {
       const aMatch = a[0].match(/^(\d+)/);
       const bMatch = b[0].match(/^(\d+)/);
@@ -61,6 +68,7 @@ const processTrainingSatisfactionByAge: ChartProcessor = (responses, palette) =>
     .map(([age]) => age);
 
   const totalRespondents = Array.from(ageTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(ageEligibleTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Define Colors
   const colors: Record<string, string> = {
@@ -95,7 +103,10 @@ const processTrainingSatisfactionByAge: ChartProcessor = (responses, palette) =>
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };

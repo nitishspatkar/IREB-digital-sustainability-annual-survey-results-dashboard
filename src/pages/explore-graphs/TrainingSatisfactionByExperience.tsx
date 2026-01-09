@@ -13,7 +13,8 @@ const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 // --- The Processor Logic ---
 const processTrainingSatisfactionByExperience: ChartProcessor = (responses, palette) => {
   const expStats = new Map<string, Map<string, number>>();
-  const expTotals = new Map<string, number>();
+  const expTotals = new Map<string, number>(); // Answered totals
+  const expEligibleTotals = new Map<string, number>(); // Eligible totals
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -25,22 +26,28 @@ const processTrainingSatisfactionByExperience: ChartProcessor = (responses, pale
     }
 
     const exp = normalize(r.raw.professionalExperienceYears ?? '');
-    const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
 
     if (!exp || exp.toLowerCase() === 'n/a') {
-      return;
-    }
-
-    // Only count explicit Yes/No
-    if (satisfaction !== 'yes' && satisfaction !== 'no') {
       return;
     }
 
     if (!expStats.has(exp)) {
       expStats.set(exp, new Map());
       expTotals.set(exp, 0);
+      expEligibleTotals.set(exp, 0);
     }
 
+    // Count eligible (Denominator)
+    expEligibleTotals.set(exp, (expEligibleTotals.get(exp) ?? 0) + 1);
+
+    const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
+
+    // Only count explicit Yes/No
+    if (satisfaction !== 'yes' && satisfaction !== 'no') {
+      return;
+    }
+
+    // Count total responses per experience level (Numerator)
     expTotals.set(exp, (expTotals.get(exp) ?? 0) + 1);
 
     const statMap = expStats.get(exp)!;
@@ -49,7 +56,7 @@ const processTrainingSatisfactionByExperience: ChartProcessor = (responses, pale
   });
 
   // 2. Sort & Filter
-  const sortedExp = Array.from(expTotals.entries())
+  const sortedExp = Array.from(expEligibleTotals.entries())
     .sort((a, b) => {
       const aLabel = a[0];
       const bLabel = b[0];
@@ -66,6 +73,7 @@ const processTrainingSatisfactionByExperience: ChartProcessor = (responses, pale
     .map(([exp]) => exp);
 
   const totalRespondents = Array.from(expTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(expEligibleTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Define Colors
   const colors: Record<string, string> = {
@@ -100,7 +108,10 @@ const processTrainingSatisfactionByExperience: ChartProcessor = (responses, pale
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };

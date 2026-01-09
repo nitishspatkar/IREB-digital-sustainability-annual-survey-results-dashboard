@@ -13,7 +13,8 @@ const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 // --- The Processor Logic ---
 const processTrainingSatisfactionByRole: ChartProcessor = (responses, palette) => {
   const roleStats = new Map<string, Map<string, number>>();
-  const roleTotals = new Map<string, number>();
+  const roleTotals = new Map<string, number>(); // Answered totals
+  const roleEligibleTotals = new Map<string, number>(); // Eligible totals
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -25,23 +26,28 @@ const processTrainingSatisfactionByRole: ChartProcessor = (responses, palette) =
     }
 
     const role = normalize(r.raw.role ?? '');
-    const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
 
     if (!role || role.toLowerCase() === 'n/a') {
-      return;
-    }
-
-    // Only count explicit Yes/No
-    if (satisfaction !== 'yes' && satisfaction !== 'no') {
       return;
     }
 
     if (!roleStats.has(role)) {
       roleStats.set(role, new Map());
       roleTotals.set(role, 0);
+      roleEligibleTotals.set(role, 0);
     }
 
-    // Count total responses per role (filtered by participation and valid satisfaction)
+    // Count eligible (Denominator)
+    roleEligibleTotals.set(role, (roleEligibleTotals.get(role) ?? 0) + 1);
+
+    const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
+
+    // Only count explicit Yes/No
+    if (satisfaction !== 'yes' && satisfaction !== 'no') {
+      return;
+    }
+
+    // Count total responses per role (Numerator)
     roleTotals.set(role, (roleTotals.get(role) ?? 0) + 1);
 
     const statMap = roleStats.get(role)!;
@@ -51,11 +57,12 @@ const processTrainingSatisfactionByRole: ChartProcessor = (responses, palette) =
   });
 
   // 2. Sort & Filter
-  const sortedRoles = Array.from(roleTotals.entries())
+  const sortedRoles = Array.from(roleEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([role]) => role);
 
   const totalRespondents = Array.from(roleTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(roleEligibleTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Define Colors
   const colors: Record<string, string> = {
@@ -90,7 +97,10 @@ const processTrainingSatisfactionByRole: ChartProcessor = (responses, palette) =
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };

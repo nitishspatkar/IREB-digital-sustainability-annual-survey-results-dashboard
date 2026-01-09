@@ -13,7 +13,8 @@ const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 // --- The Processor Logic ---
 const processTrainingSatisfactionByOrgType: ChartProcessor = (responses, palette) => {
   const orgStats = new Map<string, Map<string, number>>();
-  const orgTotals = new Map<string, number>();
+  const orgTotals = new Map<string, number>(); // Answered totals
+  const orgEligibleTotals = new Map<string, number>(); // Eligible totals
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -25,22 +26,28 @@ const processTrainingSatisfactionByOrgType: ChartProcessor = (responses, palette
     }
 
     const orgType = normalize(r.raw.organizationType ?? '');
-    const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
 
     if (!orgType || orgType.toLowerCase() === 'n/a') {
-      return;
-    }
-
-    // Only count explicit Yes/No
-    if (satisfaction !== 'yes' && satisfaction !== 'no') {
       return;
     }
 
     if (!orgStats.has(orgType)) {
       orgStats.set(orgType, new Map());
       orgTotals.set(orgType, 0);
+      orgEligibleTotals.set(orgType, 0);
     }
 
+    // Count eligible (Denominator)
+    orgEligibleTotals.set(orgType, (orgEligibleTotals.get(orgType) ?? 0) + 1);
+
+    const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
+
+    // Only count explicit Yes/No
+    if (satisfaction !== 'yes' && satisfaction !== 'no') {
+      return;
+    }
+
+    // Count total responses per org type (Numerator)
     orgTotals.set(orgType, (orgTotals.get(orgType) ?? 0) + 1);
 
     const statMap = orgStats.get(orgType)!;
@@ -49,11 +56,12 @@ const processTrainingSatisfactionByOrgType: ChartProcessor = (responses, palette
   });
 
   // 2. Sort & Filter
-  const sortedOrgTypes = Array.from(orgTotals.entries())
+  const sortedOrgTypes = Array.from(orgEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([orgType]) => orgType);
 
   const totalRespondents = Array.from(orgTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(orgEligibleTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Define Colors
   const colors: Record<string, string> = {
@@ -88,7 +96,10 @@ const processTrainingSatisfactionByOrgType: ChartProcessor = (responses, palette
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };
