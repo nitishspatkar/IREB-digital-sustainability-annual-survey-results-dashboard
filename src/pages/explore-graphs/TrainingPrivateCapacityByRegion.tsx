@@ -88,7 +88,8 @@ const getRegion = (country: string): string => {
 // --- The Processor Logic ---
 const processTrainingPrivateCapacityByRegion: ChartProcessor = (responses, palette) => {
   const regionCapacityStats = new Map<string, Map<string, number>>();
-  const regionTotals = new Map<string, number>();
+  const regionTotals = new Map<string, number>(); // Answered totals
+  const regionEligibleTotals = new Map<string, number>(); // Eligible totals (participated in training)
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -105,6 +106,16 @@ const processTrainingPrivateCapacityByRegion: ChartProcessor = (responses, palet
     }
 
     const region = getRegion(country);
+
+    if (!regionCapacityStats.has(region)) {
+      regionCapacityStats.set(region, new Map());
+      regionTotals.set(region, 0);
+      regionEligibleTotals.set(region, 0);
+    }
+
+    // Count eligible (Denominator) - Valid region and participated in training
+    regionEligibleTotals.set(region, (regionEligibleTotals.get(region) ?? 0) + 1);
+
     const rawCapacity = norm(r.raw.trainingPrivateCapacity ?? '');
 
     // Determine capacity category
@@ -114,12 +125,7 @@ const processTrainingPrivateCapacityByRegion: ChartProcessor = (responses, palet
 
     if (!matchedOption) return;
 
-    if (!regionCapacityStats.has(region)) {
-      regionCapacityStats.set(region, new Map());
-      regionTotals.set(region, 0);
-    }
-
-    // Count total responses per region (filtered by participation)
+    // Count total responses per region (Numerator) - Valid answer provided
     regionTotals.set(region, (regionTotals.get(region) ?? 0) + 1);
 
     const capacityMap = regionCapacityStats.get(region)!;
@@ -127,11 +133,12 @@ const processTrainingPrivateCapacityByRegion: ChartProcessor = (responses, palet
   });
 
   // 2. Sort & Filter
-  const sortedRegions = Array.from(regionTotals.entries())
+  const sortedRegions = Array.from(regionEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([region]) => region);
 
   const totalRespondents = Array.from(regionTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(regionEligibleTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Define Colors for Capacity
   const capacityColors: Record<string, string> = {
@@ -169,7 +176,10 @@ const processTrainingPrivateCapacityByRegion: ChartProcessor = (responses, palet
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };

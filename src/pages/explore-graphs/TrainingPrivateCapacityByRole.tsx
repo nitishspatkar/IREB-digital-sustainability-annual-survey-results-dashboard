@@ -23,7 +23,8 @@ const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 // --- The Processor Logic ---
 const processTrainingPrivateCapacityByRole: ChartProcessor = (responses, palette) => {
   const roleCapacityStats = new Map<string, Map<string, number>>();
-  const roleTotals = new Map<string, number>();
+  const roleTotals = new Map<string, number>(); // Answered totals
+  const roleEligibleTotals = new Map<string, number>(); // Eligible totals
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
@@ -41,6 +42,15 @@ const processTrainingPrivateCapacityByRole: ChartProcessor = (responses, palette
       return;
     }
 
+    if (!roleCapacityStats.has(role)) {
+      roleCapacityStats.set(role, new Map());
+      roleTotals.set(role, 0);
+      roleEligibleTotals.set(role, 0);
+    }
+
+    // Count eligible (Denominator)
+    roleEligibleTotals.set(role, (roleEligibleTotals.get(role) ?? 0) + 1);
+
     // Determine capacity category
     const matchedOption = capacityOptions.find((opt) =>
       opt.searchTerms.some((term) => rawCapacity.startsWith(term))
@@ -48,12 +58,7 @@ const processTrainingPrivateCapacityByRole: ChartProcessor = (responses, palette
 
     if (!matchedOption) return;
 
-    if (!roleCapacityStats.has(role)) {
-      roleCapacityStats.set(role, new Map());
-      roleTotals.set(role, 0);
-    }
-
-    // Count total responses per role (filtered by participation)
+    // Count total responses per role (Numerator)
     roleTotals.set(role, (roleTotals.get(role) ?? 0) + 1);
 
     const capacityMap = roleCapacityStats.get(role)!;
@@ -61,11 +66,12 @@ const processTrainingPrivateCapacityByRole: ChartProcessor = (responses, palette
   });
 
   // 2. Sort & Filter
-  const sortedRoles = Array.from(roleTotals.entries())
+  const sortedRoles = Array.from(roleEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([role]) => role);
 
   const totalRespondents = Array.from(roleTotals.values()).reduce((a, b) => a + b, 0);
+  const totalEligible = Array.from(roleEligibleTotals.values()).reduce((a, b) => a + b, 0);
 
   // 3. Define Colors for Capacity
   const capacityColors: Record<string, string> = {
@@ -101,7 +107,10 @@ const processTrainingPrivateCapacityByRole: ChartProcessor = (responses, palette
   });
 
   return {
-    stats: { numberOfResponses: totalRespondents },
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: totalEligible,
+    },
     traces: traces,
   };
 };
