@@ -95,6 +95,11 @@ const processTrainingParticipationByRegion: ChartProcessor = (responses, palette
     const region = getRegion(country);
     const participatedInTraining = norm(r.raw.participatedInTraining);
 
+    // Filter out responses that don't have a valid Yes/No answer for training
+    if (participatedInTraining !== 'yes' && participatedInTraining !== 'no') {
+      return;
+    }
+
     if (!regionParticipationStats.has(region)) {
       regionParticipationStats.set(region, new Map());
       regionTotals.set(region, 0);

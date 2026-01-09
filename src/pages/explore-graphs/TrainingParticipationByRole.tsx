@@ -26,6 +26,11 @@ const processTrainingParticipationByRole: ChartProcessor = (responses, palette) 
       return;
     }
 
+    // Filter out responses that don't have a valid Yes/No answer for training
+    if (participatedInTraining !== 'yes' && participatedInTraining !== 'no') {
+      return;
+    }
+
     if (!roleParticipationStats.has(role)) {
       roleParticipationStats.set(role, new Map());
       roleTotals.set(role, 0);
