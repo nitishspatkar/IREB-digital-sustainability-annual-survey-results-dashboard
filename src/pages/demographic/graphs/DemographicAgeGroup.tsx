@@ -7,6 +7,12 @@ import { DefinitionAwarenessByAge } from '../../explore-graphs/DefinitionAwarene
 import { TrainingReasonsNoByAge } from '../../explore-graphs/TrainingReasonsNoByAge.tsx';
 import { TrainingReasonsNotMoreByAge } from '../../explore-graphs/TrainingReasonsNotMoreByAge.tsx';
 import { TrainingSatisfactionByAge } from '../../explore-graphs/TrainingSatisfactionByAge.tsx';
+import { OrganizationDepartmentCoordinationByAge } from '../../explore-graphs/OrganizationDepartmentCoordinationByAge.tsx';
+import { OrganizationHasGoalsByAge } from '../../explore-graphs/OrganizationHasGoalsByAge.tsx';
+import { OrganizationHasSustainabilityTeamByAge } from '../../explore-graphs/OrganizationHasSustainabilityTeamByAge.tsx';
+import { OrganizationIncorporatesPracticesByAge } from '../../explore-graphs/OrganizationIncorporatesPracticesByAge.tsx';
+import { OrganizationOffersTrainingByAge } from '../../explore-graphs/OrganizationOffersTrainingByAge.tsx';
+import { OrganizationReportsOnSustainabilityByAge } from '../../explore-graphs/OrganizationReportsOnSustainabilityByAge.tsx';
 
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -90,6 +96,12 @@ const DemographicAgeGroup = ({ onExplore }: { onExplore?: () => void; className?
         TrainingReasonsNoByAge,
         TrainingSatisfactionByAge,
         TrainingReasonsNotMoreByAge,
+        OrganizationDepartmentCoordinationByAge,
+        OrganizationHasGoalsByAge,
+        OrganizationHasSustainabilityTeamByAge,
+        OrganizationIncorporatesPracticesByAge,
+        OrganizationOffersTrainingByAge,
+        OrganizationReportsOnSustainabilityByAge,
       ]}
       onExplore={onExplore}
     />

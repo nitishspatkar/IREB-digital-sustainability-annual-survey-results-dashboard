@@ -12,6 +12,12 @@ import { TrainingPrivateCapacityByRole } from '../../explore-graphs/TrainingPriv
 import { TrainingProgramsCountByRole } from '../../explore-graphs/TrainingProgramsCountByRole.tsx';
 import { TrainingReasonsNoByRole } from '../../explore-graphs/TrainingReasonsNoByRole.tsx';
 import { TrainingSatisfactionByRole } from '../../explore-graphs/TrainingSatisfactionByRole.tsx';
+import { OrganizationDepartmentCoordinationByRole } from '../../explore-graphs/OrganizationDepartmentCoordinationByRole.tsx';
+import { OrganizationHasGoalsByRole } from '../../explore-graphs/OrganizationHasGoalsByRole.tsx';
+import { OrganizationHasSustainabilityTeamByRole } from '../../explore-graphs/OrganizationHasSustainabilityTeamByRole.tsx';
+import { OrganizationIncorporatesPracticesByRole } from '../../explore-graphs/OrganizationIncorporatesPracticesByRole.tsx';
+import { OrganizationOffersTrainingByRole } from '../../explore-graphs/OrganizationOffersTrainingByRole.tsx';
+import { OrganizationReportsOnSustainabilityByRole } from '../../explore-graphs/OrganizationReportsOnSustainabilityByRole.tsx';
 
 const normalizeRole = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -92,6 +98,12 @@ export const DemographicOrganizationalRole = ({ onExplore }: { onExplore?: () =>
         TrainingProgramsCountByRole,
         TrainingReasonsNoByRole,
         TrainingSatisfactionByRole,
+        OrganizationDepartmentCoordinationByRole,
+        OrganizationHasGoalsByRole,
+        OrganizationHasSustainabilityTeamByRole,
+        OrganizationIncorporatesPracticesByRole,
+        OrganizationOffersTrainingByRole,
+        OrganizationReportsOnSustainabilityByRole,
       ]}
       onExplore={onExplore}
       dataExtractor={organizationalRoleDataExtractor}
