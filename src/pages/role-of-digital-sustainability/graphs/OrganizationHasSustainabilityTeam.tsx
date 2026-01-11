@@ -3,6 +3,7 @@ import type { ChartProcessor } from '../../../components/GraphViews';
 import { OrganizationHasSustainabilityTeamByAge } from '../../explore-graphs/OrganizationHasSustainabilityTeamByAge.tsx';
 import { OrganizationHasSustainabilityTeamByRole } from '../../explore-graphs/OrganizationHasSustainabilityTeamByRole.tsx';
 import { OrganizationHasSustainabilityTeamByOrgType } from '../../explore-graphs/OrganizationHasSustainabilityTeamByOrgType.tsx';
+import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -71,6 +72,7 @@ const OrganizationHasSustainabilityTeam = ({ onExplore }: { onExplore?: () => vo
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
       exploreComponents={[
+        OrganizationMeasures,
         OrganizationHasSustainabilityTeamByAge,
         OrganizationHasSustainabilityTeamByRole,
         OrganizationHasSustainabilityTeamByOrgType,

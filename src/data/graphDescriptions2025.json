@@ -194,9 +194,17 @@
     "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?",
     "description": "Shows the reasons why organizations do not offer training on sustainable digital solutions."
   },
+  "NoTrainingReasonsByTrainingOffer": {
+    "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?",
+    "description": "Shows the reasons why organizations do not offer training, broken down by whether the organization currently offers training."
+  },
   "NoTrainingReasonsDetails": {
     "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Other]",
     "description": "Lists the free-text reasons provided under the Other option."
+  },
+  "OrganizationMeasures": {
+    "question": "Summary of Organizational Sustainability Measures",
+    "description": "A consolidated view of various organizational sustainability measures, including goals, teams, practices, coordination, reporting, and training."
   },
   "OrganizationDepartmentCoordination": {
     "question": "Do different departments in your organization coordinate on sustainability for software development projects?",
@@ -357,5 +365,9 @@
   "OrganizationOffersTrainingByOrgType": {
     "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
     "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by organization type."
+  },
+  "OrganizationOffersTrainingByRegion": {
+    "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
+    "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by region."
   }
 }

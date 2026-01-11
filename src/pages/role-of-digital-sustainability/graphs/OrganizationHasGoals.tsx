@@ -3,6 +3,7 @@ import type { ChartProcessor } from '../../../components/GraphViews';
 import { OrganizationHasGoalsByAge } from '../../explore-graphs/OrganizationHasGoalsByAge.tsx';
 import { OrganizationHasGoalsByRole } from '../../explore-graphs/OrganizationHasGoalsByRole.tsx';
 import { OrganizationHasGoalsByOrgType } from '../../explore-graphs/OrganizationHasGoalsByOrgType.tsx';
+import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -71,6 +72,7 @@ const OrganizationHasGoals = ({ onExplore }: { onExplore?: () => void }) => {
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
       exploreComponents={[
+        OrganizationMeasures,
         OrganizationHasGoalsByAge,
         OrganizationHasGoalsByRole,
         OrganizationHasGoalsByOrgType,

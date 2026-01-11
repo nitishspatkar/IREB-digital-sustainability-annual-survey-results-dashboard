@@ -10,6 +10,7 @@ interface GraphWrapperProps {
   showExploreButton?: boolean;
   onBack?: () => void;
   showBackButton?: boolean;
+  showResponseStats?: boolean;
   // Comparison support
   compareYear?: string | null;
   onCompareYearChange?: (year: string | null) => void;
@@ -28,6 +29,7 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
       showExploreButton = false,
       onBack,
       showBackButton = false,
+      showResponseStats = true,
       compareYear,
       onCompareYearChange,
       availableCompareYears = [],
@@ -41,7 +43,7 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
     return (
       <div ref={ref} className="space-y-4">
         {/* Stats boxes */}
-        {showStats && (
+        {showStats && showResponseStats && (
           <div className="flex gap-4 font-mori">
             {showNumberOfResponses && (
               <div className="bg-ireb-light-berry px-6 py-3">

@@ -3,6 +3,7 @@ import type { ChartProcessor } from '../../../components/GraphViews';
 import { OrganizationDepartmentCoordinationByAge } from '../../explore-graphs/OrganizationDepartmentCoordinationByAge.tsx';
 import { OrganizationDepartmentCoordinationByRole } from '../../explore-graphs/OrganizationDepartmentCoordinationByRole.tsx';
 import { OrganizationDepartmentCoordinationByOrgType } from '../../explore-graphs/OrganizationDepartmentCoordinationByOrgType.tsx';
+import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -78,6 +79,7 @@ const OrganizationDepartmentCoordination = ({ onExplore }: { onExplore?: () => v
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
       exploreComponents={[
+        OrganizationMeasures,
         OrganizationDepartmentCoordinationByAge,
         OrganizationDepartmentCoordinationByRole,
         OrganizationDepartmentCoordinationByOrgType,

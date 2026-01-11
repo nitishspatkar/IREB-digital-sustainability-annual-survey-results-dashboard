@@ -3,6 +3,8 @@ import type { ChartProcessor } from '../../../components/GraphViews';
 import { OrganizationOffersTrainingByAge } from '../../explore-graphs/OrganizationOffersTrainingByAge.tsx';
 import { OrganizationOffersTrainingByRole } from '../../explore-graphs/OrganizationOffersTrainingByRole.tsx';
 import { OrganizationOffersTrainingByOrgType } from '../../explore-graphs/OrganizationOffersTrainingByOrgType.tsx';
+import { OrganizationOffersTrainingByRegion } from '../../explore-graphs/OrganizationOffersTrainingByRegion.tsx';
+import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
 
 // The Logic (Pure Function)
 const processData: ChartProcessor = (responses, palette) => {
@@ -75,8 +77,10 @@ const OrganizationOffersTraining = ({ onExplore }: { onExplore?: () => void }) =
         yaxis: { title: { text: 'Number of respondents' } },
       }}
       exploreComponents={[
-        OrganizationOffersTrainingByAge,
+        OrganizationMeasures,
         OrganizationOffersTrainingByRole,
+        OrganizationOffersTrainingByRegion,
+        OrganizationOffersTrainingByAge,
         OrganizationOffersTrainingByOrgType,
       ]}
       onExplore={onExplore}

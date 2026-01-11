@@ -92,6 +92,7 @@ interface GenericChartProps<T = never> {
   onExplore?: () => void;
   exploreComponents?: ExploreComponent[]; // Optional array of explore components
   isEmbedded?: boolean;
+  showResponseStats?: boolean;
   onBack?: () => void; // Optional back handler
   // Comparison support (optional)
   dataExtractor?: DataExtractor<T>;
@@ -108,6 +109,7 @@ export const GenericChart = <T,>({
   isEmbedded = false,
   onBack,
   dataExtractor,
+  showResponseStats = true,
   comparisonStrategy,
   enableInteractions = false,
 }: GenericChartProps<T>) => {
@@ -240,6 +242,7 @@ export const GenericChart = <T,>({
         description={description}
         numberOfResponses={stats.numberOfResponses}
         responseRate={responseRate}
+        showResponseStats={showResponseStats}
         showBackButton={!!onBack}
         onBack={onBack}
         compareYear={compareYear}
@@ -271,6 +274,7 @@ export const GenericChart = <T,>({
       description={description}
       numberOfResponses={stats.numberOfResponses}
       responseRate={responseRate}
+      showResponseStats={showResponseStats}
       showExploreButton={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
       onExplore={handleExplore}
       showBackButton={!!onBack}
