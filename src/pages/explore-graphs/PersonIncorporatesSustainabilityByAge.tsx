@@ -64,10 +64,11 @@ export const PersonIncorporatesSustainabilityByAge = ({
             color: palette.spring,
           },
           text: yesValues.map((v) => (v > 0 ? v.toString() : '')),
-          textposition: 'auto',
+          textposition: 'inside',
+          insidetextanchor: 'middle',
           textfont: {
             family: 'PP Mori, sans-serif',
-            size: 12,
+            size: 13,
             color: palette.grey,
           },
           hoverinfo: 'name' as const,
@@ -81,7 +82,8 @@ export const PersonIncorporatesSustainabilityByAge = ({
             color: palette.mandarin,
           },
           text: noValues.map((v) => (v > 0 ? v.toString() : '')),
-          textposition: 'auto',
+          textposition: 'inside',
+          insidetextanchor: 'middle',
           textfont: {
             family: 'PP Mori, sans-serif',
             size: 12,

@@ -1,15 +1,17 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 import { GenericChart, type ChartProcessor } from './GraphViews';
+import type { SurveyRecord } from '../data/data-parsing-logic/SurveyCsvParser.ts';
+import type { GraphId } from '../hooks/useGraphDescription';
 
 type Props = {
-  graphId: string;
+  graphId: GraphId;
   onBack?: () => void;
   showBackButton?: boolean;
   // Logic to extract the category (X-axis) from a response. Return null to skip.
-  getCategory: (raw: any) => string | null;
+  getCategory: (raw: Readonly<SurveyRecord>) => string | null;
   // Logic to extract 'yes' or 'no'. Return null to skip.
-  getYesNo: (raw: any) => 'yes' | 'no' | null;
+  getYesNo: (raw: Readonly<SurveyRecord>) => 'yes' | 'no' | null;
   // Optional: Custom sort order for categories
   sortOrder?: string[];
   // Optional: Override layout
@@ -72,9 +74,10 @@ export const GroupedYesNoChart = ({
           type: 'bar',
           marker: { color: palette.spring }, // Green
           text: yesValues.map((v) => (v > 0 ? v.toString() : '')),
-          textposition: 'auto',
-          textfont: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey },
-          hoverinfo: 'name+y',
+          textposition: 'inside',
+          insidetextanchor: 'middle',
+          textfont: { family: 'PP Mori, sans-serif', size: 13, color: palette.grey },
+          hoverinfo: 'name',
         },
         {
           x: categories,
@@ -83,9 +86,10 @@ export const GroupedYesNoChart = ({
           type: 'bar',
           marker: { color: palette.mandarin }, // Red/Orange
           text: noValues.map((v) => (v > 0 ? v.toString() : '')),
-          textposition: 'auto',
+          textposition: 'inside',
+          insidetextanchor: 'middle',
           textfont: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey },
-          hoverinfo: 'name+y',
+          hoverinfo: 'name',
         },
       ];
 
