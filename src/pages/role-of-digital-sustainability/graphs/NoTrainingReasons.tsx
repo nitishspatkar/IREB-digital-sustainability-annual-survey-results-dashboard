@@ -5,6 +5,8 @@ import {
 } from '../../../components/GraphViews';
 import { NoTrainingReasonsOther } from '../../explore-graphs/NoTrainingReasonsOther';
 import { NoTrainingReasonsByTrainingOffer } from '../../explore-graphs/NoTrainingReasonsByTrainingOffer';
+import { NoTrainingReasonsByRole } from '../../explore-graphs/NoTrainingReasonsByRole';
+import { NoTrainingReasonsByAge } from '../../explore-graphs/NoTrainingReasonsByAge';
 import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
@@ -128,7 +130,12 @@ export const NoTrainingReasons = ({ onExplore }: { onExplore?: () => void }) => 
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
-      exploreComponents={[NoTrainingReasonsOther, NoTrainingReasonsByTrainingOffer]}
+      exploreComponents={[
+        NoTrainingReasonsOther,
+        NoTrainingReasonsByTrainingOffer,
+        NoTrainingReasonsByRole,
+        NoTrainingReasonsByAge,
+      ]}
       onExplore={onExplore}
       dataExtractor={noTrainingReasonsDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}

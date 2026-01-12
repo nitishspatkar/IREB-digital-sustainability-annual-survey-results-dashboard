@@ -198,6 +198,14 @@
     "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?",
     "description": "Shows the reasons why organizations do not offer training, broken down by whether the organization currently offers training."
   },
+  "NoTrainingReasonsByRole": {
+    "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?",
+    "description": "Shows the reasons why organizations do not offer training, broken down by organizational role."
+  },
+  "NoTrainingReasonsByAge": {
+    "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?",
+    "description": "Shows the reasons why organizations do not offer training, broken down by age group."
+  },
   "NoTrainingReasonsDetails": {
     "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Other]",
     "description": "Lists the free-text reasons provided under the Other option."
@@ -329,6 +337,10 @@
   "OrganizationIncorporatesPracticesByOrgType": {
     "question": "Does your organization incorporate sustainable development practices?",
     "description": "Shows whether organizations incorporate sustainable practices in their software development, broken down by organization type."
+  },
+  "OrganizationIncorporatesPracticesByRegion": {
+    "question": "Does your organization incorporate sustainable development practices?",
+    "description": "Shows whether organizations incorporate sustainable practices in their software development, broken down by region."
   },
   "OrganizationDepartmentCoordinationByAge": {
     "question": "Do different departments in your organization coordinate on sustainability for software development projects?",

@@ -5,6 +5,7 @@ import { OrganizationOffersTrainingByRole } from '../../explore-graphs/Organizat
 import { OrganizationOffersTrainingByOrgType } from '../../explore-graphs/OrganizationOffersTrainingByOrgType.tsx';
 import { OrganizationOffersTrainingByRegion } from '../../explore-graphs/OrganizationOffersTrainingByRegion.tsx';
 import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
+import { NoTrainingReasonsByTrainingOffer } from '../../explore-graphs/NoTrainingReasonsByTrainingOffer.tsx';
 
 // The Logic (Pure Function)
 const processData: ChartProcessor = (responses, palette) => {
@@ -82,6 +83,7 @@ const OrganizationOffersTraining = ({ onExplore }: { onExplore?: () => void }) =
         OrganizationOffersTrainingByRegion,
         OrganizationOffersTrainingByAge,
         OrganizationOffersTrainingByOrgType,
+        NoTrainingReasonsByTrainingOffer,
       ]}
       onExplore={onExplore}
     />

@@ -3,6 +3,7 @@ import type { ChartProcessor } from '../../../components/GraphViews';
 import { OrganizationIncorporatesPracticesByAge } from '../../explore-graphs/OrganizationIncorporatesPracticesByAge.tsx';
 import { OrganizationIncorporatesPracticesByRole } from '../../explore-graphs/OrganizationIncorporatesPracticesByRole.tsx';
 import { OrganizationIncorporatesPracticesByOrgType } from '../../explore-graphs/OrganizationIncorporatesPracticesByOrgType.tsx';
+import { OrganizationIncorporatesPracticesByRegion } from '../../explore-graphs/OrganizationIncorporatesPracticesByRegion.tsx';
 import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
@@ -76,6 +77,7 @@ const OrganizationIncorporatesPractices = ({ onExplore }: { onExplore?: () => vo
         OrganizationIncorporatesPracticesByAge,
         OrganizationIncorporatesPracticesByRole,
         OrganizationIncorporatesPracticesByOrgType,
+        OrganizationIncorporatesPracticesByRegion,
       ]}
       onExplore={onExplore}
     />

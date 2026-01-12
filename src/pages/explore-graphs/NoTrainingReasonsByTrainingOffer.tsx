@@ -125,7 +125,7 @@ export const NoTrainingReasonsByTrainingOffer = ({
       uniformtext: { mode: 'show', minsize: 13 },
       margin: { t: 40, r: 20, b: 60, l: 200 }, // Left margin for Reason labels
       xaxis: {
-        title: { text: 'Number of Responses' },
+        title: { text: 'Number of Respondents' },
         automargin: true,
       },
       yaxis: {
@@ -135,6 +135,7 @@ export const NoTrainingReasonsByTrainingOffer = ({
         tickcolor: 'rgba(0,0,0,0)',
       },
       legend: {
+        title: { text: 'Org. offers training?' },
         orientation: 'h',
         yanchor: 'bottom',
         y: 1.02,
