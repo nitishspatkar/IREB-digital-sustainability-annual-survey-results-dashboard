@@ -3,6 +3,7 @@ import type { ChartProcessor } from '../../../components/GraphViews';
 import { OrganizationHasGoalsByAge } from '../../explore-graphs/OrganizationHasGoalsByAge.tsx';
 import { OrganizationHasGoalsByRole } from '../../explore-graphs/OrganizationHasGoalsByRole.tsx';
 import { OrganizationHasGoalsByOrgType } from '../../explore-graphs/OrganizationHasGoalsByOrgType.tsx';
+import { PersonIncorporatesSustainabilityByOrgGoals } from '../../explore-graphs/PersonIncorporatesSustainabilityByOrgGoals.tsx';
 import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
@@ -76,6 +77,7 @@ const OrganizationHasGoals = ({ onExplore }: { onExplore?: () => void }) => {
         OrganizationHasGoalsByAge,
         OrganizationHasGoalsByRole,
         OrganizationHasGoalsByOrgType,
+        PersonIncorporatesSustainabilityByOrgGoals,
       ]}
       onExplore={onExplore}
     />
