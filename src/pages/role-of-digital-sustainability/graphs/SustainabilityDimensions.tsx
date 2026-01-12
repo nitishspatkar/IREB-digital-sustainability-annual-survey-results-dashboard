@@ -6,6 +6,7 @@ import {
 import { SustainabilityDimensionsOther } from '../../explore-graphs/SustainabilityDimensionsOther';
 import { SustainabilityDimensionsByAge } from '../../explore-graphs/SustainabilityDimensionsByAge';
 import { SustainabilityDimensionsByOrgType } from '../../explore-graphs/SustainabilityDimensionsByOrgType';
+import { SustainabilityDimensionsByExperience } from '../../explore-graphs/SustainabilityDimensionsByExperience';
 import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
@@ -153,6 +154,7 @@ export const SustainabilityDimensions = ({ onExplore }: { onExplore?: () => void
         SustainabilityDimensionsOther,
         SustainabilityDimensionsByAge,
         SustainabilityDimensionsByOrgType,
+        SustainabilityDimensionsByExperience,
       ]}
       onExplore={onExplore}
       dataExtractor={sustainabilityDimensionsDataExtractor}
