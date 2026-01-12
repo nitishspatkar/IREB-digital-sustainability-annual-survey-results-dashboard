@@ -11,6 +11,7 @@ import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
 } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { SustainabilityDimensionsByOrgType } from '../../explore-graphs/SustainabilityDimensionsByOrgType';
 
 // --- DATA EXTRACTOR ---
 const sustainabilityDimensionsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -148,7 +149,7 @@ export const SustainabilityDimensionsInTasks = ({ onExplore }: { onExplore?: () 
       graphId="SustainabilityDimensionsInTasks"
       processor={sustainabilityDimensionsProcessor}
       layout={layout}
-      exploreComponents={[SustainabilityDimensionsInTasksOther]}
+      exploreComponents={[SustainabilityDimensionsInTasksOther, SustainabilityDimensionsByOrgType]}
       onExplore={onExplore}
       dataExtractor={sustainabilityDimensionsDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}

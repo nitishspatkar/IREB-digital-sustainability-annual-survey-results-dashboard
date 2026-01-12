@@ -385,5 +385,9 @@
   "OrganizationOffersTrainingByRegion": {
     "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
     "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by region."
+  },
+  "SustainabilityDimensionsByOrgType": {
+    "question": "Which dimensions of sustainability are actively considered in your organization's software development projects?",
+    "description": "This 100% stacked bar chart visualizes which sustainability dimensions (Environmental, Social, Individual, Economic, and Technical) are considered by different types of organizations. Organizations are grouped into three categories: Large companies (large enterprises), Research institutions (universities and research institutes), and Other organizations (all remaining types). Each group displays five bars representing the five sustainability dimensions, showing the percentage of organizations that actively consider each dimension. The green section represents organizations that consider the dimension, while the pink section represents those that do not. Only respondents whose organizations incorporate sustainable practices are included in this analysis."
   }
 }
