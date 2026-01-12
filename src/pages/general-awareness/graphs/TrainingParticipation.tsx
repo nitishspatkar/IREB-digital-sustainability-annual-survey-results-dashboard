@@ -2,6 +2,7 @@ import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
 import { TrainingParticipationByRole } from '../../explore-graphs/TrainingParticipationByRole';
 import { TrainingParticipationByRegion } from '../../explore-graphs/TrainingParticipationByRegion';
+import { TrainingParticipationByTrainingOffer } from '../../explore-graphs/TrainingParticipationByTrainingOffer';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -62,7 +63,11 @@ const TrainingParticipation = ({ onExplore }: { onExplore?: () => void }) => {
         margin: { t: 60, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
-      exploreComponents={[TrainingParticipationByRole, TrainingParticipationByRegion]}
+      exploreComponents={[
+        TrainingParticipationByRole,
+        TrainingParticipationByRegion,
+        TrainingParticipationByTrainingOffer,
+      ]}
       onExplore={onExplore}
     />
   );
