@@ -4,6 +4,8 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import { SustainabilityDimensionsOther } from '../../explore-graphs/SustainabilityDimensionsOther';
+import { SustainabilityDimensionsByAge } from '../../explore-graphs/SustainabilityDimensionsByAge';
+import { SustainabilityDimensionsByOrgType } from '../../explore-graphs/SustainabilityDimensionsByOrgType';
 import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
@@ -147,7 +149,11 @@ export const SustainabilityDimensions = ({ onExplore }: { onExplore?: () => void
           tickcolor: 'rgba(0,0,0,0)',
         },
       }}
-      exploreComponents={[SustainabilityDimensionsOther]}
+      exploreComponents={[
+        SustainabilityDimensionsOther,
+        SustainabilityDimensionsByAge,
+        SustainabilityDimensionsByOrgType,
+      ]}
       onExplore={onExplore}
       dataExtractor={sustainabilityDimensionsDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}
