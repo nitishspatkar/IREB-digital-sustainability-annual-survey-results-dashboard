@@ -397,5 +397,9 @@
   "SustainabilityDimensionsByExperience": {
     "question": "Which dimensions of sustainability are actively considered in your organization's software development projects?",
     "description": "This 100% stacked bar chart visualizes which sustainability dimensions (Environmental, Social, Individual, Economic, and Technical) are considered by respondents across different professional experience levels. The chart groups respondents into three experience categories: 0-10 years, 11-20 years, and More than 20 years. Each experience group displays five bars representing the five sustainability dimensions, showing the percentage of respondents in that experience level whose organizations actively consider each dimension. The green section represents organizations that consider the dimension, while the pink section represents those that do not. Only respondents whose organizations incorporate sustainable practices are included in this analysis."
+  },
+  "OrganizationalPracticesByOrgType": {
+    "question": "Organizational Practices by Organization Type",
+    "description": "This 100% stacked bar chart visualizes responses to five key organizational questions across different organization types. Organizations are grouped into three categories: Other organizations, Large company, and Research. Each group displays five bars representing: (1) Has specific digital sustainability goals or benchmarks, (2) Has a dedicated sustainability or CSR team/department, (3) Incorporates sustainable development practices, (4) Reports on sustainability practices, and (5) Offers training or resources on sustainable software development. The bars show the percentage breakdown of responses: Yes (green), No (pink), and Not sure (grey). This chart helps identify how organizational sustainability practices vary across different types of organizations."
   }
 }

@@ -7,6 +7,7 @@ import { OrganizationOffersTrainingByRegion } from '../../explore-graphs/Organiz
 import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
 import { NoTrainingReasonsByTrainingOffer } from '../../explore-graphs/NoTrainingReasonsByTrainingOffer.tsx';
 import { TrainingParticipationByTrainingOffer } from '../../explore-graphs/TrainingParticipationByTrainingOffer.tsx';
+import { OrganizationalPracticesByOrgType } from '../../explore-graphs/OrganizationalPracticesByOrgType.tsx';
 
 // The Logic (Pure Function)
 const processData: ChartProcessor = (responses, palette) => {
@@ -86,6 +87,7 @@ const OrganizationOffersTraining = ({ onExplore }: { onExplore?: () => void }) =
         OrganizationOffersTrainingByOrgType,
         NoTrainingReasonsByTrainingOffer,
         TrainingParticipationByTrainingOffer,
+        OrganizationalPracticesByOrgType,
       ]}
       onExplore={onExplore}
     />
