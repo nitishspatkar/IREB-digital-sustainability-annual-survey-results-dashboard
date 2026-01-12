@@ -51,7 +51,6 @@ export const OrganizationalPracticesByOrgType = ({ onBack, showBackButton = true
 
         const qMap = statsMap.get(groupName)!;
         QUESTIONS.forEach((question) => {
-          // @ts-expect-error - Dynamic key access on SurveyRecord
           const val = norm(r.raw[question.key] as unknown as string);
           if (val === '' || val === 'n/a') return;
 
