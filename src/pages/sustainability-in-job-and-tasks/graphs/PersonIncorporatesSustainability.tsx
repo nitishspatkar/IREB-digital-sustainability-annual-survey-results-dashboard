@@ -1,5 +1,6 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
+import { PersonIncorporatesSustainabilityByAge } from '../../explore-graphs/PersonIncorporatesSustainabilityByAge';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -51,7 +52,7 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const PersonIncorporatesSustainability = () => {
+const PersonIncorporatesSustainability = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="PersonIncorporatesSustainability"
@@ -60,6 +61,8 @@ const PersonIncorporatesSustainability = () => {
         margin: { t: 50, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
+      exploreComponents={[PersonIncorporatesSustainabilityByAge]}
+      onExplore={onExplore}
     />
   );
 };

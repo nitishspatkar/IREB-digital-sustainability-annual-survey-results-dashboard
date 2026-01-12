@@ -49,6 +49,10 @@
     "question": "Have you heard of the term 'digital sustainability'?",
     "description": "A clear majority of practitioners in RE indicate that they are not familiar with the definition, while stakeholders in all other roles (management, technical, and research) have a clear majority indicating that they are familiar with the definition"
   },
+  "PersonIncorporatesSustainabilityByAge": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks? (By Age Group)",
+    "description": "This chart shows the breakdown of respondents who incorporate digital sustainability considerations in their role-specific tasks, segmented by age group. Each age group displays the count of 'Yes' and 'No' responses in a stacked horizontal bar format."
+  },
   "DefinitionAwarenessByAge": {
     "question": "Have you heard of the term 'digital sustainability'?",
     "description": "Factors related to better familiarity with the definition were respondents over 60 years old or working at a research organization."
