@@ -18,6 +18,7 @@ import { OrganizationHasSustainabilityTeamByRole } from '../../explore-graphs/Or
 import { OrganizationIncorporatesPracticesByRole } from '../../explore-graphs/OrganizationIncorporatesPracticesByRole.tsx';
 import { OrganizationOffersTrainingByRole } from '../../explore-graphs/OrganizationOffersTrainingByRole.tsx';
 import { OrganizationReportsOnSustainabilityByRole } from '../../explore-graphs/OrganizationReportsOnSustainabilityByRole.tsx';
+import { PersonIncorporatesSustainabilityByRole } from '../../explore-graphs/PersonIncorporatesSustainabilityByRole.tsx';
 
 const normalizeRole = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -104,6 +105,7 @@ export const DemographicOrganizationalRole = ({ onExplore }: { onExplore?: () =>
         OrganizationIncorporatesPracticesByRole,
         OrganizationOffersTrainingByRole,
         OrganizationReportsOnSustainabilityByRole,
+        PersonIncorporatesSustainabilityByRole,
       ]}
       onExplore={onExplore}
       dataExtractor={organizationalRoleDataExtractor}

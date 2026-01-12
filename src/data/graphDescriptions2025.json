@@ -294,6 +294,10 @@
     "question": "Do you incorporate digital sustainability considerations in your role-specific tasks? ",
     "description": "Shows the proportion of respondents who incorporate digital sustainability in their tasks."
   },
+  "PersonIncorporatesSustainabilityByRole": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks?",
+    "description": "Shows whether respondents incorporate digital sustainability considerations in their role-specific tasks, broken down by organizational role. Each role displays the count of 'Yes' and 'No' responses in a stacked horizontal bar format."
+  },
   "SustainabilityDimensionsInTasks": {
     "question": "Which sustainability dimensions do you consider in your role-specific tasks?",
     "description": "Shows which sustainability dimensions respondents consider in their role-specific tasks."

@@ -1,6 +1,7 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor } from '../../../components/GraphViews';
 import { PersonIncorporatesSustainabilityByAge } from '../../explore-graphs/PersonIncorporatesSustainabilityByAge';
+import { PersonIncorporatesSustainabilityByRole } from '../../explore-graphs/PersonIncorporatesSustainabilityByRole';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -61,7 +62,10 @@ const PersonIncorporatesSustainability = ({ onExplore }: { onExplore?: () => voi
         margin: { t: 50, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },
       }}
-      exploreComponents={[PersonIncorporatesSustainabilityByAge]}
+      exploreComponents={[
+        PersonIncorporatesSustainabilityByAge,
+        PersonIncorporatesSustainabilityByRole,
+      ]}
       onExplore={onExplore}
     />
   );
