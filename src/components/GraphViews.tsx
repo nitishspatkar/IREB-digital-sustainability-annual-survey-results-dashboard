@@ -236,6 +236,51 @@ export const GenericChart = <T,>({
   // --- List Mode: Render a styled list instead of a chart ---
   if (items) {
     return (
+      <div className="flex flex-col">
+        {import.meta.env.DEV && (
+          <div className="mb-1 w-fit border border-yellow-400 bg-yellow-100 px-1 font-mono text-xs text-yellow-800 select-all">
+            graphId="{graphId}"
+          </div>
+        )}
+        <GraphWrapper
+          ref={graphRef}
+          question={question}
+          description={description}
+          numberOfResponses={stats.numberOfResponses}
+          responseRate={responseRate}
+          showResponseStats={showResponseStats}
+          showBackButton={!!onBack}
+          onBack={onBack}
+          compareYear={compareYear}
+          onCompareYearChange={dataExtractor && comparisonStrategy ? setCompareYear : undefined}
+          availableCompareYears={dataExtractor && comparisonStrategy ? availableYears : []}
+        >
+          <div className="h-[520px]">
+            <ul className="h-full overflow-y-auto" style={{ color: palette.grey }}>
+              {items.map((item, index) => (
+                <li
+                  key={index}
+                  className="border-b px-2 py-3 text-sm"
+                  style={{ borderColor: palette.grey }}
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </GraphWrapper>
+      </div>
+    );
+  }
+
+  // --- Chart Mode: Render standard Plotly chart ---
+  return (
+    <div className="flex flex-col">
+      {import.meta.env.DEV && (
+        <div className="mb-1 w-fit border border-yellow-400 bg-yellow-100 px-1 font-mono text-xs text-yellow-800 select-all">
+          graphId="{graphId}"
+        </div>
+      )}
       <GraphWrapper
         ref={graphRef}
         question={question}
@@ -243,6 +288,8 @@ export const GenericChart = <T,>({
         numberOfResponses={stats.numberOfResponses}
         responseRate={responseRate}
         showResponseStats={showResponseStats}
+        showExploreButton={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
+        onExplore={handleExplore}
         showBackButton={!!onBack}
         onBack={onBack}
         compareYear={compareYear}
@@ -250,72 +297,39 @@ export const GenericChart = <T,>({
         availableCompareYears={dataExtractor && comparisonStrategy ? availableYears : []}
       >
         <div className="h-[520px]">
-          <ul className="h-full overflow-y-auto" style={{ color: palette.grey }}>
-            {items.map((item, index) => (
-              <li
-                key={index}
-                className="border-b px-2 py-3 text-sm"
-                style={{ borderColor: palette.grey }}
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
+          <Plot
+            data={traces as Data[]}
+            layout={
+              enableInteractions
+                ? layout
+                : {
+                    ...layout,
+                    dragmode: false,
+                    xaxis: {
+                      ...(layout?.xaxis || {}),
+                      fixedrange: true,
+                    },
+                    yaxis: {
+                      ...(layout?.yaxis || {}),
+                      fixedrange: true,
+                    },
+                  }
+            }
+            config={
+              enableInteractions
+                ? { displayModeBar: false, responsive: true }
+                : {
+                    displayModeBar: false,
+                    responsive: true,
+                    scrollZoom: false,
+                    doubleClick: false,
+                  }
+            }
+            useResizeHandler
+            style={{ width: '100%', height: '100%' }}
+          />
         </div>
       </GraphWrapper>
-    );
-  }
-
-  // --- Chart Mode: Render standard Plotly chart ---
-  return (
-    <GraphWrapper
-      ref={graphRef}
-      question={question}
-      description={description}
-      numberOfResponses={stats.numberOfResponses}
-      responseRate={responseRate}
-      showResponseStats={showResponseStats}
-      showExploreButton={!!onExplore || (!!exploreComponents && exploreComponents.length > 0)}
-      onExplore={handleExplore}
-      showBackButton={!!onBack}
-      onBack={onBack}
-      compareYear={compareYear}
-      onCompareYearChange={dataExtractor && comparisonStrategy ? setCompareYear : undefined}
-      availableCompareYears={dataExtractor && comparisonStrategy ? availableYears : []}
-    >
-      <div className="h-[520px]">
-        <Plot
-          data={traces as Data[]}
-          layout={
-            enableInteractions
-              ? layout
-              : {
-                  ...layout,
-                  dragmode: false,
-                  xaxis: {
-                    ...(layout?.xaxis || {}),
-                    fixedrange: true,
-                  },
-                  yaxis: {
-                    ...(layout?.yaxis || {}),
-                    fixedrange: true,
-                  },
-                }
-          }
-          config={
-            enableInteractions
-              ? { displayModeBar: false, responsive: true }
-              : {
-                  displayModeBar: false,
-                  responsive: true,
-                  scrollZoom: false,
-                  doubleClick: false,
-                }
-          }
-          useResizeHandler
-          style={{ width: '100%', height: '100%' }}
-        />
-      </div>
-    </GraphWrapper>
+    </div>
   );
 };
