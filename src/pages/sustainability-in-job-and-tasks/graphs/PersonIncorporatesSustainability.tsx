@@ -3,6 +3,8 @@ import type { ChartProcessor } from '../../../components/GraphViews';
 import { PersonIncorporatesSustainabilityByAge } from '../../explore-graphs/PersonIncorporatesSustainabilityByAge';
 import { PersonIncorporatesSustainabilityByRole } from '../../explore-graphs/PersonIncorporatesSustainabilityByRole';
 import { PersonIncorporatesSustainabilityByOrgGoals } from '../../explore-graphs/PersonIncorporatesSustainabilityByOrgGoals';
+import { PersonIncorporatesSustainabilityByExperience } from '../../explore-graphs/PersonIncorporatesSustainabilityByExperience';
+import { PersonIncorporatesSustainabilityByMeasureCount } from '../../explore-graphs/PersonIncorporatesSustainabilityByMeasureCount';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -67,6 +69,8 @@ const PersonIncorporatesSustainability = ({ onExplore }: { onExplore?: () => voi
         PersonIncorporatesSustainabilityByAge,
         PersonIncorporatesSustainabilityByRole,
         PersonIncorporatesSustainabilityByOrgGoals,
+        PersonIncorporatesSustainabilityByExperience,
+        PersonIncorporatesSustainabilityByMeasureCount,
       ]}
       onExplore={onExplore}
     />

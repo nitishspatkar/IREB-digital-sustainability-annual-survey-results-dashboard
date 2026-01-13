@@ -13,6 +13,7 @@ import { OrganizationOffersTrainingByOrgType } from '../../explore-graphs/Organi
 import { OrganizationReportsOnSustainabilityByOrgType } from '../../explore-graphs/OrganizationReportsOnSustainabilityByOrgType.tsx';
 import { SustainabilityDimensionsByOrgType } from '../../explore-graphs/SustainabilityDimensionsByOrgType.tsx';
 import { OrganizationalPracticesByOrgType } from '../../explore-graphs/OrganizationalPracticesByOrgType.tsx';
+import { DriversToIncorporateSustainabilityByOrgType } from '../../explore-graphs/DriversToIncorporateSustainabilityByOrgType.tsx';
 
 // Helper function to normalize organization type strings
 const normalizeOrganizationType = (value: string) => value.replace(/\s+/g, ' ').trim();
@@ -96,6 +97,7 @@ const DemographicOrganizationType = ({ onExplore }: { onExplore?: () => void }) 
         OrganizationReportsOnSustainabilityByOrgType,
         SustainabilityDimensionsByOrgType,
         OrganizationalPracticesByOrgType,
+        DriversToIncorporateSustainabilityByOrgType,
       ]}
       onExplore={onExplore}
       dataExtractor={organizationTypeDataExtractor}

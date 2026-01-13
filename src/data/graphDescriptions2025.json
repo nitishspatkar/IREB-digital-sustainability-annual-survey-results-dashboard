@@ -413,5 +413,17 @@
   "OrganizationalPracticesByOrgType": {
     "question": "Organizational Practices by Organization Type",
     "description": "This 100% stacked bar chart visualizes responses to five key organizational questions across different organization types. Organizations are grouped into three categories: Other organizations, Large company, and Research. Each group displays five bars representing: (1) Has specific digital sustainability goals or benchmarks, (2) Has a dedicated sustainability or CSR team/department, (3) Incorporates sustainable development practices, (4) Reports on sustainability practices, and (5) Offers training or resources on sustainable software development. The bars show the percentage breakdown of responses: Yes (green), No (pink), and Not sure (grey). This chart helps identify how organizational sustainability practices vary across different types of organizations."
+  },
+  "PersonIncorporatesSustainabilityByExperience": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks? (By Professional Experience)",
+    "description": "This chart shows the breakdown of respondents who incorporate digital sustainability considerations in their role-specific tasks, segmented by professional experience. Each experience group displays the count of 'Yes' and 'No' responses in a grouped vertical bar format."
+  },
+  "PersonIncorporatesSustainabilityByMeasureCount": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks? (By Organizational Context)",
+    "description": "This chart illustrates the relationship between the organizational context and whether employees incorporate sustainability into their work. Respondents are categorized by their organization's stance: 'No sustainability' (organization does not incorporate practices), 'Unclear communication' (respondent is unsure), or by the number of specific measures in place (1 to 4+). Generally, as organizations adopt more measures (goals, teams, practices, coordination, reporting, training), employees are more likely to incorporate sustainability. An exception is observed at three measures, where a specific combination often lacks training/resources, highlighting the importance of employee support."
+  },
+  "DriversToIncorporateSustainabilityByOrgType": {
+    "question": "What drives you to incorporate digital sustainability in your role-related tasks?",
+    "description": "This grouped bar chart shows the percentage of respondents motivated by different drivers (Organizational policies, Personal beliefs, Client requirements, User requirements, Legal requirements), broken down by organization type (Large company, Research, Other organizations). The data highlights how drivers vary across sectors, specifically confirming that client and user requirements play a negligible role in research settings compared to industry."
   }
 }

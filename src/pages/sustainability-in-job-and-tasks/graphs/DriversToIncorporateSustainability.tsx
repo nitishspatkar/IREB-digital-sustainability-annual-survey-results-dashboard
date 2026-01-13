@@ -7,6 +7,7 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import { DriversToIncorporateSustainabilityOther } from '../../explore-graphs/DriversToIncorporateSustainabilityOther';
+import { DriversToIncorporateSustainabilityByOrgType } from '../../explore-graphs/DriversToIncorporateSustainabilityByOrgType';
 import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
@@ -148,7 +149,10 @@ export const DriversToIncorporateSustainability = ({ onExplore }: { onExplore?: 
       graphId="DriversToIncorporateSustainability"
       processor={driversProcessor}
       layout={layout}
-      exploreComponents={[DriversToIncorporateSustainabilityOther]}
+      exploreComponents={[
+        DriversToIncorporateSustainabilityOther,
+        DriversToIncorporateSustainabilityByOrgType,
+      ]}
       onExplore={onExplore}
       dataExtractor={driversDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}
