@@ -23,6 +23,8 @@ export type ChartPalette = {
   spring: string;
   darkSpring: string;
   mandarin: string;
+  transport: string;
+  night: string;
 };
 
 // 2. Define what your logic function must return
@@ -139,6 +141,8 @@ export const GenericChart = <T,>({
     spring: useThemeColor('--color-ireb-spring'),
     darkSpring: useThemeColor('--color-ireb-dark-spring'),
     mandarin: useThemeColor('--color-ireb-mandarin'),
+    transport: useThemeColor('--color-ireb-sky'),
+    night: useThemeColor('--color-ireb-grey-01'),
   };
 
   // --- C. Execute the unique logic ---
@@ -177,6 +181,8 @@ export const GenericChart = <T,>({
     palette.mandarin,
     palette.lightBerry,
     palette.superLightBerry,
+    palette.transport,
+    palette.night,
   ]);
 
   // --- CHECK: If no data exists, do not render anything ---
