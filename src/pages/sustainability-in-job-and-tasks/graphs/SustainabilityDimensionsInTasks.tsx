@@ -12,6 +12,10 @@ import {
   type HorizontalBarData,
 } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 import { SustainabilityDimensionsByOrgType } from '../../explore-graphs/SustainabilityDimensionsByOrgType';
+import { SustainabilityDimensionsInTasksByRegion } from '../../explore-graphs/SustainabilityDimensionsInTasksByRegion';
+import { SustainabilityDimensionsInTasksByRole } from '../../explore-graphs/SustainabilityDimensionsInTasksByRole';
+import { SustainabilityDimensionsInTasksByMeasureCount } from '../../explore-graphs/SustainabilityDimensionsInTasksByMeasureCount';
+import { SusAFDimensionsComparison } from '../../explore-graphs/SusAFDimensionsComparison';
 
 // --- DATA EXTRACTOR ---
 const sustainabilityDimensionsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -149,7 +153,14 @@ export const SustainabilityDimensionsInTasks = ({ onExplore }: { onExplore?: () 
       graphId="SustainabilityDimensionsInTasks"
       processor={sustainabilityDimensionsProcessor}
       layout={layout}
-      exploreComponents={[SustainabilityDimensionsInTasksOther, SustainabilityDimensionsByOrgType]}
+      exploreComponents={[
+        SustainabilityDimensionsInTasksOther,
+        SustainabilityDimensionsByOrgType,
+        SustainabilityDimensionsInTasksByRegion,
+        SustainabilityDimensionsInTasksByRole,
+        SustainabilityDimensionsInTasksByMeasureCount,
+        SusAFDimensionsComparison,
+      ]}
       onExplore={onExplore}
       dataExtractor={sustainabilityDimensionsDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}

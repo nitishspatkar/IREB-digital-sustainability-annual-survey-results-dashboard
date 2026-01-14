@@ -7,6 +7,7 @@ import { TrainingReasonsNotMoreByExperience } from '../../explore-graphs/Trainin
 import { TrainingSatisfactionByExperience } from '../../explore-graphs/TrainingSatisfactionByExperience.tsx';
 import { SustainabilityDimensionsByExperience } from '../../explore-graphs/SustainabilityDimensionsByExperience';
 import { PersonIncorporatesSustainabilityByExperience } from '../../explore-graphs/PersonIncorporatesSustainabilityByExperience.tsx';
+import { HindrancesToIncorporateSustainabilityByExperience } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByExperience.tsx';
 
 // Helper to sort experience ranges naturally
 const sortExperience = (a: string, b: string) => {
@@ -94,6 +95,7 @@ export const DemographicProfessionalExperience = ({
         TrainingSatisfactionByExperience,
         SustainabilityDimensionsByExperience,
         PersonIncorporatesSustainabilityByExperience,
+        HindrancesToIncorporateSustainabilityByExperience,
       ]}
       onExplore={onExplore}
     />

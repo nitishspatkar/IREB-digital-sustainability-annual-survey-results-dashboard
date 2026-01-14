@@ -1,11 +1,57 @@
+import { useMemo } from 'react';
+import type { Layout } from 'plotly.js';
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
+import { UsesToolsByRole } from '../../explore-graphs/UsesToolsByRole';
+import { UsesToolsByOrgType } from '../../explore-graphs/UsesToolsByOrgType';
+import {
+  horizontalBarComparisonStrategy,
+  type HorizontalBarData,
+} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+
+// --- DATA EXTRACTOR ---
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
+const usesToolsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const counts = new Map<string, number>();
+  // Initialize to ensure order/presence
+  counts.set('Yes', 0);
+  counts.set('No', 0);
+  counts.set('Not sure', 0);
+
+  let numberOfResponses = 0;
+
+  responses.forEach((r) => {
+    // Precondition: Q28 = Yes
+    if (normalize(r.raw.personIncorporatesSustainability ?? '').toLowerCase() !== 'yes') return;
+
+    const raw = normalize(r.raw.usesTools ?? '');
+    const lower = raw.toLowerCase();
+
+    if (lower === 'yes' || lower === 'no' || lower === 'not sure') {
+      let label = 'Not sure';
+      if (lower === 'yes') label = 'Yes';
+      if (lower === 'no') label = 'No';
+
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+      numberOfResponses++;
+    }
+  });
+
+  const items = Array.from(counts.entries()).map(([label, value]) => ({ label, value }));
+
+  return {
+    items,
+    stats: {
+      numberOfResponses,
+    },
+  };
+};
+
 // The Logic (Pure Function)
 // Precondition: Q28 = Yes (personIncorporatesSustainability)
-const processData: ChartProcessor = (responses, palette) => {
+const usesToolsProcessor: ChartProcessor = (responses, palette) => {
   const filteredResponses = responses.filter(
     (r) => normalize(r.raw.personIncorporatesSustainability ?? '').toLowerCase() === 'yes'
   );
@@ -64,15 +110,35 @@ const processData: ChartProcessor = (responses, palette) => {
 };
 
 // The Component
-const UsesTools = () => {
+const UsesTools = ({ onExplore }: { onExplore?: () => void }) => {
+  const layout = useMemo<Partial<Layout>>(
+    () => ({
+      margin: { t: 40, r: 40, b: 40, l: 40 },
+      yaxis: {
+        title: {
+          text: 'Number of Respondents',
+        },
+        automargin: true,
+        ticks: 'outside',
+        ticklen: 10,
+        tickcolor: 'rgba(0,0,0,0)',
+      },
+      xaxis: {
+        automargin: true,
+      },
+    }),
+    []
+  );
+
   return (
     <GenericChart
       graphId="UsesTools"
-      processor={processData}
-      layout={{
-        margin: { t: 50, r: 20, b: 60, l: 48 },
-        yaxis: { title: { text: 'Number of Respondents' } },
-      }}
+      processor={usesToolsProcessor}
+      layout={layout}
+      exploreComponents={[UsesToolsByRole, UsesToolsByOrgType]}
+      onExplore={onExplore}
+      dataExtractor={usesToolsDataExtractor}
+      comparisonStrategy={horizontalBarComparisonStrategy}
     />
   );
 };

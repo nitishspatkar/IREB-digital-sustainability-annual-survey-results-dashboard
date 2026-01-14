@@ -7,6 +7,9 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import { HindrancesToIncorporateSustainabilityOther } from '../../explore-graphs/HindrancesToIncorporateSustainabilityOther';
+import { HindrancesToIncorporateSustainabilityByRole } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByRole';
+import { HindrancesToIncorporateSustainabilityByAge } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByAge';
+import { HindrancesToIncorporateSustainabilityByExperience } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByExperience';
 import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
@@ -180,7 +183,12 @@ export const HindrancesToIncorporateSustainability = ({
       graphId="HindrancesToIncorporateSustainability"
       processor={hindrancesProcessor}
       layout={layout}
-      exploreComponents={[HindrancesToIncorporateSustainabilityOther]}
+      exploreComponents={[
+        HindrancesToIncorporateSustainabilityOther,
+        HindrancesToIncorporateSustainabilityByRole,
+        HindrancesToIncorporateSustainabilityByAge,
+        HindrancesToIncorporateSustainabilityByExperience,
+      ]}
       onExplore={onExplore}
       dataExtractor={hindrancesDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}

@@ -5,7 +5,7 @@ import type { GraphId } from '../hooks/useGraphDescription';
 import type { SurveyRecord } from '../data/data-parsing-logic/SurveyCsvParser';
 
 // --- Shared Constants ---
-const DIMENSIONS = [
+const DEFAULT_DIMENSIONS = [
   { key: 'considerEnvironmental', label: 'Environmental' },
   { key: 'considerSocial', label: 'Social' },
   { key: 'considerIndividual', label: 'Individual' },
@@ -15,6 +15,11 @@ const DIMENSIONS = [
 
 const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
+interface DimensionDef {
+  key: string; // Using string to allow flexible keys from SurveyRecord
+  label: string;
+}
+
 interface Props {
   graphId: GraphId;
   groups: string[];
@@ -22,6 +27,7 @@ interface Props {
   getGroup: (rawResponse: SurveyRecord) => string | null;
   onBack?: () => void;
   showBackButton?: boolean;
+  dimensions?: DimensionDef[];
 }
 
 export const SustainabilityGroupedChart = ({
@@ -30,6 +36,7 @@ export const SustainabilityGroupedChart = ({
   getGroup,
   onBack,
   showBackButton = true,
+  dimensions = DEFAULT_DIMENSIONS as unknown as DimensionDef[],
 }: Props) => {
   // 1. Create the Processor dynamically based on props
   const processor: ChartProcessor = useMemo(
@@ -43,7 +50,7 @@ export const SustainabilityGroupedChart = ({
       const statsMap = new Map<string, Map<string, { yes: number; total: number }>>();
       groups.forEach((g) => {
         const dimMap = new Map();
-        DIMENSIONS.forEach((d) => dimMap.set(d.key, { yes: 0, total: 0 }));
+        dimensions.forEach((d) => dimMap.set(d.key, { yes: 0, total: 0 }));
         statsMap.set(g, dimMap);
       });
 
@@ -53,8 +60,9 @@ export const SustainabilityGroupedChart = ({
         if (!groupName || !statsMap.has(groupName)) return;
 
         const dimMap = statsMap.get(groupName)!;
-        DIMENSIONS.forEach((dim) => {
-          const val = norm(r.raw[dim.key] ?? '');
+        dimensions.forEach((dim) => {
+          // Cast strictly typed key to string access for SurveyRecord
+          const val = norm((r.raw as any)[dim.key] ?? '');
           const s = dimMap.get(dim.key)!;
           s.total++;
           if (val === 'yes') s.yes++;
@@ -72,7 +80,7 @@ export const SustainabilityGroupedChart = ({
       const GAP = 1;
 
       groups.forEach((g) => {
-        DIMENSIONS.forEach((dim) => {
+        dimensions.forEach((dim) => {
           const s = statsMap.get(g)!.get(dim.key)!;
           const yesPct = s.total > 0 ? (s.yes / s.total) * 100 : 0;
           const noPct = s.total > 0 ? ((s.total - s.yes) / s.total) * 100 : 0;
@@ -113,12 +121,12 @@ export const SustainabilityGroupedChart = ({
         ] as Data[],
       };
     },
-    [groups, getGroup]
+    [groups, getGroup, dimensions]
   );
 
   // 2. Create Layout dynamically based on props
   const layout = useMemo<Partial<Layout>>(() => {
-    const barsPerGroup = DIMENSIONS.length;
+    const barsPerGroup = dimensions.length;
     // Calculate center tick position: (start + end) / 2
     // Start is i * (bars + gap), End is start + (bars - 1)
     const stride = barsPerGroup + 1;
@@ -137,7 +145,7 @@ export const SustainabilityGroupedChart = ({
       legend: { orientation: 'h', y: 1.02, x: 1, xanchor: 'right' },
       margin: { t: 40, r: 20, b: 80, l: 60 },
     };
-  }, [groups]);
+  }, [groups, dimensions]);
 
   return (
     <GenericChart

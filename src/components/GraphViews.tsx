@@ -21,6 +21,7 @@ export type ChartPalette = {
   grey: string;
   grey02: string;
   spring: string;
+  lightSpring: string;
   darkSpring: string;
   mandarin: string;
   transport: string;
@@ -139,6 +140,7 @@ export const GenericChart = <T,>({
     grey: useThemeColor('--color-ireb-grey-01'),
     grey02: useThemeColor('--color-ireb-grey-02'),
     spring: useThemeColor('--color-ireb-spring'),
+    lightSpring: useThemeColor('--color-ireb-light-spring'),
     darkSpring: useThemeColor('--color-ireb-dark-spring'),
     mandarin: useThemeColor('--color-ireb-mandarin'),
     transport: useThemeColor('--color-ireb-sky'),
@@ -177,6 +179,7 @@ export const GenericChart = <T,>({
     palette.grey,
     palette.grey02,
     palette.spring,
+    palette.lightSpring,
     palette.darkSpring,
     palette.mandarin,
     palette.lightBerry,

@@ -17,6 +17,7 @@ import { TrainingPrivateCapacityByRegion } from '../../explore-graphs/TrainingPr
 import { TrainingProgramsCountByRegion } from '../../explore-graphs/TrainingProgramsCountByRegion';
 import { TrainingReasonsNoByRegion } from '../../explore-graphs/TrainingReasonsNoByRegion';
 import { TrainingSatisfactionByRegion } from '../../explore-graphs/TrainingSatisfactionByRegion';
+import { SustainabilityDimensionsInTasksByRegion } from '../../explore-graphs/SustainabilityDimensionsInTasksByRegion.tsx';
 
 type DemographicRegionDistributionProps = {
   respondentStats: RespondentStat[];
@@ -289,6 +290,7 @@ const DemographicRegionDistribution = ({ respondentStats }: DemographicRegionDis
         TrainingProgramsCountByRegion,
         TrainingReasonsNoByRegion,
         TrainingSatisfactionByRegion,
+        SustainabilityDimensionsInTasksByRegion,
       ]}
     />
   );

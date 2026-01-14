@@ -15,6 +15,7 @@ import { OrganizationIncorporatesPracticesByAge } from '../../explore-graphs/Org
 import { OrganizationOffersTrainingByAge } from '../../explore-graphs/OrganizationOffersTrainingByAge.tsx';
 import { OrganizationReportsOnSustainabilityByAge } from '../../explore-graphs/OrganizationReportsOnSustainabilityByAge.tsx';
 import { SustainabilityDimensionsByAge } from '../../explore-graphs/SustainabilityDimensionsByAge.tsx';
+import { HindrancesToIncorporateSustainabilityByAge } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByAge.tsx';
 
 const normalizeAgeGroup = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -106,6 +107,7 @@ const DemographicAgeGroup = ({ onExplore }: { onExplore?: () => void; className?
         OrganizationOffersTrainingByAge,
         OrganizationReportsOnSustainabilityByAge,
         SustainabilityDimensionsByAge,
+        HindrancesToIncorporateSustainabilityByAge,
       ]}
       onExplore={onExplore}
     />
