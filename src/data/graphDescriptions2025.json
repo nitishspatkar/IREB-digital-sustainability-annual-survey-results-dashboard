@@ -262,6 +262,22 @@
     "question": "What additional support or resources would help you integrate digital sustainability into your work?",
     "description": "Shows what additional support or resources respondents need to integrate digital sustainability."
   },
+  "AdditionalSupportResourcesByTraining": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work? (By Training Status)",
+    "description": "Percentage of Additional Support Needed by Training Status. This shows that those who have had training have less interest in receiving theoretical knowledge, structures or curricula, probably because they already have these; their demand is greater especially for positive case studies, and slightly higher for the more applied aspects of practical knowledge and tutorials."
+  },
+  "AdditionalSupportResourcesByAge": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work? (By Age Group)",
+    "description": "Breakdown of needed support resources by age group. More junior respondents (18-28) tend to prefer tools and show less interest in theoretical knowledge or positive case studies, while those aged 29-44 frequently indicate a need for positive case studies."
+  },
+  "AdditionalSupportResourcesByRole": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work? (By Role)",
+    "description": "Breakdown of needed support resources by organizational role. Respondents in management roles notably express a higher preference for tools compared to other support types."
+  },
+  "AdditionalSupportResourcesByOrgType": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work? (By Organization Type)",
+    "description": "Breakdown of needed support resources by organization type. Respondents from medium- and small-sized organizations show a stronger emphasis on theoretical knowledge compared to those from other organization types."
+  },
   "AdditionalSupportResourcesDetails": {
     "question": "What additional support or resources would help you integrate digital sustainability into your work? [Other]",
     "description": "Lists the free-text resources provided under the Other option."

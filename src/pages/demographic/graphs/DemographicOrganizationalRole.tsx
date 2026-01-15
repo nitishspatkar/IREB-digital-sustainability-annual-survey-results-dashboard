@@ -22,6 +22,7 @@ import { PersonIncorporatesSustainabilityByRole } from '../../explore-graphs/Per
 import { HindrancesToIncorporateSustainabilityByRole } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByRole.tsx';
 import { SustainabilityDimensionsInTasksByRole } from '../../explore-graphs/SustainabilityDimensionsInTasksByRole.tsx';
 import { UsesToolsByRole } from '../../explore-graphs/UsesToolsByRole.tsx';
+import { AdditionalSupportResourcesByRole } from '../../explore-graphs/AdditionalSupportResourcesByRole.tsx';
 
 const normalizeRole = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -112,6 +113,7 @@ export const DemographicOrganizationalRole = ({ onExplore }: { onExplore?: () =>
         HindrancesToIncorporateSustainabilityByRole,
         SustainabilityDimensionsInTasksByRole,
         UsesToolsByRole,
+        AdditionalSupportResourcesByRole,
       ]}
       onExplore={onExplore}
       dataExtractor={organizationalRoleDataExtractor}

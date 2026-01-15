@@ -7,6 +7,10 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import { AdditionalSupportResourcesOther } from '../../explore-graphs/AdditionalSupportResourcesOther';
+import { AdditionalSupportResourcesByTraining } from '../../explore-graphs/AdditionalSupportResourcesByTraining';
+import { AdditionalSupportResourcesByAge } from '../../explore-graphs/AdditionalSupportResourcesByAge';
+import { AdditionalSupportResourcesByRole } from '../../explore-graphs/AdditionalSupportResourcesByRole';
+import { AdditionalSupportResourcesByOrgType } from '../../explore-graphs/AdditionalSupportResourcesByOrgType';
 import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
@@ -163,7 +167,13 @@ export const AdditionalSupportResources = ({ onExplore }: { onExplore?: () => vo
       graphId="AdditionalSupportResources"
       processor={additionalSupportResourcesProcessor}
       layout={layout}
-      exploreComponents={[AdditionalSupportResourcesOther]}
+      exploreComponents={[
+        AdditionalSupportResourcesOther,
+        AdditionalSupportResourcesByTraining,
+        AdditionalSupportResourcesByAge,
+        AdditionalSupportResourcesByRole,
+        AdditionalSupportResourcesByOrgType,
+      ]}
       onExplore={onExplore}
       dataExtractor={additionalSupportResourcesDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}
