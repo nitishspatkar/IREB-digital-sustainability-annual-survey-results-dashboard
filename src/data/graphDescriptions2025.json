@@ -298,6 +298,18 @@
     "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?",
     "description": "Shows which sustainability dimensions respondents feel they lack knowledge or tools to address."
   },
+  "KnowledgeGapsByDimensionByAge": {
+    "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? (By Age Group)",
+    "description": "Shows which sustainability dimensions respondents feel they lack knowledge or tools to address by age group."
+  },
+  "KnowledgeGapsByDimensionByExperience": {
+    "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? (By Professional Experience)",
+    "description": "Shows which sustainability dimensions respondents feel they lack knowledge or tools to address by professional experience."
+  },
+  "KnowledgeGapsByDimensionByApplicationStatus": {
+    "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? (By Application of Sustainability)",
+    "description": "Shows which sustainability dimensions respondents feel they lack knowledge or tools to address by application status."
+  },
   "KnowledgeGapsByDimensionDetails": {
     "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? [Other]",
     "description": "Lists the free-text dimensions provided under the Other option."

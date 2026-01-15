@@ -7,6 +7,9 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import { KnowledgeGapsByDimensionOther } from '../../explore-graphs/KnowledgeGapsByDimensionOther';
+import { KnowledgeGapsByDimensionByAge } from '../../explore-graphs/KnowledgeGapsByDimensionByAge';
+import { KnowledgeGapsByDimensionByExperience } from '../../explore-graphs/KnowledgeGapsByDimensionByExperience';
+import { KnowledgeGapsByDimensionByApplicationStatus } from '../../explore-graphs/KnowledgeGapsByDimensionByApplicationStatus';
 import {
   horizontalBarComparisonStrategy,
   type HorizontalBarData,
@@ -151,7 +154,12 @@ export const KnowledgeGapsByDimension = ({ onExplore }: { onExplore?: () => void
       graphId="KnowledgeGapsByDimension"
       processor={knowledgeGapsProcessor}
       layout={layout}
-      exploreComponents={[KnowledgeGapsByDimensionOther]}
+      exploreComponents={[
+        KnowledgeGapsByDimensionOther,
+        KnowledgeGapsByDimensionByAge,
+        KnowledgeGapsByDimensionByExperience,
+        KnowledgeGapsByDimensionByApplicationStatus,
+      ]}
       onExplore={onExplore}
       dataExtractor={knowledgeGapsDataExtractor}
       comparisonStrategy={horizontalBarComparisonStrategy}
