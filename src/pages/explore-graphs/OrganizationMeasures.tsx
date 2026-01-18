@@ -98,6 +98,7 @@ const processData: ChartProcessor = (responses, palette) => {
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 13,
+          color: '#FFFFFF',
         },
         hovertemplate: '%{fullData.name}: %{x:.2f}%<extra></extra>',
       },
@@ -114,6 +115,7 @@ const processData: ChartProcessor = (responses, palette) => {
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 13,
+          color: '#FFFFFF',
         },
         hovertemplate: '%{fullData.name}: %{x:.2f}%<extra></extra>',
       },
@@ -130,6 +132,7 @@ const processData: ChartProcessor = (responses, palette) => {
         textfont: {
           family: 'PP Mori, sans-serif',
           size: 13,
+          color: '#FFFFFF',
         },
         hovertemplate: '%{fullData.name}: %{x:.2f}%<extra></extra>',
       },

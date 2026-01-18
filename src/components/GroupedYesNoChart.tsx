@@ -76,7 +76,7 @@ export const GroupedYesNoChart = ({
           text: yesValues.map((v) => (v > 0 ? v.toString() : '')),
           textposition: 'inside',
           insidetextanchor: 'middle',
-          textfont: { family: 'PP Mori, sans-serif', size: 13, color: palette.grey },
+          textfont: { family: 'PP Mori, sans-serif', size: 13, color: '#FFFFFF' },
           hoverinfo: 'name',
         },
         {
@@ -88,7 +88,7 @@ export const GroupedYesNoChart = ({
           text: noValues.map((v) => (v > 0 ? v.toString() : '')),
           textposition: 'inside',
           insidetextanchor: 'middle',
-          textfont: { family: 'PP Mori, sans-serif', size: 12, color: palette.grey },
+          textfont: { family: 'PP Mori, sans-serif', size: 13, color: '#FFFFFF' },
           hoverinfo: 'name',
         },
       ];

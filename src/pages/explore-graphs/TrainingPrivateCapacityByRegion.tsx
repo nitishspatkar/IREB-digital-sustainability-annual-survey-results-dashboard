@@ -169,7 +169,7 @@ const processTrainingPrivateCapacityByRegion: ChartProcessor = (responses, palet
       textfont: {
         family: 'PP Mori, sans-serif',
         size: 13,
-        color: capacityLabel === 'Mixed' ? '#000000' : '#FFFFFF',
+        color: '#FFFFFF',
       },
       hoverinfo: 'x+y+name',
     };

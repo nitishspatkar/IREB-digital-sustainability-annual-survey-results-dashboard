@@ -100,7 +100,7 @@ const processTrainingPrivateCapacityByRole: ChartProcessor = (responses, palette
       textfont: {
         family: 'PP Mori, sans-serif',
         size: 13,
-        color: capacityLabel === 'Mixed' ? '#000000' : '#FFFFFF', // Black text for lighter mixed color if needed, else white
+        color: '#FFFFFF',
       },
       hoverinfo: 'x+y+name',
     };
@@ -131,7 +131,7 @@ export const TrainingPrivateCapacityByRole = ({
       margin: { t: 40, r: 20, b: 60, l: 200 }, // Left margin for Roles
       uniformtext: {
         mode: 'show',
-        minsize: 10,
+        minsize: 13,
       },
       xaxis: {
         title: { text: 'Number of Respondents' },

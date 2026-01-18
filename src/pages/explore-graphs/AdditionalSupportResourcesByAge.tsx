@@ -86,7 +86,7 @@ const processAdditionalSupportByAge: ChartProcessor = (responses, palette) => {
   const colors = [
     palette.berry,
     palette.lightBerry,
-    palette.superLightBerry,
+    palette.grey02,
     palette.mandarin,
     palette.transport,
     palette.spring,

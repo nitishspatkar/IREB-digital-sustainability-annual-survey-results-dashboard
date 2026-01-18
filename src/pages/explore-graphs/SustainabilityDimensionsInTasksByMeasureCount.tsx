@@ -159,6 +159,10 @@ export const SustainabilityDimensionsInTasksByMeasureCount = ({
         y: 1.1,
         x: 0,
       },
+      uniformtext: {
+        mode: 'show',
+        minsize: 13,
+      },
       xaxis: {
         title: { text: 'Number of Respondents' },
         automargin: true,

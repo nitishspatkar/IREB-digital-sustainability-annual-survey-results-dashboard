@@ -90,7 +90,13 @@ const processKnowledgeGapsByDimensionByApplicationStatus: ChartProcessor = (resp
       x: xLabels,
       y: yValues,
       text: yValues.map((v) => v.toString()),
-      textposition: 'auto',
+      textposition: 'inside',
+      insidetextanchor: 'middle',
+      textfont: {
+        family: 'PP Mori, sans-serif',
+        size: 13,
+        color: '#FFFFFF', // White text for better contrast on colors
+      },
       marker: {
         color: index === 0 ? palette.spring : palette.mandarin,
       },

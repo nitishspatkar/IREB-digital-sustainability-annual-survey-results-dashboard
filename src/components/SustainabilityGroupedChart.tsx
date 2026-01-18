@@ -142,7 +142,7 @@ export const SustainabilityGroupedChart = ({
         fixedrange: true,
       },
       yaxis: { range: [0, 100], ticksuffix: '%', fixedrange: true },
-      legend: { orientation: 'h', y: 1.02, x: 1, xanchor: 'right' },
+      legend: { orientation: 'h', y: 1.12, x: 1, xanchor: 'right' },
       margin: { t: 40, r: 20, b: 80, l: 60 },
     };
   }, [groups, dimensions]);

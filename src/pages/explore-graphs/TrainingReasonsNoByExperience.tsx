@@ -155,7 +155,7 @@ const processTrainingReasonsNoByExperience: ChartProcessor = (responses, palette
     texttemplate: '%{text}',
     textfont: {
       family: 'PP Mori, sans-serif',
-      size: 12,
+      size: 13,
       color: textColors as unknown as string,
     },
     hoverinfo: 'x+y+z',

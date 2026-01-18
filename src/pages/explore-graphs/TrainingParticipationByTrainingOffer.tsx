@@ -89,7 +89,7 @@ const processTrainingParticipationByTrainingOffer: ChartProcessor = (responses, 
       textfont: {
         family: 'PP Mori, sans-serif',
         size: 13,
-        color: label === 'No Answer' ? palette.grey : '#FFFFFF',
+        color: '#FFFFFF',
       },
       hoverinfo: 'x+y+name',
     };

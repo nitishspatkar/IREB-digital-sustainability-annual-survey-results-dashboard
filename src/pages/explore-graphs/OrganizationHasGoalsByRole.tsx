@@ -83,7 +83,7 @@ const processOrganizationHasGoalsByRole: ChartProcessor = (responses, palette) =
       textfont: {
         family: 'PP Mori, sans-serif',
         size: 13,
-        color: label === 'Not sure' ? palette.grey : '#FFFFFF',
+        color: '#FFFFFF',
       },
       hoverinfo: 'x+y+name',
     };
@@ -116,7 +116,7 @@ export const OrganizationHasGoalsByRole = ({
       yaxis: {
         automargin: true,
         ticks: 'outside',
-        ticklen: 10,
+        ticklen: 13,
         tickcolor: 'rgba(0,0,0,0)',
       },
       legend: {

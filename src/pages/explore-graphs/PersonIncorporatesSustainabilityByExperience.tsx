@@ -72,7 +72,7 @@ export const PersonIncorporatesSustainabilityByExperience = ({
           textfont: {
             family: 'PP Mori, sans-serif',
             size: 13,
-            color: palette.grey,
+            color: '#FFFFFF',
           },
           hoverinfo: 'name' as const,
         },
@@ -89,8 +89,8 @@ export const PersonIncorporatesSustainabilityByExperience = ({
           insidetextanchor: 'middle',
           textfont: {
             family: 'PP Mori, sans-serif',
-            size: 12,
-            color: palette.grey,
+            size: 13,
+            color: '#FFFFFF',
           },
           hoverinfo: 'name' as const,
         },

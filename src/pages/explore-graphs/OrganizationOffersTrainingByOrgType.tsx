@@ -83,7 +83,7 @@ const processOrganizationOffersTrainingByOrgType: ChartProcessor = (responses, p
       textfont: {
         family: 'PP Mori, sans-serif',
         size: 13,
-        color: label === 'Not sure' ? palette.grey : '#FFFFFF',
+        color: '#FFFFFF',
       },
       hoverinfo: 'x+y+name',
     };

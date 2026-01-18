@@ -83,7 +83,7 @@ const processOrganizationOffersTrainingByRole: ChartProcessor = (responses, pale
       textfont: {
         family: 'PP Mori, sans-serif',
         size: 13,
-        color: label === 'Not sure' ? palette.grey : '#FFFFFF',
+        color: '#FFFFFF',
       },
       hoverinfo: 'x+y+name',
     };
@@ -108,7 +108,7 @@ export const OrganizationOffersTrainingByRole = ({
       barmode: 'stack',
       bargap: 0.15,
       margin: { t: 40, r: 20, b: 60, l: 200 }, // Increased left margin
-      uniformtext: { mode: 'show', minsize: 10 },
+      uniformtext: { mode: 'show', minsize: 13 },
       xaxis: {
         title: { text: 'Number of Respondents' },
         automargin: true,
