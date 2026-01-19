@@ -6,7 +6,7 @@ import {
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 import { TrainingPrivateCapacityByRole } from '../../explore-graphs/TrainingPrivateCapacityByRole.tsx';
 import { TrainingPrivateCapacityByRegion } from '../../explore-graphs/TrainingPrivateCapacityByRegion.tsx';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy.ts';
 
 // Define the categories and their search terms
 const capacityOptions = [
@@ -111,7 +111,7 @@ const TrainingPrivateCapacity = ({ onExplore }: { onExplore?: () => void }) => {
       exploreComponents={[TrainingPrivateCapacityByRole, TrainingPrivateCapacityByRegion]}
       onExplore={onExplore}
       dataExtractor={trainingPrivateCapacityDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

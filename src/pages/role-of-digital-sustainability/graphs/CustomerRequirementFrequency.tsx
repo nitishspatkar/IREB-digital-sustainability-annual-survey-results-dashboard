@@ -4,7 +4,7 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
 
 // Define the logical order of answers
 const frequencyOrder = [
@@ -89,7 +89,7 @@ const CustomerRequirementFrequency = () => {
         },
       }}
       dataExtractor={customerRequirementDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

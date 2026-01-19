@@ -12,7 +12,7 @@ import { AdditionalSupportResourcesByAge } from '../../explore-graphs/Additional
 import { AdditionalSupportResourcesByRole } from '../../explore-graphs/AdditionalSupportResourcesByRole';
 import { AdditionalSupportResourcesByOrgType } from '../../explore-graphs/AdditionalSupportResourcesByOrgType';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
 
 // --- DATA EXTRACTOR ---
 const additionalSupportResourcesDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -174,7 +174,7 @@ export const AdditionalSupportResources = ({ onExplore }: { onExplore?: () => vo
       ]}
       onExplore={onExplore}
       dataExtractor={additionalSupportResourcesDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

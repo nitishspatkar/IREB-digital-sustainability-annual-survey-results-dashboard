@@ -20,7 +20,7 @@ import { HindrancesToIncorporateSustainabilityByRole } from '../../explore-graph
 import { SustainabilityDimensionsInTasksByRole } from '../../explore-graphs/SustainabilityDimensionsInTasksByRole.tsx';
 import { UsesToolsByRole } from '../../explore-graphs/UsesToolsByRole.tsx';
 import { AdditionalSupportResourcesByRole } from '../../explore-graphs/AdditionalSupportResourcesByRole.tsx';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy.ts';
 
 const normalizeRole = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -115,7 +115,7 @@ export const DemographicOrganizationalRole = ({ onExplore }: { onExplore?: () =>
       ]}
       onExplore={onExplore}
       dataExtractor={organizationalRoleDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

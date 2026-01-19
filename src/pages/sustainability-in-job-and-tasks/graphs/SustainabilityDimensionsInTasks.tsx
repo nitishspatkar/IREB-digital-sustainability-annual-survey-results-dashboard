@@ -8,7 +8,7 @@ import {
 } from '../../../components/GraphViews';
 import { SustainabilityDimensionsInTasksOther } from '../../explore-graphs/SustainabilityDimensionsInTasksOther';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
 import { SustainabilityDimensionsByOrgType } from '../../explore-graphs/SustainabilityDimensionsByOrgType';
 import { SustainabilityDimensionsInTasksByRegion } from '../../explore-graphs/SustainabilityDimensionsInTasksByRegion';
 import { SustainabilityDimensionsInTasksByRole } from '../../explore-graphs/SustainabilityDimensionsInTasksByRole';
@@ -161,7 +161,7 @@ export const SustainabilityDimensionsInTasks = ({ onExplore }: { onExplore?: () 
       ]}
       onExplore={onExplore}
       dataExtractor={sustainabilityDimensionsDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

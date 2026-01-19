@@ -8,7 +8,7 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import type { RespondentStat } from '../demographicTypes';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { createDumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
 import { TrainingParticipationByRegion } from '../../explore-graphs/TrainingParticipationByRegion';
 import { TrainingPrivateCapacityByRegion } from '../../explore-graphs/TrainingPrivateCapacityByRegion';
 import { TrainingProgramsCountByRegion } from '../../explore-graphs/TrainingProgramsCountByRegion';
@@ -100,6 +100,8 @@ const getDachCountry = (country: string): 'Germany' | 'Austria' | 'Switzerland' 
   if (['switzerland', 'schweiz'].includes(c)) return 'Switzerland';
   return null;
 };
+
+const comparisonStrategy = createDumbbellComparisonStrategy({});
 
 const DemographicRegionDistribution = ({ respondentStats }: DemographicRegionDistributionProps) => {
   const colorOther = useThemeColor('--color-ireb-grey-03');
@@ -289,7 +291,7 @@ const DemographicRegionDistribution = ({ respondentStats }: DemographicRegionDis
       processor={processor}
       layout={layout}
       dataExtractor={dataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={comparisonStrategy}
       exploreComponents={[
         TrainingParticipationByRegion,
         TrainingPrivateCapacityByRegion,

@@ -8,7 +8,7 @@ import { SustainabilityDimensionsByAge } from '../../explore-graphs/Sustainabili
 import { SustainabilityDimensionsByOrgType } from '../../explore-graphs/SustainabilityDimensionsByOrgType';
 import { SustainabilityDimensionsByExperience } from '../../explore-graphs/SustainabilityDimensionsByExperience';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
 
 // --- DATA EXTRACTOR ---
 const sustainabilityDimensionsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -156,7 +156,7 @@ export const SustainabilityDimensions = ({ onExplore }: { onExplore?: () => void
       ]}
       onExplore={onExplore}
       dataExtractor={sustainabilityDimensionsDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

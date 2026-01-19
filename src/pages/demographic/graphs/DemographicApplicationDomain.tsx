@@ -2,7 +2,7 @@ import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 import { DemographicApplicationDomainOther } from '../../explore-graphs/DemographicApplicationDomainOther';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy.ts';
 
 const normalize = (val: string) => val.replace(/\s+/g, ' ').trim();
 
@@ -79,7 +79,7 @@ export const DemographicApplicationDomain = ({ onExplore }: { onExplore?: () => 
       exploreComponents={[DemographicApplicationDomainOther]}
       onExplore={onExplore}
       dataExtractor={applicationDomainDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

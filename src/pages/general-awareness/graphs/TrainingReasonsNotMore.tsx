@@ -7,7 +7,7 @@ import { TrainingReasonsNotMoreOther } from '../../explore-graphs/TrainingReason
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 import { TrainingReasonsNotMoreByAge } from '../../explore-graphs/TrainingReasonsNotMoreByAge.tsx';
 import { TrainingReasonsNotMoreByExperience } from '../../explore-graphs/TrainingReasonsNotMoreByExperience.tsx';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy.ts';
 
 // --- DATA EXTRACTOR ---
 const trainingReasonsNotMoreDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -140,7 +140,7 @@ export const TrainingReasonsNotMore = ({ onExplore }: { onExplore?: () => void }
       ]}
       onExplore={onExplore}
       dataExtractor={trainingReasonsNotMoreDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

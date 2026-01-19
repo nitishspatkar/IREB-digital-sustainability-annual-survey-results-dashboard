@@ -11,7 +11,7 @@ import { HindrancesToIncorporateSustainabilityByRole } from '../../explore-graph
 import { HindrancesToIncorporateSustainabilityByAge } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByAge';
 import { HindrancesToIncorporateSustainabilityByExperience } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByExperience';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
 
 // --- DATA EXTRACTOR ---
 const hindrancesDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -189,7 +189,7 @@ export const HindrancesToIncorporateSustainability = ({
       ]}
       onExplore={onExplore}
       dataExtractor={hindrancesDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

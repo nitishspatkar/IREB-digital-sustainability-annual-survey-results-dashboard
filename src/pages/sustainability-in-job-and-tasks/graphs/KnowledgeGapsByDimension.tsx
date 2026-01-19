@@ -11,7 +11,7 @@ import { KnowledgeGapsByDimensionByAge } from '../../explore-graphs/KnowledgeGap
 import { KnowledgeGapsByDimensionByExperience } from '../../explore-graphs/KnowledgeGapsByDimensionByExperience';
 import { KnowledgeGapsByDimensionByApplicationStatus } from '../../explore-graphs/KnowledgeGapsByDimensionByApplicationStatus';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
 
 // --- DATA EXTRACTOR ---
 const knowledgeGapsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -160,7 +160,7 @@ export const KnowledgeGapsByDimension = ({ onExplore }: { onExplore?: () => void
       ]}
       onExplore={onExplore}
       dataExtractor={knowledgeGapsDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

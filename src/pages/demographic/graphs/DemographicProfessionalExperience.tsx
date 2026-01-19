@@ -9,7 +9,7 @@ import { SustainabilityDimensionsByExperience } from '../../explore-graphs/Susta
 import { PersonIncorporatesSustainabilityByExperience } from '../../explore-graphs/PersonIncorporatesSustainabilityByExperience.tsx';
 import { HindrancesToIncorporateSustainabilityByExperience } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByExperience.tsx';
 import { KnowledgeGapsByDimensionByExperience } from '../../explore-graphs/KnowledgeGapsByDimensionByExperience.tsx';
-import { createScatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // Helper to sort experience ranges naturally
@@ -91,8 +91,6 @@ const professionalExperienceDataExtractor: DataExtractor<HorizontalBarData> = (r
   };
 };
 
-const scatterPlotComparisonStrategy = createScatterPlotComparisonStrategy();
-
 // The Component
 export const DemographicProfessionalExperience = ({
   onExplore,
@@ -105,7 +103,7 @@ export const DemographicProfessionalExperience = ({
       graphId="DemographicProfessionalExperience"
       processor={processData}
       dataExtractor={professionalExperienceDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
       layout={{
         margin: { t: 50, r: 40, b: 60, l: 60 },
         xaxis: {

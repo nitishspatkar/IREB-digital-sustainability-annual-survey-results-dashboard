@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const TRAINING_PARTICIPATION_TEMPLATE = [
@@ -85,9 +87,6 @@ const processTrainingParticipationByRegion: ChartProcessor = (responses, palette
   // 1. Parse Data
   responses.forEach((r) => {
     const country = r.getCountryOfResidence();
-    // We only care if country is present, getRegion handles the rest.
-    // However, if country is missing/NA, getRegion returns 'Other' or we might want to skip?
-    // Usually 'Other' is fine, or we check if country is defined.
     if (!country || country.toLowerCase() === 'n/a') {
       return;
     }
@@ -95,7 +94,6 @@ const processTrainingParticipationByRegion: ChartProcessor = (responses, palette
     const region = getRegion(country);
     const participatedInTraining = norm(r.raw.participatedInTraining);
 
-    // Filter out responses that don't have a valid Yes/No answer for training
     if (participatedInTraining !== 'yes' && participatedInTraining !== 'no') {
       return;
     }
@@ -125,13 +123,11 @@ const processTrainingParticipationByRegion: ChartProcessor = (responses, palette
 
   const totalRespondents = Array.from(regionTotals.values()).reduce((a, b) => a + b, 0);
 
-  // 3. Define Colors for Participation (Matching TrainingParticipation.tsx parent)
   const participationColors: Record<string, string> = {
     Participated: palette.spring,
     'Did Not Participate': palette.mandarin,
   };
 
-  // 4. Build Traces (One per Participation type)
   const traces: Data[] = TRAINING_PARTICIPATION_TEMPLATE.map((participationDef) => {
     const participationLabel = participationDef.label;
     const xValues = sortedRegions.map(
@@ -153,7 +149,7 @@ const processTrainingParticipationByRegion: ChartProcessor = (responses, palette
       textfont: {
         family: 'PP Mori, sans-serif',
         size: 13,
-        color: '#FFFFFF', // White text for contrast inside bars
+        color: '#FFFFFF',
       },
       hoverinfo: 'x+y+name',
     };
@@ -165,6 +161,11 @@ const processTrainingParticipationByRegion: ChartProcessor = (responses, palette
   };
 };
 
+const comparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
 // --- The Component ---
 export const TrainingParticipationByRegion = ({
   onBack,
@@ -173,6 +174,53 @@ export const TrainingParticipationByRegion = ({
   onBack: () => void;
   showBackButton?: boolean;
 }) => {
+  // --- DATA EXTRACTOR ---
+  const dataExtractor = useCallback<DataExtractor<HorizontalBarData>>((responses) => {
+    const regionParticipationCounts = new Map<string, { yes: number; no: number }>();
+    let totalValidResponses = 0;
+
+    responses.forEach((r) => {
+      const country = r.getCountryOfResidence();
+      if (!country || country.toLowerCase() === 'n/a') return;
+
+      const region = getRegion(country);
+      const participated = r.raw.participatedInTraining?.trim().toLowerCase();
+
+      if (participated === 'yes' || participated === 'no') {
+        totalValidResponses++;
+        if (!regionParticipationCounts.has(region)) {
+          regionParticipationCounts.set(region, { yes: 0, no: 0 });
+        }
+        const counts = regionParticipationCounts.get(region)!;
+        if (participated === 'yes') {
+          counts.yes++;
+        } else {
+          counts.no++;
+        }
+      }
+    });
+
+    const items: { label: string; value: number }[] = [];
+
+    regionParticipationCounts.forEach((counts, region) => {
+      // Calculate percentages based on TOTAL valid responses (Grand Total)
+      const yesPct = totalValidResponses > 0 ? (counts.yes / totalValidResponses) * 100 : 0;
+      const noPct = totalValidResponses > 0 ? (counts.no / totalValidResponses) * 100 : 0;
+
+      if (yesPct > 0) {
+        items.push({ label: `${region} - Participated`, value: yesPct });
+      }
+      if (noPct > 0) {
+        items.push({ label: `${region} - Did Not Participate`, value: noPct });
+      }
+    });
+
+    return {
+      items,
+      stats: { numberOfResponses: totalValidResponses },
+    };
+  }, []);
+
   // Static layout overrides
   const layout = useMemo<Partial<Layout>>(
     () => ({
@@ -212,6 +260,8 @@ export const TrainingParticipationByRegion = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={dataExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

@@ -3,7 +3,7 @@ import type { ChartProcessor, DataExtractor } from '../../../components/GraphVie
 import { DefinitionAwarenessByRole } from '../../explore-graphs/DefinitionAwarenessByRole';
 import { DefinitionAwarenessByExperience } from '../../explore-graphs/DefinitionAwarenessByExperience';
 import { DefinitionAwarenessByAge } from '../../explore-graphs/DefinitionAwarenessByAge';
-import { createScatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
@@ -85,13 +85,6 @@ const definitionAwarenessDataExtractor: DataExtractor<HorizontalBarData> = (resp
   };
 };
 
-const scatterPlotComparisonStrategy = createScatterPlotComparisonStrategy({
-  colorMap: {
-    Yes: 'spring',
-    No: 'mandarin',
-  },
-});
-
 // The Component
 export const DefinitionAwareness = () => {
   return (
@@ -99,7 +92,7 @@ export const DefinitionAwareness = () => {
       graphId="DefinitionAwareness"
       processor={processData}
       dataExtractor={definitionAwarenessDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
       layout={{
         margin: { t: 60, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },

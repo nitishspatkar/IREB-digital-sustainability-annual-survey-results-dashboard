@@ -13,7 +13,7 @@ import { OrganizationalPracticesByOrgType } from '../../explore-graphs/Organizat
 import { DriversToIncorporateSustainabilityByOrgType } from '../../explore-graphs/DriversToIncorporateSustainabilityByOrgType.tsx';
 import { UsesToolsByOrgType } from '../../explore-graphs/UsesToolsByOrgType.tsx';
 import { AdditionalSupportResourcesByOrgType } from '../../explore-graphs/AdditionalSupportResourcesByOrgType.tsx';
-import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy.ts';
 
 // Helper function to normalize organization type strings
 const normalizeOrganizationType = (value: string) => value.replace(/\s+/g, ' ').trim();
@@ -103,7 +103,7 @@ const DemographicOrganizationType = ({ onExplore }: { onExplore?: () => void }) 
       ]}
       onExplore={onExplore}
       dataExtractor={organizationTypeDataExtractor}
-      comparisonStrategy={scatterPlotComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };
