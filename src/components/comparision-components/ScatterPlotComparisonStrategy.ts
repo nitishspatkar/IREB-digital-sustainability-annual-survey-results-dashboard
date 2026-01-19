@@ -1,5 +1,5 @@
 import type { Data, Layout } from 'plotly.js';
-import type { ComparisonStrategy } from '../GraphViews';
+import type { ComparisonStrategy, ChartPalette } from '../GraphViews';
 import type { HorizontalBarData } from './HorizontalBarComparisonStrategy';
 
 export interface ScatterPlotOptions {
@@ -10,6 +10,12 @@ export interface ScatterPlotOptions {
    * @default true
    */
   showLegend?: boolean;
+  /**
+   * Optional mapping of labels to colors.
+   * Can be a direct color string (hex, rgb) or a key of the ChartPalette (e.g., 'berry', 'spring').
+   * If a label is not found, a default color from the palette will be used.
+   */
+  colorMap?: Record<string, string | keyof ChartPalette>;
 }
 
 /**
@@ -25,7 +31,7 @@ export interface ScatterPlotOptions {
 export const createScatterPlotComparisonStrategy = (
   options: ScatterPlotOptions = {}
 ): ComparisonStrategy<HorizontalBarData> => {
-  const { showLegend = true } = options;
+  const { showLegend = true, colorMap = {} } = options;
 
   return (currentYearData, compareYearData, currentYear, compareYear, palette) => {
     // 1. Prepare Data
@@ -36,6 +42,29 @@ export const createScatterPlotComparisonStrategy = (
       ])
     );
 
+    const defaultColors = [
+      palette.berry,
+      palette.spring,
+      palette.mandarin,
+      palette.transport,
+      palette.lightBerry,
+      palette.lightSpring,
+      palette.darkSpring,
+    ];
+
+    const getColor = (label: string, index: number) => {
+      const mapped = colorMap[label];
+      if (mapped) {
+        // If mapped value is a key in the palette, use that color
+        if (mapped in palette) {
+          return palette[mapped as keyof ChartPalette];
+        }
+        // Otherwise assume it's a direct color string
+        return mapped as string;
+      }
+      return defaultColors[index % defaultColors.length];
+    };
+
     const currentTotal = currentYearData.stats.numberOfResponses || 1;
     const compareTotal = compareYearData.stats.numberOfResponses || 1;
 
@@ -45,10 +74,11 @@ export const createScatterPlotComparisonStrategy = (
       return item ? (item.value / total) * 100 : 0;
     };
 
-    const points = allLabels.map((label) => ({
+    const points = allLabels.map((label, index) => ({
       label,
       x: getPct(compareYearData.items, label, compareTotal), // Old Year
       y: getPct(currentYearData.items, label, currentTotal), // New Year
+      color: getColor(label, index),
     }));
 
     // Determine axis range (0 to max value + padding)
@@ -85,7 +115,7 @@ export const createScatterPlotComparisonStrategy = (
           x: [point.x],
           y: [point.y],
           marker: {
-            color: palette.berry,
+            color: point.color,
             size: 12,
             opacity: 0.9,
             line: {
@@ -115,7 +145,7 @@ export const createScatterPlotComparisonStrategy = (
           color: palette.night,
         },
         marker: {
-          color: palette.berry,
+          color: points.map((p) => p.color),
           size: 12,
           opacity: 0.9,
           line: {

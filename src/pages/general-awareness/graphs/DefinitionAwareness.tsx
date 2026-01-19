@@ -85,7 +85,12 @@ const definitionAwarenessDataExtractor: DataExtractor<HorizontalBarData> = (resp
   };
 };
 
-const scatterPlotComparisonStrategy = createScatterPlotComparisonStrategy();
+const scatterPlotComparisonStrategy = createScatterPlotComparisonStrategy({
+  colorMap: {
+    Yes: 'spring',
+    No: 'mandarin',
+  },
+});
 
 // The Component
 export const DefinitionAwareness = () => {
