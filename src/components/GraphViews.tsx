@@ -57,6 +57,7 @@ type ChartModeResult = {
   traces: Data[];
   items?: never;
   stats: ChartProcessorStats;
+  layout?: Partial<Layout>;
 };
 
 // List mode: returns string items
@@ -284,6 +285,10 @@ export const GenericChart = <T,>({
   }
 
   // --- Chart Mode: Render standard Plotly chart ---
+  // Merge layout from processor if available (e.g. for comparison views)
+  const processorLayout = 'layout' in processorResult ? processorResult.layout : {};
+  const mergedLayout = { ...layout, ...processorLayout };
+
   return (
     <div className="flex flex-col">
       {(import.meta.env.DEV || new URLSearchParams(window.location.search).get('debug')) && (
@@ -312,16 +317,16 @@ export const GenericChart = <T,>({
             data={traces as Data[]}
             layout={
               enableInteractions
-                ? layout
+                ? mergedLayout
                 : {
-                    ...layout,
+                    ...mergedLayout,
                     dragmode: false,
                     xaxis: {
-                      ...(layout?.xaxis || {}),
+                      ...(mergedLayout?.xaxis || {}),
                       fixedrange: true,
                     },
                     yaxis: {
-                      ...(layout?.yaxis || {}),
+                      ...(mergedLayout?.yaxis || {}),
                       fixedrange: true,
                     },
                   }

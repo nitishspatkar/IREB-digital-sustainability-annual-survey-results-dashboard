@@ -8,10 +8,7 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import type { RespondentStat } from '../demographicTypes';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
 import { TrainingParticipationByRegion } from '../../explore-graphs/TrainingParticipationByRegion';
 import { TrainingPrivateCapacityByRegion } from '../../explore-graphs/TrainingPrivateCapacityByRegion';
 import { TrainingProgramsCountByRegion } from '../../explore-graphs/TrainingProgramsCountByRegion';
@@ -19,6 +16,7 @@ import { TrainingReasonsNoByRegion } from '../../explore-graphs/TrainingReasonsN
 import { TrainingSatisfactionByRegion } from '../../explore-graphs/TrainingSatisfactionByRegion';
 import { SustainabilityDimensionsInTasksByRegion } from '../../explore-graphs/SustainabilityDimensionsInTasksByRegion.tsx';
 import { OrganizationIncorporatesPracticesByRegion } from '../../explore-graphs/OrganizationIncorporatesPracticesByRegion.tsx';
+import type { HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy.ts';
 
 type DemographicRegionDistributionProps = {
   respondentStats: RespondentStat[];
@@ -110,28 +108,33 @@ const DemographicRegionDistribution = ({ respondentStats }: DemographicRegionDis
   const darkText = useThemeColor('--color-ireb-grey-01'); // For inside lighter bars
 
   // --- DATA EXTRACTOR ---
-  const dataExtractor = useCallback<DataExtractor<HorizontalBarData>>(() => {
+  const dataExtractor = useCallback<DataExtractor<HorizontalBarData>>((responses) => {
     // Aggregate by region, showing total for each region
     const regionMap = new Map<string, number>();
+    let validCount = 0;
 
-    respondentStats.forEach((stat) => {
-      const region = getRegion(stat.country);
-      regionMap.set(region, (regionMap.get(region) ?? 0) + stat.count);
+    responses.forEach((r) => {
+      const rawCountry = r.getCountryOfResidence();
+      const country = rawCountry.replace(/\s+/g, ' ').trim();
+
+      if (country && country.toLowerCase() !== 'n/a') {
+        const region = getRegion(country);
+        regionMap.set(region, (regionMap.get(region) ?? 0) + 1);
+        validCount++;
+      }
     });
 
     const items = Array.from(regionMap.entries())
       .filter(([, count]) => count > 0)
       .map(([label, value]) => ({ label, value }));
 
-    const numberOfResponses = respondentStats.reduce((sum, stat) => sum + stat.count, 0);
-
     return {
       items,
       stats: {
-        numberOfResponses,
+        numberOfResponses: validCount,
       },
     };
-  }, [respondentStats]);
+  }, []);
 
   const processor = useCallback<ChartProcessor>(
     (responses, palette) => {
@@ -286,7 +289,7 @@ const DemographicRegionDistribution = ({ respondentStats }: DemographicRegionDis
       processor={processor}
       layout={layout}
       dataExtractor={dataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
       exploreComponents={[
         TrainingParticipationByRegion,
         TrainingPrivateCapacityByRegion,
