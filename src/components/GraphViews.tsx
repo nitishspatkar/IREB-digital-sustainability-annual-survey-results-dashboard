@@ -246,7 +246,7 @@ export const GenericChart = <T,>({
   if (items) {
     return (
       <div className="flex flex-col">
-        {import.meta.env.DEV && (
+        {(import.meta.env.DEV || new URLSearchParams(window.location.search).get('debug')) && (
           <div className="mb-1 w-fit border border-yellow-400 bg-yellow-100 px-1 font-mono text-xs text-yellow-800 select-all">
             graphId="{graphId}"
           </div>
@@ -285,7 +285,7 @@ export const GenericChart = <T,>({
   // --- Chart Mode: Render standard Plotly chart ---
   return (
     <div className="flex flex-col">
-      {import.meta.env.DEV && (
+      {(import.meta.env.DEV || new URLSearchParams(window.location.search).get('debug')) && (
         <div className="mb-1 w-fit border border-yellow-400 bg-yellow-100 px-1 font-mono text-xs text-yellow-800 select-all">
           graphId="{graphId}"
         </div>

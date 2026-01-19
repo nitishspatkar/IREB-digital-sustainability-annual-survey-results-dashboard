@@ -66,7 +66,8 @@ function App() {
                         element={<DigitalSustainabilityRole />}
                       />
                       <Route path="/sustainability-tasks" element={<SustainabilityTasks />} />
-                      {import.meta.env.DEV && (
+                      {(import.meta.env.DEV ||
+                        new URLSearchParams(window.location.search).get('debug')) && (
                         <Route path="/dev/all-graphs" element={<AllGraphsPage />} />
                       )}
                       <Route path="*" element={<Navigate to="/demographics" replace />} />

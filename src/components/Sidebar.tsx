@@ -113,7 +113,7 @@ function Sidebar({ activeYear }: SidebarProps) {
             })}
           </ul>
         </nav>
-        {import.meta.env.DEV && (
+        {(import.meta.env.DEV || new URLSearchParams(window.location.search).get('debug')) && (
           <div className="mt-6 pt-4 border-t-2 border-ireb-light-berry">
             <NavLink
               to="/dev/all-graphs"
