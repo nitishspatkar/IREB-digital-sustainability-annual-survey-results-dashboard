@@ -1,36 +1,56 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 import { OrganizationHasGoalsByAge } from '../../explore-graphs/OrganizationHasGoalsByAge.tsx';
 import { OrganizationHasGoalsByRole } from '../../explore-graphs/OrganizationHasGoalsByRole.tsx';
 import { OrganizationHasGoalsByOrgType } from '../../explore-graphs/OrganizationHasGoalsByOrgType.tsx';
 import { PersonIncorporatesSustainabilityByOrgGoals } from '../../explore-graphs/PersonIncorporatesSustainabilityByOrgGoals.tsx';
 import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
+import {
+  yesNoNotSureComparisonStrategy,
+  type YesNoNotSureData,
+} from '../../../components/comparision-components/YesNoNotSureComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-// The Logic (Pure Function)
-const processData: ChartProcessor = (responses, palette) => {
-  const counts = new Map<string, number>();
-  counts.set('Yes', 0);
-  counts.set('No', 0);
-  counts.set('Not sure', 0);
+// Data Extractor: Extracts Yes/No/Not Sure counts
+const dataExtractor: DataExtractor<YesNoNotSureData> = (responses) => {
+  let yesCount = 0;
+  let noCount = 0;
+  let notSureCount = 0;
 
   responses.forEach((r) => {
     const raw = normalize(r.raw.organizationHasDigitalSustainabilityGoals ?? '');
     const lower = raw.toLowerCase();
 
     if (lower === 'yes') {
-      counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+      yesCount++;
     } else if (lower === 'no') {
-      counts.set('No', (counts.get('No') ?? 0) + 1);
+      noCount++;
     } else if (lower === 'not sure') {
-      counts.set('Not sure', (counts.get('Not sure') ?? 0) + 1);
+      notSureCount++;
     }
   });
 
+  const total = yesCount + noCount + notSureCount;
+
+  return {
+    counts: {
+      yes: yesCount,
+      no: noCount,
+      notSure: notSureCount,
+    },
+    stats: {
+      numberOfResponses: total,
+    },
+  };
+};
+
+// The Logic (Pure Function)
+const processData: ChartProcessor = (responses, palette) => {
+  const data = dataExtractor(responses);
+
   const labels = ['Yes', 'No', 'Not sure'];
-  const values = labels.map((label) => counts.get(label) ?? 0);
-  const total = values.reduce((a, b) => a + b, 0);
+  const values = [data.counts.yes, data.counts.no, data.counts.notSure];
 
   return {
     traces: [
@@ -56,9 +76,7 @@ const processData: ChartProcessor = (responses, palette) => {
         hoverinfo: 'none',
       },
     ],
-    stats: {
-      numberOfResponses: total,
-    },
+    stats: data.stats,
   };
 };
 
@@ -80,6 +98,8 @@ const OrganizationHasGoals = ({ onExplore }: { onExplore?: () => void }) => {
         PersonIncorporatesSustainabilityByOrgGoals,
       ]}
       onExplore={onExplore}
+      dataExtractor={dataExtractor}
+      comparisonStrategy={yesNoNotSureComparisonStrategy}
     />
   );
 };
