@@ -104,7 +104,7 @@ export const createScatterPlotComparisonStrategy = (
       // Single trace with text labels on points
       traces.push({
         type: 'scatter',
-        mode: 'markers+text',
+        mode: 'markers',
         x: points.map((p) => p.x),
         y: points.map((p) => p.y),
         text: points.map((p) => p.label),
@@ -136,14 +136,14 @@ export const createScatterPlotComparisonStrategy = (
     const layout: Partial<Layout> = {
       xaxis: {
         title: { text: `${compareYear} (%)` },
-        range: [0, rangeMax],
+        range: [-5, rangeMax],
         zeroline: false,
         showgrid: true,
         dtick: 10, // Grid every 10%
       },
       yaxis: {
         title: { text: `${currentYear} (%)` },
-        range: [0, rangeMax],
+        range: [-5, rangeMax],
         zeroline: false,
         showgrid: true,
         dtick: 10,
