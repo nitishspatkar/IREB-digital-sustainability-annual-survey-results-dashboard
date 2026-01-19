@@ -321,7 +321,7 @@ const AllGraphsPage = () => {
 
               {isExpanded && (
                 <div className="p-6 space-y-8">
-                  {section.graphs.map(({ name, Component, path, hasComparison }) => (
+                  {section.graphs.map(({ name, Component, path }) => (
                     <div key={path} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <h3 className="font-mori text-xl font-semibold text-ireb-berry flex items-center gap-2">
