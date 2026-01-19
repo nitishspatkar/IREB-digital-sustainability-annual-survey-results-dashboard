@@ -130,6 +130,7 @@ export const TrainingParticipationByRole = ({
         y: 1.1, // Position legend above chart
         xanchor: 'right',
         x: 1,
+        traceorder: 'normal',
       },
     }),
     []

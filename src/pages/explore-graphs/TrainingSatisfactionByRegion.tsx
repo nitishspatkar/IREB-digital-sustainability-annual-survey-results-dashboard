@@ -200,6 +200,7 @@ export const TrainingSatisfactionByRegion = ({
         y: 1.1,
         xanchor: 'right',
         x: 1,
+        traceorder: 'normal',
       },
     }),
     []

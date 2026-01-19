@@ -155,6 +155,7 @@ export const PersonIncorporatesSustainabilityByMeasureCount = ({
         y: 1.1,
         xanchor: 'right',
         x: 1,
+        traceorder: 'reversed',
       },
       xaxis: {
         title: {

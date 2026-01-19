@@ -133,6 +133,7 @@ export const TrainingParticipationByTrainingOffer = ({
         y: 1.02,
         xanchor: 'right',
         x: 1,
+        traceorder: 'normal',
       },
     }),
     []

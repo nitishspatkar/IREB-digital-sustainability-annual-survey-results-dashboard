@@ -133,6 +133,7 @@ export const OrganizationDepartmentCoordinationByRole = ({
         y: 1.1,
         xanchor: 'right',
         x: 1,
+        traceorder: 'normal',
       },
     }),
     []

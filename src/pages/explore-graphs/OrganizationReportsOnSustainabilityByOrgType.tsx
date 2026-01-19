@@ -128,6 +128,7 @@ export const OrganizationReportsOnSustainabilityByOrgType = ({
         y: 1.1,
         xanchor: 'right',
         x: 1,
+        traceorder: 'normal',
       },
     }),
     []

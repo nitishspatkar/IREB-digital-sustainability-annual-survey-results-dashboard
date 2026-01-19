@@ -137,6 +137,7 @@ export const AdditionalSupportResourcesByTraining = ({ onBack }: { onBack: () =>
         y: 1.1,
         xanchor: 'right',
         x: 1,
+        traceorder: 'reversed',
       },
     }),
     []

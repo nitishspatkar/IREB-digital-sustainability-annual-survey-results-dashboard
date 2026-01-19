@@ -144,6 +144,7 @@ export const HindrancesToIncorporateSustainabilityByExperience = ({
         y: 1.1,
         xanchor: 'right',
         x: 1,
+        traceorder: 'normal',
       },
       xaxis: {
         title: { text: 'Number of Respondents' },

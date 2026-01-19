@@ -82,6 +82,7 @@ const layout: Partial<Layout> = {
     y: 1.1,
     xanchor: 'right',
     x: 1,
+    traceorder: 'normal',
   },
   xaxis: {
     title: {

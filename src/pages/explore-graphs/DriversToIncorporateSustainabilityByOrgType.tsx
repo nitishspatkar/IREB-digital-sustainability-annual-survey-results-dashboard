@@ -145,8 +145,11 @@ export const DriversToIncorporateSustainabilityByOrgType = ({
       margin: { t: 100, r: 20, b: 60, l: 200 },
       legend: {
         orientation: 'h',
-        y: 1.2,
-        x: 0,
+        yanchor: 'bottom',
+        y: 1.1,
+        xanchor: 'right',
+        x: 1,
+        traceorder: 'normal',
       },
       xaxis: {
         title: {
