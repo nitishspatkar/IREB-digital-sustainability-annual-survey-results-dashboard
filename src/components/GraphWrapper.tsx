@@ -2,6 +2,7 @@ import { forwardRef, type ReactNode } from 'react';
 
 interface GraphWrapperProps {
   question: string;
+  graphId?: string;
   description?: string;
   numberOfResponses?: number;
   responseRate?: number;
@@ -21,6 +22,7 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
   (
     {
       question,
+      graphId,
       description,
       numberOfResponses,
       responseRate,
@@ -39,6 +41,11 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
     const showNumberOfResponses = typeof numberOfResponses === 'number';
     const showResponseRate = typeof responseRate === 'number';
     const showStats = showNumberOfResponses || showResponseRate;
+
+    // Use graphId for stable group name if available, otherwise fallback to sanitized question
+    const radioGroupName = graphId
+      ? `compare-${graphId}`
+      : `compare-${question.replace(/[^a-zA-Z0-9-_]/g, '')}`;
 
     return (
       <div ref={ref} className="space-y-4">
@@ -81,9 +88,9 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
 
         {/* Action buttons */}
         <div className="flex gap-4 items-center flex-wrap">
-          <button className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-berry text-white border-ireb-berry shadow-card">
+          <div className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-berry text-white border-ireb-berry shadow-card">
             Results
-          </button>
+          </div>
           {showExploreButton && (
             <button
               onClick={onExplore}
@@ -108,10 +115,11 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
               <label className="flex items-center gap-2 cursor-pointer font-mori">
                 <input
                   type="radio"
-                  name={`compare-${question}`}
+                  name={radioGroupName}
                   checked={compareYear === null}
                   onChange={() => onCompareYearChange(null)}
                   className="w-4 h-4 text-ireb-berry border-ireb-berry focus:ring-ireb-berry"
+                  style={{ accentColor: 'var(--color-ireb-berry)' }}
                 />
                 <span className="text-ireb-berry">None</span>
               </label>
@@ -119,10 +127,11 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
                 <label key={year} className="flex items-center gap-2 cursor-pointer font-mori">
                   <input
                     type="radio"
-                    name={`compare-${question}`}
+                    name={radioGroupName}
                     checked={compareYear === year}
                     onChange={() => onCompareYearChange(year)}
                     className="w-4 h-4 text-ireb-berry border-ireb-berry focus:ring-ireb-berry"
+                    style={{ accentColor: 'var(--color-ireb-berry)' }}
                   />
                   <span className="text-ireb-berry">{year}</span>
                 </label>

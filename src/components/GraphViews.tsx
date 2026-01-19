@@ -254,6 +254,7 @@ export const GenericChart = <T,>({
         <GraphWrapper
           ref={graphRef}
           question={question}
+          graphId={graphId}
           description={description}
           numberOfResponses={stats.numberOfResponses}
           responseRate={responseRate}
@@ -293,6 +294,7 @@ export const GenericChart = <T,>({
       <GraphWrapper
         ref={graphRef}
         question={question}
+        graphId={graphId}
         description={description}
         numberOfResponses={stats.numberOfResponses}
         responseRate={responseRate}
