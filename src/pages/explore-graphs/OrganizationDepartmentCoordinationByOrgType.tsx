@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import {
+  stackedBarComparisonStrategy,
+  type StackedBarData,
+} from '../../components/comparision-components/StackedBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const COORDINATION_TEMPLATE = [
@@ -10,13 +14,14 @@ const COORDINATION_TEMPLATE = [
 ];
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
+const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
-// --- The Processor Logic ---
-const processOrganizationDepartmentCoordinationByOrgType: ChartProcessor = (responses, palette) => {
+// --- The Extractor Logic ---
+const extractOrganizationDepartmentCoordinationByOrgType: DataExtractor<StackedBarData> = (
+  responses
+) => {
   const orgStats = new Map<string, Map<string, number>>();
   const orgTotals = new Map<string, number>();
-
-  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
   // 1. Filter Data: Precondition Q17 = Yes
   const filteredResponses = responses.filter(
@@ -61,28 +66,46 @@ const processOrganizationDepartmentCoordinationByOrgType: ChartProcessor = (resp
 
   const totalRespondents = Array.from(orgTotals.values()).reduce((a, b) => a + b, 0);
 
-  // 4. Define Colors
+  // 4. Construct Series in StackedBarData format
+  const series = COORDINATION_TEMPLATE.map((def) => {
+    const label = def.label;
+    const values = sortedOrgTypes.map((orgType) => orgStats.get(orgType)?.get(label) ?? 0);
+    return { label, values };
+  });
+
+  return {
+    categories: sortedOrgTypes,
+    series,
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: filteredResponses.length,
+    },
+  };
+};
+
+// --- The Processor Logic ---
+const processOrganizationDepartmentCoordinationByOrgType: ChartProcessor = (responses, palette) => {
+  const data = extractOrganizationDepartmentCoordinationByOrgType(responses);
+
+  // Define Colors (locally for single-year view)
   const colors: Record<string, string> = {
     Yes: palette.spring,
     No: palette.mandarin,
     'Not sure': palette.grey02,
   };
 
-  // 5. Build Traces
-  const traces: Data[] = COORDINATION_TEMPLATE.map((def) => {
-    const label = def.label;
-    const xValues = sortedOrgTypes.map((orgType) => orgStats.get(orgType)?.get(label) ?? 0);
-
+  // Build Traces
+  const traces: Data[] = data.series.map((s) => {
     return {
       type: 'bar',
-      name: label,
+      name: s.label,
       orientation: 'h',
-      y: sortedOrgTypes,
-      x: xValues,
+      y: data.categories,
+      x: s.values,
       marker: {
-        color: colors[label],
+        color: colors[s.label],
       },
-      text: xValues.map((v) => (v > 0 ? v.toString() : '')),
+      text: s.values.map((v) => (v > 0 ? v.toString() : '')),
       textposition: 'inside',
       insidetextanchor: 'middle',
       textfont: {
@@ -95,10 +118,7 @@ const processOrganizationDepartmentCoordinationByOrgType: ChartProcessor = (resp
   });
 
   return {
-    stats: {
-      numberOfResponses: totalRespondents,
-      totalEligible: filteredResponses.length,
-    },
+    stats: data.stats,
     traces: traces,
   };
 };
@@ -145,6 +165,8 @@ export const OrganizationDepartmentCoordinationByOrgType = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractOrganizationDepartmentCoordinationByOrgType}
+      comparisonStrategy={stackedBarComparisonStrategy}
     />
   );
 };

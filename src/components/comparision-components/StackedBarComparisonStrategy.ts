@@ -49,27 +49,27 @@ export const stackedBarComparisonStrategy: ComparisonStrategy<StackedBarData> = 
     return fallbackPalette[index % fallbackPalette.length] ?? palette.grey02;
   };
 
-  // Create combined Y-axis labels with year suffixes
-  const currentYearLabels = currentYearData.categories.map((cat) => `${cat} (${currentYear})`);
-  const compareYearLabels = compareYearData.categories.map((cat) => `${cat} (${compareYear})`);
+  // Identify all unique categories, preserving the order of the current year (usually sorted by value)
+  // Categories unique to compareYear are prepended (assuming they are less significant/frequency 0 in current year)
+  const currentCategories = new Set(currentYearData.categories);
+  const uniqueCompareCategories = compareYearData.categories.filter(
+    (c) => !currentCategories.has(c)
+  );
+  const allCategories = [...uniqueCompareCategories, ...currentYearData.categories];
 
+  // Create combined Y-axis labels with year suffixes and align data
   // Interleave the labels with spacing: [cat1-2025, cat1-2026, spacer, cat2-2025, cat2-2026, spacer, ...]
   const allLabels: string[] = [];
-  const maxLength = Math.max(currentYearData.categories.length, compareYearData.categories.length);
 
-  for (let i = 0; i < maxLength; i++) {
-    if (i < currentYearData.categories.length) {
-      allLabels.push(currentYearLabels[i]);
-    }
-    if (i < compareYearData.categories.length) {
-      allLabels.push(compareYearLabels[i]);
-    }
+  allCategories.forEach((cat, i) => {
+    allLabels.push(`${cat} (${currentYear})`);
+    allLabels.push(`${cat} (${compareYear})`);
     // Add spacing between comparison pairs (except after the last pair)
-    if (i < maxLength - 1) {
+    if (i < allCategories.length - 1) {
       // Use unique whitespace strings to prevent Plotly from grouping identical "empty" labels together
       allLabels.push(' '.repeat(i + 1));
     }
-  }
+  });
 
   // Build traces for each series (Yes, No, Not sure, etc.)
   const traces: Data[] = [];
@@ -96,28 +96,31 @@ export const stackedBarComparisonStrategy: ComparisonStrategy<StackedBarData> = 
     const opacities: number[] = [];
     const textValues: string[] = [];
 
-    for (let i = 0; i < maxLength; i++) {
-      // Current year value
-      if (i < currentYearData.categories.length) {
-        const val = currentSeries?.values[i] ?? 0;
-        values.push(val);
-        opacities.push(1.0); // Full opacity for current year
-        textValues.push(val > 0 ? val.toString() : '');
-      }
-      // Compare year value
-      if (i < compareYearData.categories.length) {
-        const val = compareSeries?.values[i] ?? 0;
-        values.push(val);
-        opacities.push(0.65); // Reduced opacity for compare year
-        textValues.push(val > 0 ? val.toString() : '');
-      }
+    // Iterate over allCategories to align values
+    allCategories.forEach((cat, i) => {
+      // Find index of category in source data
+      const currentIdx = currentYearData.categories.indexOf(cat);
+      const compareIdx = compareYearData.categories.indexOf(cat);
+
+      // Current Year Value
+      const val1 = currentIdx !== -1 && currentSeries ? (currentSeries.values[currentIdx] ?? 0) : 0;
+      values.push(val1);
+      opacities.push(1.0); // Full opacity for current year
+      textValues.push(val1 > 0 ? val1.toString() : '');
+
+      // Compare Year Value
+      const val2 = compareIdx !== -1 && compareSeries ? (compareSeries.values[compareIdx] ?? 0) : 0;
+      values.push(val2);
+      opacities.push(0.65); // Reduced opacity for compare year
+      textValues.push(val2 > 0 ? val2.toString() : '');
+
       // Spacer
-      if (i < maxLength - 1) {
+      if (i < allCategories.length - 1) {
         values.push(0);
         opacities.push(0);
         textValues.push('');
       }
-    }
+    });
 
     traces.push({
       type: 'bar',
