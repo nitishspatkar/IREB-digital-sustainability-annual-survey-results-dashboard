@@ -1,8 +1,10 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 import { DefinitionAwarenessByRole } from '../../explore-graphs/DefinitionAwarenessByRole';
 import { DefinitionAwarenessByExperience } from '../../explore-graphs/DefinitionAwarenessByExperience';
 import { DefinitionAwarenessByAge } from '../../explore-graphs/DefinitionAwarenessByAge';
+import { createScatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -53,12 +55,46 @@ const processData: ChartProcessor = (responses, palette) => {
   };
 };
 
+const definitionAwarenessDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const counts = new Map<string, number>();
+  counts.set('Yes', 0);
+  counts.set('No', 0);
+
+  responses.forEach((r) => {
+    const raw = normalize(r.raw.heardOfDigitalSustainabilityDefinition ?? '');
+    const lower = raw.toLowerCase();
+
+    if (lower === 'yes') {
+      counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+    } else if (lower === 'no') {
+      counts.set('No', (counts.get('No') ?? 0) + 1);
+    }
+  });
+
+  const labels = ['Yes', 'No'];
+  const items = labels.map((label) => ({
+    label,
+    value: counts.get(label) ?? 0,
+  }));
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: items.reduce((sum, item) => sum + item.value, 0),
+    },
+  };
+};
+
+const scatterPlotComparisonStrategy = createScatterPlotComparisonStrategy();
+
 // The Component
 export const DefinitionAwareness = () => {
   return (
     <GenericChart
       graphId="DefinitionAwareness"
       processor={processData}
+      dataExtractor={definitionAwarenessDataExtractor}
+      comparisonStrategy={scatterPlotComparisonStrategy}
       layout={{
         margin: { t: 60, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },

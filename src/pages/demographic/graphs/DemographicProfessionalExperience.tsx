@@ -1,5 +1,5 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 import { DiscussionFrequencyByExperience } from '../../explore-graphs/DiscussionFrequencyByExperience.tsx';
 import { DefinitionAwarenessByExperience } from '../../explore-graphs/DefinitionAwarenessByExperience.tsx';
 import { TrainingReasonsNoByExperience } from '../../explore-graphs/TrainingReasonsNoByExperience.tsx';
@@ -9,6 +9,8 @@ import { SustainabilityDimensionsByExperience } from '../../explore-graphs/Susta
 import { PersonIncorporatesSustainabilityByExperience } from '../../explore-graphs/PersonIncorporatesSustainabilityByExperience.tsx';
 import { HindrancesToIncorporateSustainabilityByExperience } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByExperience.tsx';
 import { KnowledgeGapsByDimensionByExperience } from '../../explore-graphs/KnowledgeGapsByDimensionByExperience.tsx';
+import { createScatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // Helper to sort experience ranges naturally
 const sortExperience = (a: string, b: string) => {
@@ -67,6 +69,30 @@ const processData: ChartProcessor = (responses, palette) => {
   };
 };
 
+const professionalExperienceDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const counts = new Map<string, number>();
+
+  responses.forEach((response) => {
+    const experience = response.raw.professionalExperienceYears ?? '';
+    if (experience.length > 0 && experience.toLowerCase() !== 'n/a') {
+      counts.set(experience, (counts.get(experience) ?? 0) + 1);
+    }
+  });
+
+  const sorted = Array.from(counts.entries())
+    .map(([experience, count]) => ({ label: experience, value: count }))
+    .sort((a, b) => sortExperience(a.label, b.label));
+
+  return {
+    items: sorted,
+    stats: {
+      numberOfResponses: sorted.reduce((sum, item) => sum + item.value, 0),
+    },
+  };
+};
+
+const scatterPlotComparisonStrategy = createScatterPlotComparisonStrategy();
+
 // The Component
 export const DemographicProfessionalExperience = ({
   onExplore,
@@ -78,6 +104,8 @@ export const DemographicProfessionalExperience = ({
     <GenericChart
       graphId="DemographicProfessionalExperience"
       processor={processData}
+      dataExtractor={professionalExperienceDataExtractor}
+      comparisonStrategy={scatterPlotComparisonStrategy}
       layout={{
         margin: { t: 50, r: 40, b: 60, l: 60 },
         xaxis: {
