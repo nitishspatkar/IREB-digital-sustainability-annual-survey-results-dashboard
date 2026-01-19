@@ -40,18 +40,45 @@ class GraphErrorBoundary extends Component<
 
 // Dynamically import all graph components from different folders
 const demographicGraphModules = import.meta.glob('../demographic/graphs/*.tsx', { eager: true });
+const demographicGraphModulesRaw = import.meta.glob('../demographic/graphs/*.tsx', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
 const generalAwarenessGraphModules = import.meta.glob('../general-awareness/graphs/*.tsx', {
   eager: true,
 });
+const generalAwarenessGraphModulesRaw = import.meta.glob('../general-awareness/graphs/*.tsx', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
 const digitalSustainabilityRoleGraphModules = import.meta.glob(
   '../role-of-digital-sustainability/graphs/*.tsx',
   { eager: true }
 );
+const digitalSustainabilityRoleGraphModulesRaw = import.meta.glob(
+  '../role-of-digital-sustainability/graphs/*.tsx',
+  { eager: true, query: '?raw', import: 'default' }
+);
+
 const sustainabilityTasksGraphModules = import.meta.glob(
   '../sustainability-in-job-and-tasks/graphs/*.tsx',
   { eager: true }
 );
+const sustainabilityTasksGraphModulesRaw = import.meta.glob(
+  '../sustainability-in-job-and-tasks/graphs/*.tsx',
+  { eager: true, query: '?raw', import: 'default' }
+);
+
 const exploreGraphModules = import.meta.glob('../explore-graphs/*.tsx', { eager: true });
+const exploreGraphModulesRaw = import.meta.glob('../explore-graphs/*.tsx', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
 
 interface GraphModule {
   default?: React.ComponentType<any>;
@@ -64,16 +91,23 @@ interface GraphSection {
     name: string;
     Component: React.ComponentType<any>;
     path: string;
+    hasComparison: boolean;
   }>;
 }
 
 // Helper function to extract component from module (handles both default and named exports)
-const extractComponents = (modules: Record<string, unknown>): GraphSection['graphs'] => {
+const extractComponents = (
+  modules: Record<string, unknown>,
+  rawModules: Record<string, string>
+): GraphSection['graphs'] => {
   const graphs: GraphSection['graphs'] = [];
 
   Object.entries(modules).forEach(([path, module]) => {
     const graphModule = module as GraphModule;
     const fileName = path.split('/').pop()?.replace('.tsx', '') || 'Unknown';
+
+    const rawContent = rawModules[path] || '';
+    const hasComparison = rawContent.includes('comparisonStrategy');
 
     // Check for default export
     if (graphModule.default) {
@@ -81,6 +115,7 @@ const extractComponents = (modules: Record<string, unknown>): GraphSection['grap
         name: fileName,
         Component: graphModule.default,
         path,
+        hasComparison,
       });
     } else {
       // Check for named exports (try to find a component export)
@@ -94,6 +129,7 @@ const extractComponents = (modules: Record<string, unknown>): GraphSection['grap
             name: exportName,
             Component: exportValue as React.ComponentType<any>,
             path,
+            hasComparison,
           });
         }
       });
@@ -103,31 +139,49 @@ const extractComponents = (modules: Record<string, unknown>): GraphSection['grap
   return graphs.sort((a, b) => a.name.localeCompare(b.name));
 };
 
+type FilterMode = 'all' | 'with-comparison' | 'without-comparison';
+
 const AllGraphsPage = () => {
   const [sections, setSections] = useState<GraphSection[]>([]);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [filterMode, setFilterMode] = useState<FilterMode>('all');
 
   useEffect(() => {
     const graphSections: GraphSection[] = [
       {
         title: 'Demographics',
-        graphs: extractComponents(demographicGraphModules),
+        graphs: extractComponents(
+          demographicGraphModules,
+          demographicGraphModulesRaw as Record<string, string>
+        ),
       },
       {
         title: 'General Awareness',
-        graphs: extractComponents(generalAwarenessGraphModules),
+        graphs: extractComponents(
+          generalAwarenessGraphModules,
+          generalAwarenessGraphModulesRaw as Record<string, string>
+        ),
       },
       {
         title: 'Digital Sustainability Role',
-        graphs: extractComponents(digitalSustainabilityRoleGraphModules),
+        graphs: extractComponents(
+          digitalSustainabilityRoleGraphModules,
+          digitalSustainabilityRoleGraphModulesRaw as Record<string, string>
+        ),
       },
       {
         title: 'Sustainability in Job and Tasks',
-        graphs: extractComponents(sustainabilityTasksGraphModules),
+        graphs: extractComponents(
+          sustainabilityTasksGraphModules,
+          sustainabilityTasksGraphModulesRaw as Record<string, string>
+        ),
       },
       {
         title: 'Explore Graphs',
-        graphs: extractComponents(exploreGraphModules),
+        graphs: extractComponents(
+          exploreGraphModules,
+          exploreGraphModulesRaw as Record<string, string>
+        ),
       },
     ];
 
@@ -159,7 +213,22 @@ const AllGraphsPage = () => {
     }
   };
 
-  const totalGraphs = sections.reduce((sum, section) => sum + section.graphs.length, 0);
+  const getFilteredGraphs = (graphs: GraphSection['graphs']) => {
+    if (filterMode === 'all') return graphs;
+    if (filterMode === 'with-comparison') {
+      return graphs.filter((g) => g.hasComparison);
+    }
+    return graphs.filter((g) => !g.hasComparison);
+  };
+
+  const filteredSections = sections
+    .map((section) => ({
+      ...section,
+      graphs: getFilteredGraphs(section.graphs),
+    }))
+    .filter((section) => section.graphs.length > 0);
+
+  const totalGraphs = filteredSections.reduce((sum, section) => sum + section.graphs.length, 0);
 
   return (
     <div className="space-y-6">
@@ -173,18 +242,54 @@ const AllGraphsPage = () => {
           </span>
         </div>
         <p className="text-lg text-ink-700">
-          Displaying all {totalGraphs} graphs from across the application
+          Displaying {totalGraphs} graphs from across the application
         </p>
-        <button
-          onClick={toggleAllSections}
-          className="rounded-md bg-ireb-superlight-berry px-4 py-2 text-sm font-medium text-ireb-berry border-2 border-ireb-berry hover:bg-ireb-light-berry transition-colors"
-        >
-          {expandedSections.size === sections.length ? 'Collapse All' : 'Expand All'}
-        </button>
+
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex rounded-md shadow-sm" role="group">
+            <button
+              onClick={() => setFilterMode('all')}
+              className={`px-4 py-2 text-sm font-medium border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-ireb-berry focus:z-10 focus:ring-2 focus:ring-ireb-berry focus:text-ireb-berry ${
+                filterMode === 'all'
+                  ? 'bg-ireb-berry text-white hover:bg-ireb-berry hover:text-white'
+                  : 'bg-white text-gray-900'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilterMode('with-comparison')}
+              className={`px-4 py-2 text-sm font-medium border-t border-b border-gray-200 hover:bg-gray-100 hover:text-ireb-berry focus:z-10 focus:ring-2 focus:ring-ireb-berry focus:text-ireb-berry ${
+                filterMode === 'with-comparison'
+                  ? 'bg-ireb-berry text-white hover:bg-ireb-berry hover:text-white'
+                  : 'bg-white text-gray-900'
+              }`}
+            >
+              Comparison Ready
+            </button>
+            <button
+              onClick={() => setFilterMode('without-comparison')}
+              className={`px-4 py-2 text-sm font-medium border border-gray-200 rounded-r-lg hover:bg-gray-100 hover:text-ireb-berry focus:z-10 focus:ring-2 focus:ring-ireb-berry focus:text-ireb-berry ${
+                filterMode === 'without-comparison'
+                  ? 'bg-ireb-berry text-white hover:bg-ireb-berry hover:text-white'
+                  : 'bg-white text-gray-900'
+              }`}
+            >
+              Missing Comparison
+            </button>
+          </div>
+
+          <button
+            onClick={toggleAllSections}
+            className="rounded-md bg-ireb-superlight-berry px-4 py-2 text-sm font-medium text-ireb-berry border-2 border-ireb-berry hover:bg-ireb-light-berry transition-colors ml-auto"
+          >
+            {expandedSections.size === sections.length ? 'Collapse All' : 'Expand All'}
+          </button>
+        </div>
       </header>
 
       <div className="space-y-8">
-        {sections.map((section) => {
+        {filteredSections.map((section) => {
           const isExpanded = expandedSections.has(section.title);
 
           return (
@@ -216,10 +321,12 @@ const AllGraphsPage = () => {
 
               {isExpanded && (
                 <div className="p-6 space-y-8">
-                  {section.graphs.map(({ name, Component, path }) => (
+                  {section.graphs.map(({ name, Component, path, hasComparison }) => (
                     <div key={path} className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-mori text-xl font-semibold text-ireb-berry">{name}</h3>
+                        <h3 className="font-mori text-xl font-semibold text-ireb-berry flex items-center gap-2">
+                          {name}
+                        </h3>
                         <span className="text-xs text-ink-500 font-mono">{path}</span>
                       </div>
                       <GraphErrorBoundary graphName={name}>
@@ -234,6 +341,12 @@ const AllGraphsPage = () => {
             </div>
           );
         })}
+
+        {filteredSections.length === 0 && (
+          <div className="text-center py-12 text-ink-500 text-lg">
+            No graphs match the selected filter.
+          </div>
+        )}
       </div>
     </div>
   );
