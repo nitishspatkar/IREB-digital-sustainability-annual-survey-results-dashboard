@@ -151,8 +151,10 @@ export const PersonIncorporatesSustainabilityByMeasureCount = ({
       margin: { t: 40, r: 20, b: 60, l: 160 }, // Left margin for labels
       legend: {
         orientation: 'h',
+        yanchor: 'bottom',
         y: 1.1,
-        x: 0,
+        xanchor: 'right',
+        x: 1,
       },
       xaxis: {
         title: {

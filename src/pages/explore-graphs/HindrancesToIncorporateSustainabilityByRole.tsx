@@ -172,8 +172,10 @@ export const HindrancesToIncorporateSustainabilityByRole = ({
       uniformtext: { mode: 'show', minsize: 13 },
       legend: {
         orientation: 'h',
-        y: 11.25,
-        x: 0,
+        yanchor: 'bottom',
+        y: 1.1,
+        xanchor: 'right',
+        x: 1,
         traceorder: 'normal',
       },
       xaxis: {

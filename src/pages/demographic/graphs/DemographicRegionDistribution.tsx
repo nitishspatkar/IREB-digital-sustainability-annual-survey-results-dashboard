@@ -259,8 +259,10 @@ const DemographicRegionDistribution = ({ respondentStats }: DemographicRegionDis
       showlegend: true,
       legend: {
         orientation: 'h',
-        y: 1.1, // Position legend above chart
-        x: 0,
+        yanchor: 'bottom',
+        y: 1.1,
+        xanchor: 'right',
+        x: 1,
         font: { family: 'PP Mori, sans-serif', size: 12, color: tickColor },
       },
       xaxis: {

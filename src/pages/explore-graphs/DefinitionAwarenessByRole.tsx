@@ -78,8 +78,10 @@ const layout: Partial<Layout> = {
   margin: { t: 40, r: 20, b: 40, l: 200 },
   legend: {
     orientation: 'h',
+    yanchor: 'bottom',
     y: 1.1,
-    x: 0,
+    xanchor: 'right',
+    x: 1,
   },
   xaxis: {
     title: {

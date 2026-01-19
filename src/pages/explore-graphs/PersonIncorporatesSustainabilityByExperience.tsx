@@ -112,8 +112,10 @@ export const PersonIncorporatesSustainabilityByExperience = ({
       margin: { t: 40, r: 20, b: 60, l: 60 },
       legend: {
         orientation: 'h',
+        yanchor: 'bottom',
         y: 1.1,
-        x: 0,
+        xanchor: 'right',
+        x: 1,
       },
       xaxis: {
         automargin: true,

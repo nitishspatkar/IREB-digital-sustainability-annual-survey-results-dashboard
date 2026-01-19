@@ -156,8 +156,10 @@ export const SustainabilityDimensionsInTasksByMeasureCount = ({
       margin: { t: 40, r: 20, b: 60, l: 160 },
       legend: {
         orientation: 'h',
+        yanchor: 'bottom',
         y: 1.1,
-        x: 0,
+        xanchor: 'right',
+        x: 1,
       },
       uniformtext: {
         mode: 'show',

@@ -105,7 +105,13 @@ export const GroupedYesNoChart = ({
     () => ({
       barmode: 'group',
       margin: { t: 40, r: 20, b: 60, l: 60 },
-      legend: { orientation: 'h', y: 1.1, x: 0 },
+      legend: {
+        orientation: 'h',
+        yanchor: 'bottom',
+        y: 1.1,
+        xanchor: 'right',
+        x: 1,
+      },
       xaxis: {
         automargin: true,
         ticklen: 10,
