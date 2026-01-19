@@ -8,10 +8,8 @@ import {
 } from '../../../components/GraphViews';
 import { DriversToIncorporateSustainabilityOther } from '../../explore-graphs/DriversToIncorporateSustainabilityOther';
 import { DriversToIncorporateSustainabilityByOrgType } from '../../explore-graphs/DriversToIncorporateSustainabilityByOrgType';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
 
 // --- DATA EXTRACTOR ---
 const driversDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -155,7 +153,7 @@ export const DriversToIncorporateSustainability = ({ onExplore }: { onExplore?: 
       ]}
       onExplore={onExplore}
       dataExtractor={driversDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

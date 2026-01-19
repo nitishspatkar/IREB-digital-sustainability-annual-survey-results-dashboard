@@ -7,10 +7,8 @@ import { NoTrainingReasonsOther } from '../../explore-graphs/NoTrainingReasonsOt
 import { NoTrainingReasonsByTrainingOffer } from '../../explore-graphs/NoTrainingReasonsByTrainingOffer';
 import { NoTrainingReasonsByRole } from '../../explore-graphs/NoTrainingReasonsByRole';
 import { NoTrainingReasonsByAge } from '../../explore-graphs/NoTrainingReasonsByAge';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
 
 // --- DATA EXTRACTOR ---
 const noTrainingReasonsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -138,7 +136,7 @@ export const NoTrainingReasons = ({ onExplore }: { onExplore?: () => void }) => 
       ]}
       onExplore={onExplore}
       dataExtractor={noTrainingReasonsDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

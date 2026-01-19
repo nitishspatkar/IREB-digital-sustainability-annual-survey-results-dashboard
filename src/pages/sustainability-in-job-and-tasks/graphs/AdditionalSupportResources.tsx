@@ -11,10 +11,8 @@ import { AdditionalSupportResourcesByTraining } from '../../explore-graphs/Addit
 import { AdditionalSupportResourcesByAge } from '../../explore-graphs/AdditionalSupportResourcesByAge';
 import { AdditionalSupportResourcesByRole } from '../../explore-graphs/AdditionalSupportResourcesByRole';
 import { AdditionalSupportResourcesByOrgType } from '../../explore-graphs/AdditionalSupportResourcesByOrgType';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
 
 // --- DATA EXTRACTOR ---
 const additionalSupportResourcesDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -176,7 +174,7 @@ export const AdditionalSupportResources = ({ onExplore }: { onExplore?: () => vo
       ]}
       onExplore={onExplore}
       dataExtractor={additionalSupportResourcesDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

@@ -10,10 +10,8 @@ import { DiscussionFrequencyByRole } from '../../explore-graphs/DiscussionFreque
 import { DiscussionFrequencyOther } from '../../explore-graphs/DiscussionFrequencyOther';
 import { DiscussionFrequencyByAge } from '../../explore-graphs/DiscussionFrequencyByAge.tsx';
 import { DiscussionFrequencyByExperience } from '../../explore-graphs/DiscussionFrequencyByExperience.tsx';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
 
 const normalizeFrequency = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -113,7 +111,7 @@ export const DiscussionFrequency = ({
       ]}
       onExplore={onExplore}
       dataExtractor={discussionFrequencyDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

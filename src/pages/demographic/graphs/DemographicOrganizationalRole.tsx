@@ -3,10 +3,7 @@ import type { ChartProcessor, DataExtractor } from '../../../components/GraphVie
 import { DemographicOrganizationalRoleOther } from '../../explore-graphs/DemographicOrganizationalRoleOther';
 import { DefinitionAwarenessByRole } from '../../explore-graphs/DefinitionAwarenessByRole.tsx';
 import { DiscussionFrequencyByRole } from '../../explore-graphs/DiscussionFrequencyByRole.tsx';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 import { TrainingParticipationByRole } from '../../explore-graphs/TrainingParticipationByRole.tsx';
 import { TrainingPrivateCapacityByRole } from '../../explore-graphs/TrainingPrivateCapacityByRole.tsx';
 import { TrainingProgramsCountByRole } from '../../explore-graphs/TrainingProgramsCountByRole.tsx';
@@ -23,6 +20,7 @@ import { HindrancesToIncorporateSustainabilityByRole } from '../../explore-graph
 import { SustainabilityDimensionsInTasksByRole } from '../../explore-graphs/SustainabilityDimensionsInTasksByRole.tsx';
 import { UsesToolsByRole } from '../../explore-graphs/UsesToolsByRole.tsx';
 import { AdditionalSupportResourcesByRole } from '../../explore-graphs/AdditionalSupportResourcesByRole.tsx';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
 
 const normalizeRole = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -117,7 +115,7 @@ export const DemographicOrganizationalRole = ({ onExplore }: { onExplore?: () =>
       ]}
       onExplore={onExplore}
       dataExtractor={organizationalRoleDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

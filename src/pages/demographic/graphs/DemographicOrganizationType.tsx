@@ -1,9 +1,6 @@
 import { GenericChart } from '../../../components/GraphViews';
 import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 import { TrainingSatisfactionByOrgType } from '../../explore-graphs/TrainingSatisfactionByOrgType.tsx';
 import { OrganizationDepartmentCoordinationByOrgType } from '../../explore-graphs/OrganizationDepartmentCoordinationByOrgType.tsx';
 import { OrganizationHasGoalsByOrgType } from '../../explore-graphs/OrganizationHasGoalsByOrgType.tsx';
@@ -16,6 +13,7 @@ import { OrganizationalPracticesByOrgType } from '../../explore-graphs/Organizat
 import { DriversToIncorporateSustainabilityByOrgType } from '../../explore-graphs/DriversToIncorporateSustainabilityByOrgType.tsx';
 import { UsesToolsByOrgType } from '../../explore-graphs/UsesToolsByOrgType.tsx';
 import { AdditionalSupportResourcesByOrgType } from '../../explore-graphs/AdditionalSupportResourcesByOrgType.tsx';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
 
 // Helper function to normalize organization type strings
 const normalizeOrganizationType = (value: string) => value.replace(/\s+/g, ' ').trim();
@@ -105,7 +103,7 @@ const DemographicOrganizationType = ({ onExplore }: { onExplore?: () => void }) 
       ]}
       onExplore={onExplore}
       dataExtractor={organizationTypeDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

@@ -3,12 +3,10 @@ import {
   type ChartProcessor,
   type DataExtractor,
 } from '../../../components/GraphViews';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 import { TrainingPrivateCapacityByRole } from '../../explore-graphs/TrainingPrivateCapacityByRole.tsx';
 import { TrainingPrivateCapacityByRegion } from '../../explore-graphs/TrainingPrivateCapacityByRegion.tsx';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
 
 // Define the categories and their search terms
 const capacityOptions = [
@@ -113,7 +111,7 @@ const TrainingPrivateCapacity = ({ onExplore }: { onExplore?: () => void }) => {
       exploreComponents={[TrainingPrivateCapacityByRole, TrainingPrivateCapacityByRegion]}
       onExplore={onExplore}
       dataExtractor={trainingPrivateCapacityDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

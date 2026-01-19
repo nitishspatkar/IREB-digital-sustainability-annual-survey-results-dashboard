@@ -10,10 +10,8 @@ import { KnowledgeGapsByDimensionOther } from '../../explore-graphs/KnowledgeGap
 import { KnowledgeGapsByDimensionByAge } from '../../explore-graphs/KnowledgeGapsByDimensionByAge';
 import { KnowledgeGapsByDimensionByExperience } from '../../explore-graphs/KnowledgeGapsByDimensionByExperience';
 import { KnowledgeGapsByDimensionByApplicationStatus } from '../../explore-graphs/KnowledgeGapsByDimensionByApplicationStatus';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
 
 // --- DATA EXTRACTOR ---
 const knowledgeGapsDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -162,7 +160,7 @@ export const KnowledgeGapsByDimension = ({ onExplore }: { onExplore?: () => void
       ]}
       onExplore={onExplore}
       dataExtractor={knowledgeGapsDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

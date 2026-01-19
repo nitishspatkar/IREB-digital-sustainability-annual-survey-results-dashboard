@@ -10,10 +10,8 @@ import { HindrancesToIncorporateSustainabilityOther } from '../../explore-graphs
 import { HindrancesToIncorporateSustainabilityByRole } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByRole';
 import { HindrancesToIncorporateSustainabilityByAge } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByAge';
 import { HindrancesToIncorporateSustainabilityByExperience } from '../../explore-graphs/HindrancesToIncorporateSustainabilityByExperience';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
 
 // --- DATA EXTRACTOR ---
 const hindrancesDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -191,7 +189,7 @@ export const HindrancesToIncorporateSustainability = ({
       ]}
       onExplore={onExplore}
       dataExtractor={hindrancesDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

@@ -4,12 +4,10 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import { TrainingReasonsNotMoreOther } from '../../explore-graphs/TrainingReasonsNotMoreOther';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 import { TrainingReasonsNotMoreByAge } from '../../explore-graphs/TrainingReasonsNotMoreByAge.tsx';
 import { TrainingReasonsNotMoreByExperience } from '../../explore-graphs/TrainingReasonsNotMoreByExperience.tsx';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
 
 // --- DATA EXTRACTOR ---
 const trainingReasonsNotMoreDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -142,7 +140,7 @@ export const TrainingReasonsNotMore = ({ onExplore }: { onExplore?: () => void }
       ]}
       onExplore={onExplore}
       dataExtractor={trainingReasonsNotMoreDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

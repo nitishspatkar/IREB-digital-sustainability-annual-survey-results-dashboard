@@ -11,10 +11,8 @@ import { TrainingReasonsNoByAge } from '../../explore-graphs/TrainingReasonsNoBy
 import { TrainingReasonsNoByExperience } from '../../explore-graphs/TrainingReasonsNoByExperience.tsx';
 import { TrainingReasonsNoByRole } from '../../explore-graphs/TrainingReasonsNoByRole.tsx';
 import { TrainingReasonsNoByRegion } from '../../explore-graphs/TrainingReasonsNoByRegion.tsx';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy.ts';
 
 // --- DATA EXTRACTOR ---
 const trainingReasonsNoDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
@@ -82,7 +80,7 @@ export const TrainingReasonsNo = ({ onExplore }: { onExplore?: () => void }) => 
       ]}
       onExplore={onExplore}
       dataExtractor={trainingReasonsNoDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };

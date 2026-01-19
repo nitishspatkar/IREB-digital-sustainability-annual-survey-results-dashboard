@@ -3,10 +3,8 @@ import {
   type ChartProcessor,
   type DataExtractor,
 } from '../../../components/GraphViews';
-import {
-  horizontalBarComparisonStrategy,
-  type HorizontalBarData,
-} from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
 
 // Define the logical order of answers
 const frequencyOrder = [
@@ -91,7 +89,7 @@ const CustomerRequirementFrequency = () => {
         },
       }}
       dataExtractor={customerRequirementDataExtractor}
-      comparisonStrategy={horizontalBarComparisonStrategy}
+      comparisonStrategy={scatterPlotComparisonStrategy}
     />
   );
 };
