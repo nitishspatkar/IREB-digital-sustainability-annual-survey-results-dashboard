@@ -113,6 +113,27 @@ function Sidebar({ activeYear }: SidebarProps) {
             })}
           </ul>
         </nav>
+        {import.meta.env.DEV && (
+          <div className="mt-6 pt-4 border-t-2 border-ireb-light-berry">
+            <NavLink
+              to="/dev/all-graphs"
+              onClick={() => {
+                setIsSidebarOpen(false);
+                setActiveExploreId(null);
+              }}
+              className={({ isActive }) => `
+                flex w-full items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50
+                ${
+                  isActive
+                    ? 'bg-ireb-berry text-white border-ireb-berry shadow-card'
+                    : 'bg-amber-100 text-amber-800 border-amber-500 hover:bg-amber-200 hover:text-amber-900'
+                }
+              `}
+            >
+              <span className="pr-2 leading-snug">🔧 All Graphs (Dev)</span>
+            </NavLink>
+          </div>
+        )}
         <div className="mt-auto pt-4 text-sm md:text-lg leading-tight text-ireb-berry">
           <div>IREB GmbH</div>
           <div>Mahlbergstrasse 25</div>

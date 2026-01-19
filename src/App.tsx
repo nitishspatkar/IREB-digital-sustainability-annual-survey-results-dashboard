@@ -16,6 +16,7 @@ const DigitalSustainabilityRole = lazy(
 const SustainabilityTasks = lazy(
   () => import('./pages/sustainability-in-job-and-tasks/SustainabilityTasksPage')
 );
+const AllGraphsPage = lazy(() => import('./pages/dev/AllGraphsPage'));
 
 const availableYears = SurveyRepository.getAvailableYears();
 const currentYear = new Date().getFullYear().toString();
@@ -65,6 +66,9 @@ function App() {
                         element={<DigitalSustainabilityRole />}
                       />
                       <Route path="/sustainability-tasks" element={<SustainabilityTasks />} />
+                      {import.meta.env.DEV && (
+                        <Route path="/dev/all-graphs" element={<AllGraphsPage />} />
+                      )}
                       <Route path="*" element={<Navigate to="/demographics" replace />} />
                     </Routes>
                   </Suspense>
