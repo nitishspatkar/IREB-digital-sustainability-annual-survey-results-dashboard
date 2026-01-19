@@ -7,7 +7,7 @@ import {
   type DataExtractor,
 } from '../../../components/GraphViews';
 import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
-import { createScatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
+import { scatterPlotComparisonStrategy } from '../../../components/comparision-components/ScatterPlotComparisonStrategy';
 import { DiscussionFrequencyByAge } from '../../explore-graphs/DiscussionFrequencyByAge.tsx';
 import { DefinitionAwarenessByAge } from '../../explore-graphs/DefinitionAwarenessByAge.tsx';
 import { PersonIncorporatesSustainabilityByAge } from '../../explore-graphs/PersonIncorporatesSustainabilityByAge.tsx';
@@ -115,7 +115,7 @@ const DemographicAgeGroup = ({ onExplore }: { onExplore?: () => void; className?
       processor={processor}
       layout={layout}
       dataExtractor={ageGroupDataExtractor}
-      comparisonStrategy={createScatterPlotComparisonStrategy({ showLegend: true })}
+      comparisonStrategy={scatterPlotComparisonStrategy}
       exploreComponents={[
         DefinitionAwarenessByAge,
         DiscussionFrequencyByAge,

@@ -7,7 +7,7 @@ export interface ScatterPlotOptions {
    * Whether to show a legend instead of text labels on points.
    * When true, shows a collapsible legend with a toggle button.
    * When false, shows text labels on each point.
-   * @default false
+   * @default true
    */
   showLegend?: boolean;
 }
@@ -25,7 +25,7 @@ export interface ScatterPlotOptions {
 export const createScatterPlotComparisonStrategy = (
   options: ScatterPlotOptions = {}
 ): ComparisonStrategy<HorizontalBarData> => {
-  const { showLegend = false } = options;
+  const { showLegend = true } = options;
 
   return (currentYearData, compareYearData, currentYear, compareYear, palette) => {
     // 1. Prepare Data
@@ -214,7 +214,7 @@ export const createScatterPlotComparisonStrategy = (
 };
 
 /**
- * Default Scatter Plot Comparison Strategy (without legend)
- * Use createScatterPlotComparisonStrategy({ showLegend: true }) for legend variant
+ * Default Scatter Plot Comparison Strategy (with legend)
+ * Use createScatterPlotComparisonStrategy({ showLegend: false }) for no-legend variant
  */
 export const scatterPlotComparisonStrategy = createScatterPlotComparisonStrategy();
