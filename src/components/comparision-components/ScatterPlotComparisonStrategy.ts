@@ -150,7 +150,7 @@ export const createScatterPlotComparisonStrategy = (
         scaleanchor: 'x', // Make axes square (1:1 ratio)
         scaleratio: 1,
       },
-      showlegend: showLegend,
+      showlegend: false, // Start hidden, user must click toggle to show
       hovermode: 'closest',
       margin: { t: 40, r: 40, b: 60, l: 60 },
       // Reset barmode if it was set in parent
@@ -178,6 +178,8 @@ export const createScatterPlotComparisonStrategy = (
       layout.updatemenus = [
         {
           type: 'buttons',
+          // Start with no button active (-1), ensuring first click triggers 'args' (show)
+          active: -1,
           showactive: true,
           x: 1.02,
           xanchor: 'left',
