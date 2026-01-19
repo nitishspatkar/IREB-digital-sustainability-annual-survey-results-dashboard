@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import {
+  stackedBarComparisonStrategy,
+  type StackedBarData,
+} from '../../components/comparision-components/StackedBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const COORDINATION_TEMPLATE = [
@@ -11,8 +15,10 @@ const COORDINATION_TEMPLATE = [
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-// --- The Processor Logic ---
-const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (responses, palette) => {
+// --- Data Extractor ---
+const organizationDepartmentCoordinationByAgeExtractor: DataExtractor<StackedBarData> = (
+  responses
+) => {
   const ageStats = new Map<string, Map<string, number>>();
   const ageTotals = new Map<string, number>();
 
@@ -68,6 +74,26 @@ const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (response
 
   const totalRespondents = Array.from(ageTotals.values()).reduce((a, b) => a + b, 0);
 
+  const series = COORDINATION_TEMPLATE.map((def) => {
+    const label = def.label;
+    const values = sortedAgeGroups.map((age) => ageStats.get(age)?.get(label) ?? 0);
+    return { label, values };
+  });
+
+  return {
+    categories: sortedAgeGroups,
+    series,
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: filteredResponses.length,
+    },
+  };
+};
+
+// --- The Processor Logic ---
+const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (responses, palette) => {
+  const data = organizationDepartmentCoordinationByAgeExtractor(responses);
+
   // 4. Define Colors
   const colors: Record<string, string> = {
     Yes: palette.spring,
@@ -76,18 +102,18 @@ const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (response
   };
 
   // 5. Build Traces
-  const traces: Data[] = COORDINATION_TEMPLATE.map((def) => {
-    const label = def.label;
-    const xValues = sortedAgeGroups.map((age) => ageStats.get(age)?.get(label) ?? 0);
+  const traces: Data[] = data.series.map((series) => {
+    const label = series.label;
+    const xValues = series.values;
 
     return {
       type: 'bar',
       name: label,
       orientation: 'h',
-      y: sortedAgeGroups,
+      y: data.categories,
       x: xValues,
       marker: {
-        color: colors[label],
+        color: colors[label] ?? palette.grey02,
       },
       text: xValues.map((v) => (v > 0 ? v.toString() : '')),
       textposition: 'inside',
@@ -102,11 +128,8 @@ const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (response
   });
 
   return {
-    stats: {
-      numberOfResponses: totalRespondents,
-      totalEligible: filteredResponses.length,
-    },
-    traces: traces,
+    stats: data.stats,
+    traces,
   };
 };
 
@@ -150,6 +173,8 @@ export const OrganizationDepartmentCoordinationByAge = ({
       graphId="OrganizationDepartmentCoordinationByAge"
       processor={processOrganizationDepartmentCoordinationByAge}
       layout={layout}
+      dataExtractor={organizationDepartmentCoordinationByAgeExtractor}
+      comparisonStrategy={stackedBarComparisonStrategy}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
     />
