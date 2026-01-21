@@ -8,13 +8,11 @@ import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx'
 import { NoTrainingReasonsByTrainingOffer } from '../../explore-graphs/NoTrainingReasonsByTrainingOffer.tsx';
 import { TrainingParticipationByTrainingOffer } from '../../explore-graphs/TrainingParticipationByTrainingOffer.tsx';
 import { OrganizationalPracticesByOrgType } from '../../explore-graphs/OrganizationalPracticesByOrgType.tsx';
-import {
-  yesNoNotSureComparisonStrategy,
-  type YesNoNotSureData,
-} from '../../../components/comparision-components/YesNoNotSureComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
-// Data Extractor: Extracts Yes/No/Not Sure counts (ignores Unknown for comparison)
-const dataExtractor: DataExtractor<YesNoNotSureData> = (responses) => {
+// Data Extractor: Extracts Yes/No/Not Sure counts for dumbbell plot
+const dataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   const norm = (v: string) => (v ?? '').trim().toLowerCase();
 
   let yesCount = 0;
@@ -31,11 +29,11 @@ const dataExtractor: DataExtractor<YesNoNotSureData> = (responses) => {
   const total = yesCount + noCount + notSureCount;
 
   return {
-    counts: {
-      yes: yesCount,
-      no: noCount,
-      notSure: notSureCount,
-    },
+    items: [
+      { label: 'Yes', value: yesCount },
+      { label: 'No', value: noCount },
+      { label: 'Not sure', value: notSureCount },
+    ],
     stats: {
       numberOfResponses: total,
     },
@@ -124,7 +122,7 @@ const OrganizationOffersTraining = ({ onExplore }: { onExplore?: () => void }) =
       ]}
       onExplore={onExplore}
       dataExtractor={dataExtractor}
-      comparisonStrategy={yesNoNotSureComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

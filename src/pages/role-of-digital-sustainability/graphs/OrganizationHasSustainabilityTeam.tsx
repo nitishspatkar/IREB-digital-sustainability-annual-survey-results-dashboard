@@ -4,15 +4,13 @@ import { OrganizationHasSustainabilityTeamByAge } from '../../explore-graphs/Org
 import { OrganizationHasSustainabilityTeamByRole } from '../../explore-graphs/OrganizationHasSustainabilityTeamByRole.tsx';
 import { OrganizationHasSustainabilityTeamByOrgType } from '../../explore-graphs/OrganizationHasSustainabilityTeamByOrgType.tsx';
 import OrganizationMeasures from '../../explore-graphs/OrganizationMeasures.tsx';
-import {
-  yesNoNotSureComparisonStrategy,
-  type YesNoNotSureData,
-} from '../../../components/comparision-components/YesNoNotSureComparisonStrategy';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-// Data Extractor: Extracts Yes/No/Not Sure counts
-const dataExtractor: DataExtractor<YesNoNotSureData> = (responses) => {
+// Data Extractor: Extracts Yes/No/Not Sure counts for dumbbell plot
+const dataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
   let yesCount = 0;
   let noCount = 0;
   let notSureCount = 0;
@@ -33,11 +31,11 @@ const dataExtractor: DataExtractor<YesNoNotSureData> = (responses) => {
   const total = yesCount + noCount + notSureCount;
 
   return {
-    counts: {
-      yes: yesCount,
-      no: noCount,
-      notSure: notSureCount,
-    },
+    items: [
+      { label: 'Yes', value: yesCount },
+      { label: 'No', value: noCount },
+      { label: 'Not sure', value: notSureCount },
+    ],
     stats: {
       numberOfResponses: total,
     },
@@ -47,9 +45,13 @@ const dataExtractor: DataExtractor<YesNoNotSureData> = (responses) => {
 // The Logic (Pure Function)
 const processData: ChartProcessor = (responses, palette) => {
   const data = dataExtractor(responses);
+  // Reconstruct values from items
+  const yesCount = data.items.find((i) => i.label === 'Yes')?.value ?? 0;
+  const noCount = data.items.find((i) => i.label === 'No')?.value ?? 0;
+  const notSureCount = data.items.find((i) => i.label === 'Not sure')?.value ?? 0;
 
   const labels = ['Yes', 'No', 'Not sure'];
-  const values = [data.counts.yes, data.counts.no, data.counts.notSure];
+  const values = [yesCount, noCount, notSureCount];
 
   return {
     traces: [
@@ -97,7 +99,7 @@ const OrganizationHasSustainabilityTeam = ({ onExplore }: { onExplore?: () => vo
       ]}
       onExplore={onExplore}
       dataExtractor={dataExtractor}
-      comparisonStrategy={yesNoNotSureComparisonStrategy}
+      comparisonStrategy={dumbbellComparisonStrategy}
     />
   );
 };

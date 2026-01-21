@@ -1,8 +1,10 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 import { TrainingParticipationByRole } from '../../explore-graphs/TrainingParticipationByRole';
 import { TrainingParticipationByRegion } from '../../explore-graphs/TrainingParticipationByRegion';
 import { TrainingParticipationByTrainingOffer } from '../../explore-graphs/TrainingParticipationByTrainingOffer';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -53,12 +55,44 @@ const processData: ChartProcessor = (responses, palette) => {
   };
 };
 
+const trainingParticipationDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const counts = new Map<string, number>();
+  counts.set('Yes', 0);
+  counts.set('No', 0);
+
+  responses.forEach((r) => {
+    const raw = normalize(r.raw.participatedInTraining ?? '');
+    const lower = raw.toLowerCase();
+
+    if (lower === 'yes') {
+      counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+    } else if (lower === 'no') {
+      counts.set('No', (counts.get('No') ?? 0) + 1);
+    }
+  });
+
+  const labels = ['Yes', 'No'];
+  const items = labels.map((label) => ({
+    label,
+    value: counts.get(label) ?? 0,
+  }));
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: items.reduce((sum, item) => sum + item.value, 0),
+    },
+  };
+};
+
 // The Component
 const TrainingParticipation = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="TrainingParticipation"
       processor={processData}
+      dataExtractor={trainingParticipationDataExtractor}
+      comparisonStrategy={dumbbellComparisonStrategy}
       layout={{
         margin: { t: 60, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },

@@ -142,6 +142,7 @@ export const createDumbbellComparisonStrategy = (
         ticksuffix: formatAsPercentage ? '%' : '',
       },
       yaxis: {
+        type: 'category',
         showgrid: false,
         automargin: true,
         ticks: 'outside',

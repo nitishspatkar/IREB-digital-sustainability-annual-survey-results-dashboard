@@ -1,8 +1,10 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 
 import { TrainingProgramsCountByRole } from '../../explore-graphs/TrainingProgramsCountByRole';
 import { TrainingProgramsCountByRegion } from '../../explore-graphs/TrainingProgramsCountByRegion';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 type CountStat = {
   label: string;
@@ -106,12 +108,49 @@ const processData: ChartProcessor = (responses, palette) => {
   };
 };
 
+const trainingProgramsCountDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const counts = new Map<string, CountStat>();
+
+  const participants = responses.filter(
+    (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
+  );
+
+  participants.forEach((r) => {
+    const cat = categorizeCount(r.raw.trainingCount ?? '');
+    if (!cat) return;
+    const key = cat.label;
+    const existing = counts.get(key);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      counts.set(key, { label: cat.label, sortKey: cat.sortKey, count: 1 });
+    }
+  });
+
+  const stats = Array.from(counts.values()).sort((a, b) => a.sortKey - b.sortKey);
+  const total = stats.reduce((sum, s) => sum + s.count, 0);
+
+  const items = stats.map((s) => ({
+    label: s.label,
+    value: s.count,
+  }));
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: total,
+    },
+  };
+};
+
 // The Component
 const TrainingProgramsCount = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="TrainingProgramsCount"
       processor={processData}
+      dataExtractor={trainingProgramsCountDataExtractor}
+      comparisonStrategy={dumbbellComparisonStrategy}
       layout={{
         margin: { t: 50, r: 0, b: 60, l: 48 },
         xaxis: {

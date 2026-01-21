@@ -1,10 +1,12 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 import { PersonIncorporatesSustainabilityByAge } from '../../explore-graphs/PersonIncorporatesSustainabilityByAge';
 import { PersonIncorporatesSustainabilityByRole } from '../../explore-graphs/PersonIncorporatesSustainabilityByRole';
 import { PersonIncorporatesSustainabilityByOrgGoals } from '../../explore-graphs/PersonIncorporatesSustainabilityByOrgGoals';
 import { PersonIncorporatesSustainabilityByExperience } from '../../explore-graphs/PersonIncorporatesSustainabilityByExperience';
 import { PersonIncorporatesSustainabilityByMeasureCount } from '../../explore-graphs/PersonIncorporatesSustainabilityByMeasureCount';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -55,12 +57,46 @@ const processData: ChartProcessor = (responses, palette) => {
   };
 };
 
+const personIncorporatesSustainabilityDataExtractor: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
+  const counts = new Map<string, number>();
+  counts.set('Yes', 0);
+  counts.set('No', 0);
+
+  responses.forEach((r) => {
+    const raw = normalize(r.raw.personIncorporatesSustainability ?? '');
+    const lower = raw.toLowerCase();
+
+    if (lower === 'yes') {
+      counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+    } else if (lower === 'no') {
+      counts.set('No', (counts.get('No') ?? 0) + 1);
+    }
+  });
+
+  const labels = ['Yes', 'No'];
+  const items = labels.map((label) => ({
+    label,
+    value: counts.get(label) ?? 0,
+  }));
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: items.reduce((sum, item) => sum + item.value, 0),
+    },
+  };
+};
+
 // The Component
 const PersonIncorporatesSustainability = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="PersonIncorporatesSustainability"
       processor={processData}
+      dataExtractor={personIncorporatesSustainabilityDataExtractor}
+      comparisonStrategy={dumbbellComparisonStrategy}
       layout={{
         margin: { t: 50, r: 20, b: 60, l: 48 },
         yaxis: { title: { text: 'Number of Respondents' } },

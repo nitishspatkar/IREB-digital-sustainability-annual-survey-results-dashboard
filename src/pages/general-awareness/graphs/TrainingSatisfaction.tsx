@@ -1,10 +1,12 @@
 import { GenericChart } from '../../../components/GraphViews';
-import type { ChartProcessor } from '../../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../../components/GraphViews';
 import { TrainingSatisfactionByRole } from '../../explore-graphs/TrainingSatisfactionByRole.tsx';
 import { TrainingSatisfactionByAge } from '../../explore-graphs/TrainingSatisfactionByAge.tsx';
 import { TrainingSatisfactionByExperience } from '../../explore-graphs/TrainingSatisfactionByExperience.tsx';
 import { TrainingSatisfactionByOrgType } from '../../explore-graphs/TrainingSatisfactionByOrgType.tsx';
 import { TrainingSatisfactionByRegion } from '../../explore-graphs/TrainingSatisfactionByRegion.tsx';
+import { dumbbellComparisonStrategy } from '../../../components/comparision-components/DumbbellComparisonStrategy';
+import { type HorizontalBarData } from '../../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -63,12 +65,51 @@ const processData: ChartProcessor = (responses, palette) => {
   };
 };
 
+const trainingSatisfactionDataExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  // Filter to only participants who said 'Yes' to training participation
+  const participants = responses.filter(
+    (r) => normalize(r.raw.participatedInTraining ?? '').toLowerCase() === 'yes'
+  );
+
+  const counts = new Map<string, number>();
+  counts.set('Yes', 0);
+  counts.set('No', 0);
+
+  participants.forEach((r) => {
+    const raw = normalize(r.raw.trainingSatisfaction ?? '');
+    if (!raw || raw.toLowerCase() === 'n/a') return;
+
+    const lower = raw.toLowerCase();
+    if (lower === 'yes') {
+      counts.set('Yes', (counts.get('Yes') ?? 0) + 1);
+    } else if (lower === 'no') {
+      counts.set('No', (counts.get('No') ?? 0) + 1);
+    }
+  });
+
+  const labels = ['Yes', 'No'];
+  const items = labels.map((label) => ({
+    label,
+    value: counts.get(label) ?? 0,
+  }));
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: items.reduce((sum, item) => sum + item.value, 0),
+      totalEligible: participants.length,
+    },
+  };
+};
+
 // The Component
 const TrainingSatisfaction = ({ onExplore }: { onExplore?: () => void }) => {
   return (
     <GenericChart
       graphId="TrainingSatisfaction"
       processor={processData}
+      dataExtractor={trainingSatisfactionDataExtractor}
+      comparisonStrategy={dumbbellComparisonStrategy}
       layout={{
         margin: { t: 50, r: 0, b: 60, l: 40 },
         yaxis: { title: { text: 'Number of Respondents' } },
