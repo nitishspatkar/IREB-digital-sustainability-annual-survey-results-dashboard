@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const PARTICIPATION_LABELS = [
@@ -101,6 +103,11 @@ const processTrainingParticipationByTrainingOffer: ChartProcessor = (responses, 
   };
 };
 
+const comparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
 // --- The Component ---
 export const TrainingParticipationByTrainingOffer = ({
   onBack,
@@ -139,6 +146,51 @@ export const TrainingParticipationByTrainingOffer = ({
     []
   );
 
+  const dataExtractor = useCallback<DataExtractor<HorizontalBarData>>((responses) => {
+    const offerStats = new Map<string, { yes: number; no: number }>();
+    let totalValidResponses = 0;
+    const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+    responses.forEach((r) => {
+      const offerRaw = norm(r.raw.organizationOffersTraining ?? '');
+      let offerStatus = '';
+      if (offerRaw === 'yes') offerStatus = 'Yes';
+      else if (offerRaw === 'no') offerStatus = 'No';
+      else if (offerRaw === 'not sure') offerStatus = 'Not sure';
+
+      if (!offerStatus) return;
+
+      // Count all valid offer status responses towards the total, matching the main chart
+      totalValidResponses++;
+
+      if (!offerStats.has(offerStatus)) {
+        offerStats.set(offerStatus, { yes: 0, no: 0 });
+      }
+
+      const participated = norm(r.raw.participatedInTraining ?? '');
+      const counts = offerStats.get(offerStatus)!;
+
+      if (participated === 'yes') counts.yes++;
+      else if (participated === 'no') counts.no++;
+    });
+
+    const items: { label: string; value: number }[] = [];
+
+    offerStats.forEach((counts, status) => {
+      // Calculate percentages based on TOTAL valid responses (Grand Total)
+      const yesPct = totalValidResponses > 0 ? (counts.yes / totalValidResponses) * 100 : 0;
+      const noPct = totalValidResponses > 0 ? (counts.no / totalValidResponses) * 100 : 0;
+
+      if (yesPct > 0) items.push({ label: `Offers: ${status} - Participated`, value: yesPct });
+      if (noPct > 0) items.push({ label: `Offers: ${status} - Did Not Participate`, value: noPct });
+    });
+
+    return {
+      items,
+      stats: { numberOfResponses: totalValidResponses },
+    };
+  }, []);
+
   return (
     <GenericChart
       graphId="TrainingParticipationByTrainingOffer"
@@ -146,6 +198,8 @@ export const TrainingParticipationByTrainingOffer = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={dataExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

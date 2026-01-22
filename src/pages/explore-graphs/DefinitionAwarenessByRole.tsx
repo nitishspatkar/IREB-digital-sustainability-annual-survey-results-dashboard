@@ -1,6 +1,9 @@
+import { useCallback } from 'react';
 import { GenericChart } from '../../components/GraphViews';
-import type { ChartProcessor } from '../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../components/GraphViews';
 import type { Layout } from 'plotly.js';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -73,6 +76,11 @@ const processor: ChartProcessor = (responses, palette) => {
   };
 };
 
+const comparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
 const layout: Partial<Layout> = {
   barmode: 'stack',
   margin: { t: 40, r: 20, b: 40, l: 200 },
@@ -98,6 +106,48 @@ const layout: Partial<Layout> = {
 };
 
 export const DefinitionAwarenessByRole = ({ onBack }: { onBack: () => void }) => {
+  const dataExtractor = useCallback<DataExtractor<HorizontalBarData>>((responses) => {
+    const roleCounts = new Map<string, { yes: number; no: number }>();
+    let totalValidResponses = 0;
+
+    responses.forEach((r) => {
+      const role = normalize(r.raw.role ?? '');
+      const awareness = normalize(r.raw.heardOfDigitalSustainabilityDefinition ?? '').toLowerCase();
+
+      if (!role || role.toLowerCase() === 'n/a' || !awareness) return;
+      if (awareness !== 'yes' && awareness !== 'no') return;
+
+      totalValidResponses++;
+
+      if (!roleCounts.has(role)) {
+        roleCounts.set(role, { yes: 0, no: 0 });
+      }
+
+      const counts = roleCounts.get(role)!;
+      if (awareness === 'yes') {
+        counts.yes++;
+      } else {
+        counts.no++;
+      }
+    });
+
+    const items: { label: string; value: number }[] = [];
+
+    roleCounts.forEach((counts, role) => {
+      // Calculate percentages based on TOTAL valid responses
+      const yesPct = totalValidResponses > 0 ? (counts.yes / totalValidResponses) * 100 : 0;
+      const noPct = totalValidResponses > 0 ? (counts.no / totalValidResponses) * 100 : 0;
+
+      if (yesPct > 0) items.push({ label: `${role} - Familiar (Yes)`, value: yesPct });
+      if (noPct > 0) items.push({ label: `${role} - Not Familiar (No)`, value: noPct });
+    });
+
+    return {
+      items,
+      stats: { numberOfResponses: totalValidResponses },
+    };
+  }, []);
+
   return (
     <GenericChart
       graphId="DefinitionAwarenessByRole"
@@ -105,6 +155,8 @@ export const DefinitionAwarenessByRole = ({ onBack }: { onBack: () => void }) =>
       layout={layout}
       isEmbedded={true}
       onBack={onBack}
+      dataExtractor={dataExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

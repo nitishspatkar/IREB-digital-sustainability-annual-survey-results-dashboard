@@ -1,6 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const TRAINING_PARTICIPATION_TEMPLATE = [
@@ -96,6 +98,11 @@ const processTrainingParticipationByRole: ChartProcessor = (responses, palette) 
   };
 };
 
+const comparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
 // --- The Component ---
 export const TrainingParticipationByRole = ({
   onBack,
@@ -136,6 +143,48 @@ export const TrainingParticipationByRole = ({
     []
   );
 
+  const dataExtractor = useCallback<DataExtractor<HorizontalBarData>>((responses) => {
+    const roleStats = new Map<string, { yes: number; no: number }>();
+    let totalValidResponses = 0;
+
+    responses.forEach((r) => {
+      const role = normalize(r.raw.role ?? '');
+      const participated = r.raw.participatedInTraining?.trim().toLowerCase();
+
+      if (!role || role.toLowerCase() === 'n/a') return;
+      if (participated !== 'yes' && participated !== 'no') return;
+
+      totalValidResponses++;
+
+      if (!roleStats.has(role)) {
+        roleStats.set(role, { yes: 0, no: 0 });
+      }
+
+      const counts = roleStats.get(role)!;
+      if (participated === 'yes') {
+        counts.yes++;
+      } else {
+        counts.no++;
+      }
+    });
+
+    const items: { label: string; value: number }[] = [];
+
+    roleStats.forEach((counts, role) => {
+      // Calculate percentages based on TOTAL valid responses (Grand Total)
+      const yesPct = totalValidResponses > 0 ? (counts.yes / totalValidResponses) * 100 : 0;
+      const noPct = totalValidResponses > 0 ? (counts.no / totalValidResponses) * 100 : 0;
+
+      if (yesPct > 0) items.push({ label: `${role} - Participated`, value: yesPct });
+      if (noPct > 0) items.push({ label: `${role} - Did Not Participate`, value: noPct });
+    });
+
+    return {
+      items,
+      stats: { numberOfResponses: totalValidResponses },
+    };
+  }, []);
+
   return (
     <GenericChart
       graphId="TrainingParticipationByRole"
@@ -143,6 +192,8 @@ export const TrainingParticipationByRole = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={dataExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

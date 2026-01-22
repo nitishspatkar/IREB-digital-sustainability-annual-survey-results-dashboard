@@ -1,6 +1,9 @@
+import { useCallback } from 'react';
 import { GenericChart } from '../../components/GraphViews';
-import type { ChartProcessor } from '../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../components/GraphViews';
 import type { Layout } from 'plotly.js';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -79,6 +82,11 @@ const processor: ChartProcessor = (responses, palette) => {
   };
 };
 
+const comparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
 const layout: Partial<Layout> = {
   barmode: 'stack',
   margin: { t: 40, r: 20, b: 40, l: 60 },
@@ -104,6 +112,48 @@ const layout: Partial<Layout> = {
 };
 
 export const DefinitionAwarenessByAge = ({ onBack }: { onBack: () => void }) => {
+  const dataExtractor = useCallback<DataExtractor<HorizontalBarData>>((responses) => {
+    const ageCounts = new Map<string, { yes: number; no: number }>();
+    let totalValidResponses = 0;
+
+    responses.forEach((r) => {
+      const age = normalize(r.raw.ageGroup ?? '');
+      const awareness = normalize(r.raw.heardOfDigitalSustainabilityDefinition ?? '').toLowerCase();
+
+      if (!age || age.toLowerCase() === 'n/a' || !awareness) return;
+      if (awareness !== 'yes' && awareness !== 'no') return;
+
+      totalValidResponses++;
+
+      if (!ageCounts.has(age)) {
+        ageCounts.set(age, { yes: 0, no: 0 });
+      }
+
+      const counts = ageCounts.get(age)!;
+      if (awareness === 'yes') {
+        counts.yes++;
+      } else {
+        counts.no++;
+      }
+    });
+
+    const items: { label: string; value: number }[] = [];
+
+    ageCounts.forEach((counts, age) => {
+      // Calculate percentages based on TOTAL valid responses (Grand Total)
+      const yesPct = totalValidResponses > 0 ? (counts.yes / totalValidResponses) * 100 : 0;
+      const noPct = totalValidResponses > 0 ? (counts.no / totalValidResponses) * 100 : 0;
+
+      if (yesPct > 0) items.push({ label: `${age} - Familiar (Yes)`, value: yesPct });
+      if (noPct > 0) items.push({ label: `${age} - Not Familiar (No)`, value: noPct });
+    });
+
+    return {
+      items,
+      stats: { numberOfResponses: totalValidResponses },
+    };
+  }, []);
+
   return (
     <GenericChart
       graphId="DefinitionAwarenessByAge"
@@ -111,6 +161,8 @@ export const DefinitionAwarenessByAge = ({ onBack }: { onBack: () => void }) => 
       layout={layout}
       isEmbedded={true}
       onBack={onBack}
+      dataExtractor={dataExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };
