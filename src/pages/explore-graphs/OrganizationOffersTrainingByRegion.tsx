@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const OFFERS_TEMPLATE = [
@@ -83,6 +85,108 @@ const getRegion = (country: string): string => {
   if (['australia', 'new zealand'].includes(c)) return 'Oceania';
 
   return 'Other';
+};
+
+const extractOrganizationOffersTrainingByRegionData: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
+  const regionCounts = new Map<string, { yes: number; no: number; notSure: number }>();
+  let totalValidResponses = 0;
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  responses.forEach((r) => {
+    const country = r.getCountryOfResidence();
+    if (!country || country.toLowerCase() === 'n/a') {
+      return;
+    }
+
+    const region = getRegion(country);
+    const offers = norm(r.raw.organizationOffersTraining ?? '');
+
+    if (offers !== 'yes' && offers !== 'no' && offers !== 'not sure') {
+      return;
+    }
+
+    totalValidResponses++;
+
+    if (!regionCounts.has(region)) {
+      regionCounts.set(region, { yes: 0, no: 0, notSure: 0 });
+    }
+
+    const counts = regionCounts.get(region)!;
+    if (offers === 'yes') counts.yes++;
+    else if (offers === 'no') counts.no++;
+    else counts.notSure++;
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  const sortedRegions = Array.from(regionCounts.keys()).sort();
+
+  sortedRegions.forEach((region) => {
+    const counts = regionCounts.get(region)!;
+    if (totalValidResponses > 0) {
+      const yesPct = (counts.yes / totalValidResponses) * 100;
+      const noPct = (counts.no / totalValidResponses) * 100;
+      const notSurePct = (counts.notSure / totalValidResponses) * 100;
+
+      if (yesPct > 0) items.push({ label: `${region}<br>Yes`, value: yesPct });
+      if (noPct > 0) items.push({ label: `${region}<br>No`, value: noPct });
+      if (notSurePct > 0) items.push({ label: `${region}<br>Not sure`, value: notSurePct });
+    }
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
 };
 
 // --- The Processor Logic ---
@@ -213,6 +317,8 @@ export const OrganizationOffersTrainingByRegion = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractOrganizationOffersTrainingByRegionData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

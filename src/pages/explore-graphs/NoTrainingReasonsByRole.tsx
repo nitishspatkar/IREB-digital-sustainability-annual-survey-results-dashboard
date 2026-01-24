@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const NO_TRAINING_REASONS_TEMPLATE = [
@@ -32,6 +34,109 @@ const hasValidNoTrainingReasonAnswer = (r: SurveyResponse): boolean => {
   if (oVal.length > 0 && oVal !== 'n/a') return true;
 
   return false;
+};
+
+const extractNoTrainingReasonsByRoleData: DataExtractor<HorizontalBarData> = (responses) => {
+  const roleCounts = new Map<string, Map<string, number>>();
+  let totalValidResponses = 0;
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  responses.forEach((r) => {
+    const role = normalize(r.raw.role ?? '');
+
+    if (!role || role.toLowerCase() === 'n/a') {
+      return;
+    }
+
+    if (hasValidNoTrainingReasonAnswer(r)) {
+      totalValidResponses++;
+
+      if (!roleCounts.has(role)) {
+        roleCounts.set(role, new Map());
+      }
+      const reasons = roleCounts.get(role)!;
+
+      NO_TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
+        let isReasonSelected = false;
+        if (reasonDef.key === 'orgNoTrainingOther') {
+          const otherValue = norm(r.raw.orgNoTrainingOther);
+          isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
+        } else {
+          isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
+        }
+
+        if (isReasonSelected) {
+          reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
+        }
+      });
+    }
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  const sortedRoles = Array.from(roleCounts.keys()).sort();
+
+  sortedRoles.forEach((role) => {
+    const reasonsMap = roleCounts.get(role)!;
+    reasonsMap.forEach((count, reasonLabel) => {
+      // Percentage of TOTAL valid responses for consistency with other "Reason" charts
+      // Note: This logic follows TrainingReasonsNotMoreByAge which uses totalValidResponses
+      const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+      items.push({ label: `${role}<br>${reasonLabel}`, value: pct });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
 };
 
 // --- The Processor Logic ---
@@ -177,6 +282,8 @@ export const NoTrainingReasonsByRole = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractNoTrainingReasonsByRoleData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

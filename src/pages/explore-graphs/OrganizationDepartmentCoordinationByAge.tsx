@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
-import {
-  stackedBarComparisonStrategy,
-  type StackedBarData,
-} from '../../components/comparision-components/StackedBarComparisonStrategy';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const COORDINATION_TEMPLATE = [
@@ -16,9 +14,124 @@ const COORDINATION_TEMPLATE = [
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
 // --- Data Extractor ---
-const organizationDepartmentCoordinationByAgeExtractor: DataExtractor<StackedBarData> = (
+const extractOrganizationDepartmentCoordinationByAgeData: DataExtractor<HorizontalBarData> = (
   responses
 ) => {
+  const ageCounts = new Map<string, { yes: number; no: number; notSure: number }>();
+  let totalValidResponses = 0;
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  // 1. Filter Data: Precondition Q17 = Yes
+  const filteredResponses = responses.filter(
+    (r) => norm(r.raw.organizationIncorporatesSustainablePractices) === 'yes'
+  );
+
+  // 2. Parse Data
+  filteredResponses.forEach((r) => {
+    const ageGroup = normalize(r.raw.ageGroup ?? '');
+    const coordination = norm(r.raw.organizationDepartmentCoordination ?? '');
+
+    if (!ageGroup || ageGroup.toLowerCase() === 'n/a') {
+      return;
+    }
+
+    // Filter valid answers
+    if (coordination !== 'yes' && coordination !== 'no' && coordination !== 'not sure') {
+      return;
+    }
+
+    totalValidResponses++;
+
+    if (!ageCounts.has(ageGroup)) {
+      ageCounts.set(ageGroup, { yes: 0, no: 0, notSure: 0 });
+    }
+
+    const counts = ageCounts.get(ageGroup)!;
+    if (coordination === 'yes') counts.yes++;
+    else if (coordination === 'no') counts.no++;
+    else counts.notSure++;
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  const sortedAges = Array.from(ageCounts.keys()).sort((a, b) => {
+    const aMatch = a.match(/^(\d+)/);
+    const bMatch = b.match(/^(\d+)/);
+    if (aMatch && bMatch) {
+      return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
+    }
+    return a.localeCompare(b);
+  });
+
+  sortedAges.forEach((age) => {
+    const counts = ageCounts.get(age)!;
+    if (totalValidResponses > 0) {
+      const yesPct = (counts.yes / totalValidResponses) * 100;
+      const noPct = (counts.no / totalValidResponses) * 100;
+      const notSurePct = (counts.notSure / totalValidResponses) * 100;
+
+      if (yesPct > 0) items.push({ label: `${age}<br>Yes`, value: yesPct });
+      if (noPct > 0) items.push({ label: `${age}<br>No`, value: noPct });
+      if (notSurePct > 0) items.push({ label: `${age}<br>Not sure`, value: notSurePct });
+    }
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+      totalEligible: filteredResponses.length,
+    },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+// --- The Processor Logic ---
+const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (responses, palette) => {
   const ageStats = new Map<string, Map<string, number>>();
   const ageTotals = new Map<string, number>();
 
@@ -74,26 +187,6 @@ const organizationDepartmentCoordinationByAgeExtractor: DataExtractor<StackedBar
 
   const totalRespondents = Array.from(ageTotals.values()).reduce((a, b) => a + b, 0);
 
-  const series = COORDINATION_TEMPLATE.map((def) => {
-    const label = def.label;
-    const values = sortedAgeGroups.map((age) => ageStats.get(age)?.get(label) ?? 0);
-    return { label, values };
-  });
-
-  return {
-    categories: sortedAgeGroups,
-    series,
-    stats: {
-      numberOfResponses: totalRespondents,
-      totalEligible: filteredResponses.length,
-    },
-  };
-};
-
-// --- The Processor Logic ---
-const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (responses, palette) => {
-  const data = organizationDepartmentCoordinationByAgeExtractor(responses);
-
   // 4. Define Colors
   const colors: Record<string, string> = {
     Yes: palette.spring,
@@ -102,18 +195,18 @@ const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (response
   };
 
   // 5. Build Traces
-  const traces: Data[] = data.series.map((series) => {
-    const label = series.label;
-    const xValues = series.values;
+  const traces: Data[] = COORDINATION_TEMPLATE.map((def) => {
+    const label = def.label;
+    const xValues = sortedAgeGroups.map((age) => ageStats.get(age)?.get(label) ?? 0);
 
     return {
       type: 'bar',
       name: label,
       orientation: 'h',
-      y: data.categories,
+      y: sortedAgeGroups,
       x: xValues,
       marker: {
-        color: colors[label] ?? palette.grey02,
+        color: colors[label],
       },
       text: xValues.map((v) => (v > 0 ? v.toString() : '')),
       textposition: 'inside',
@@ -128,8 +221,11 @@ const processOrganizationDepartmentCoordinationByAge: ChartProcessor = (response
   });
 
   return {
-    stats: data.stats,
-    traces,
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: filteredResponses.length,
+    },
+    traces: traces,
   };
 };
 
@@ -174,10 +270,10 @@ export const OrganizationDepartmentCoordinationByAge = ({
       graphId="OrganizationDepartmentCoordinationByAge"
       processor={processOrganizationDepartmentCoordinationByAge}
       layout={layout}
-      dataExtractor={organizationDepartmentCoordinationByAgeExtractor}
-      comparisonStrategy={stackedBarComparisonStrategy}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractOrganizationDepartmentCoordinationByAgeData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

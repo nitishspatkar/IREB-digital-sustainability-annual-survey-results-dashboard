@@ -1,10 +1,8 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
-import {
-  stackedBarComparisonStrategy,
-  type StackedBarData,
-} from '../../components/comparision-components/StackedBarComparisonStrategy';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const COORDINATION_TEMPLATE = [
@@ -17,9 +15,115 @@ const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
 // --- The Extractor Logic ---
-const extractOrganizationDepartmentCoordinationByOrgType: DataExtractor<StackedBarData> = (
+const extractOrganizationDepartmentCoordinationByOrgType: DataExtractor<HorizontalBarData> = (
   responses
 ) => {
+  const orgCounts = new Map<string, { yes: number; no: number; notSure: number }>();
+  let totalValidResponses = 0;
+
+  // 1. Filter Data: Precondition Q17 = Yes
+  const filteredResponses = responses.filter(
+    (r) => norm(r.raw.organizationIncorporatesSustainablePractices) === 'yes'
+  );
+
+  // 2. Parse Data
+  filteredResponses.forEach((r) => {
+    const orgType = normalize(r.raw.organizationType ?? '');
+    const coordination = norm(r.raw.organizationDepartmentCoordination ?? '');
+
+    if (!orgType || orgType.toLowerCase() === 'n/a') {
+      return;
+    }
+
+    if (coordination !== 'yes' && coordination !== 'no' && coordination !== 'not sure') {
+      return;
+    }
+
+    totalValidResponses++;
+
+    if (!orgCounts.has(orgType)) {
+      orgCounts.set(orgType, { yes: 0, no: 0, notSure: 0 });
+    }
+
+    const counts = orgCounts.get(orgType)!;
+    if (coordination === 'yes') counts.yes++;
+    else if (coordination === 'no') counts.no++;
+    else counts.notSure++;
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  const sortedOrgTypes = Array.from(orgCounts.keys()).sort();
+
+  sortedOrgTypes.forEach((orgType) => {
+    const counts = orgCounts.get(orgType)!;
+    if (totalValidResponses > 0) {
+      const yesPct = (counts.yes / totalValidResponses) * 100;
+      const noPct = (counts.no / totalValidResponses) * 100;
+      const notSurePct = (counts.notSure / totalValidResponses) * 100;
+
+      if (yesPct > 0) items.push({ label: `${orgType}<br>Yes`, value: yesPct });
+      if (noPct > 0) items.push({ label: `${orgType}<br>No`, value: noPct });
+      if (notSurePct > 0) items.push({ label: `${orgType}<br>Not sure`, value: notSurePct });
+    }
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+      totalEligible: filteredResponses.length,
+    },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+// --- The Processor Logic ---
+const processOrganizationDepartmentCoordinationByOrgType: ChartProcessor = (responses, palette) => {
   const orgStats = new Map<string, Map<string, number>>();
   const orgTotals = new Map<string, number>();
 
@@ -66,28 +170,7 @@ const extractOrganizationDepartmentCoordinationByOrgType: DataExtractor<StackedB
 
   const totalRespondents = Array.from(orgTotals.values()).reduce((a, b) => a + b, 0);
 
-  // 4. Construct Series in StackedBarData format
-  const series = COORDINATION_TEMPLATE.map((def) => {
-    const label = def.label;
-    const values = sortedOrgTypes.map((orgType) => orgStats.get(orgType)?.get(label) ?? 0);
-    return { label, values };
-  });
-
-  return {
-    categories: sortedOrgTypes,
-    series,
-    stats: {
-      numberOfResponses: totalRespondents,
-      totalEligible: filteredResponses.length,
-    },
-  };
-};
-
-// --- The Processor Logic ---
-const processOrganizationDepartmentCoordinationByOrgType: ChartProcessor = (responses, palette) => {
-  const data = extractOrganizationDepartmentCoordinationByOrgType(responses);
-
-  // Define Colors (locally for single-year view)
+  // Define Colors
   const colors: Record<string, string> = {
     Yes: palette.spring,
     No: palette.mandarin,
@@ -95,17 +178,20 @@ const processOrganizationDepartmentCoordinationByOrgType: ChartProcessor = (resp
   };
 
   // Build Traces
-  const traces: Data[] = data.series.map((s) => {
+  const traces: Data[] = COORDINATION_TEMPLATE.map((def) => {
+    const label = def.label;
+    const xValues = sortedOrgTypes.map((orgType) => orgStats.get(orgType)?.get(label) ?? 0);
+
     return {
       type: 'bar',
-      name: s.label,
+      name: label,
       orientation: 'h',
-      y: data.categories,
-      x: s.values,
+      y: sortedOrgTypes,
+      x: xValues,
       marker: {
-        color: colors[s.label],
+        color: colors[label],
       },
-      text: s.values.map((v) => (v > 0 ? v.toString() : '')),
+      text: xValues.map((v) => (v > 0 ? v.toString() : '')),
       textposition: 'inside',
       insidetextanchor: 'middle',
       textfont: {
@@ -118,7 +204,10 @@ const processOrganizationDepartmentCoordinationByOrgType: ChartProcessor = (resp
   });
 
   return {
-    stats: data.stats,
+    stats: {
+      numberOfResponses: totalRespondents,
+      totalEligible: filteredResponses.length,
+    },
     traces: traces,
   };
 };
@@ -167,7 +256,7 @@ export const OrganizationDepartmentCoordinationByOrgType = ({
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
       dataExtractor={extractOrganizationDepartmentCoordinationByOrgType}
-      comparisonStrategy={stackedBarComparisonStrategy}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

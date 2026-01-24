@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const PRACTICES_TEMPLATE = [
@@ -10,6 +12,114 @@ const PRACTICES_TEMPLATE = [
 ];
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
+
+const extractOrganizationIncorporatesPracticesByAgeData: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
+  const ageCounts = new Map<string, { yes: number; no: number; notSure: number }>();
+  let totalValidResponses = 0;
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  responses.forEach((r) => {
+    const ageGroup = normalize(r.raw.ageGroup ?? '');
+    const hasPractices = norm(r.raw.organizationIncorporatesSustainablePractices ?? '');
+
+    if (!ageGroup || ageGroup.toLowerCase() === 'n/a') {
+      return;
+    }
+
+    if (hasPractices !== 'yes' && hasPractices !== 'no' && hasPractices !== 'not sure') {
+      return;
+    }
+
+    totalValidResponses++;
+
+    if (!ageCounts.has(ageGroup)) {
+      ageCounts.set(ageGroup, { yes: 0, no: 0, notSure: 0 });
+    }
+
+    const counts = ageCounts.get(ageGroup)!;
+    if (hasPractices === 'yes') counts.yes++;
+    else if (hasPractices === 'no') counts.no++;
+    else counts.notSure++;
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  const sortedAges = Array.from(ageCounts.keys()).sort((a, b) => {
+    const aMatch = a.match(/^(\d+)/);
+    const bMatch = b.match(/^(\d+)/);
+    if (aMatch && bMatch) {
+      return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
+    }
+    return a.localeCompare(b);
+  });
+
+  sortedAges.forEach((age) => {
+    const counts = ageCounts.get(age)!;
+    if (totalValidResponses > 0) {
+      const yesPct = (counts.yes / totalValidResponses) * 100;
+      const noPct = (counts.no / totalValidResponses) * 100;
+      const notSurePct = (counts.notSure / totalValidResponses) * 100;
+
+      if (yesPct > 0) items.push({ label: `${age}<br>Yes`, value: yesPct });
+      if (noPct > 0) items.push({ label: `${age}<br>No`, value: noPct });
+      if (notSurePct > 0) items.push({ label: `${age}<br>Not sure`, value: notSurePct });
+    }
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
 
 // --- The Processor Logic ---
 const processOrganizationIncorporatesPracticesByAge: ChartProcessor = (responses, palette) => {
@@ -145,6 +255,8 @@ export const OrganizationIncorporatesPracticesByAge = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractOrganizationIncorporatesPracticesByAgeData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };
