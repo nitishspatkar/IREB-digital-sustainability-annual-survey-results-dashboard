@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
+
 // --- Constants & Helpers ---
 const FREQUENCY_TEMPLATE = ['daily', 'weekly', 'monthly', 'every few months', 'never', 'other'];
 
@@ -94,6 +97,108 @@ const processDiscussionFrequency: ChartProcessor = (responses, palette) => {
   };
 };
 
+// --- Comparison Strategy Setup ---
+const discussionFrequencyByRoleExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const roleStats = new Map<string, Map<string, number>>();
+  const roleTotals = new Map<string, number>();
+
+  responses.forEach((r) => {
+    const role = normalize(r.raw.role ?? '');
+    let frequency = normalize(r.raw.discussionFrequency ?? '').toLowerCase();
+
+    if (!role || role.toLowerCase() === 'n/a' || !frequency || frequency === 'n/a') return;
+
+    if (frequency.includes('every few months')) frequency = 'every few months';
+    else if (frequency === 'monthly') frequency = 'monthly';
+
+    if (!FREQUENCY_TEMPLATE.includes(frequency) && frequency !== 'other') {
+      frequency = 'other';
+    }
+
+    if (!roleStats.has(role)) {
+      roleStats.set(role, new Map());
+      roleTotals.set(role, 0);
+    }
+    const freqs = roleStats.get(role)!;
+    freqs.set(frequency, (freqs.get(frequency) ?? 0) + 1);
+
+    roleTotals.set(role, (roleTotals.get(role) ?? 0) + 1);
+  });
+
+  const items: { label: string; value: number }[] = [];
+  const validResponses = Array.from(roleTotals.values()).reduce((a, b) => a + b, 0);
+
+  roleStats.forEach((freqMap, role) => {
+    const roleTotal = roleTotals.get(role) ?? 0;
+    if (roleTotal === 0) return;
+
+    freqMap.forEach((count, freq) => {
+      const pct = (count / validResponses) * 100;
+      let freqLabel = freq;
+      if (freq === 'every few months') freqLabel = 'Every few months';
+      else freqLabel = freq.charAt(0).toUpperCase() + freq.slice(1);
+
+      items.push({
+        label: `${role} - ${freqLabel}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: { numberOfResponses: validResponses },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels (prevent skipping)
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        // @ts-expect-error - title can be a string or object in Plotly types, but we know it's an object here from the strategy
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment based on number of items
+    // traces[1] is the compareYear markers trace, its y-axis data has the labels/items
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 40 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
 // --- The Component ---
 export const DiscussionFrequencyByRole = ({
   onBack,
@@ -127,6 +232,8 @@ export const DiscussionFrequencyByRole = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={discussionFrequencyByRoleExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

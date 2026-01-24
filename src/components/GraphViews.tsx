@@ -102,6 +102,7 @@ interface GenericChartProps<T = never> {
   dataExtractor?: DataExtractor<T>;
   comparisonStrategy?: ComparisonStrategy<T>;
   enableInteractions?: boolean;
+  containerClassName?: string;
 }
 
 export const GenericChart = <T,>({
@@ -116,6 +117,7 @@ export const GenericChart = <T,>({
   showResponseStats = true,
   comparisonStrategy,
   enableInteractions = false,
+  containerClassName,
 }: GenericChartProps<T>) => {
   // --- A. Boilerplate Hooks ---
   const { activeExploreId, setActiveExploreId } = useGraphExplore();
@@ -132,6 +134,15 @@ export const GenericChart = <T,>({
   // --- Scroll position tracking ---
   const graphRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef<number>(0);
+
+  const handleCompareYearChange = (year: string | null) => {
+    setCompareYear(year);
+    if (year === null) {
+      setTimeout(() => {
+        graphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  };
 
   // --- B. Fetch Theme Colors once ---
   const palette = {
@@ -263,7 +274,9 @@ export const GenericChart = <T,>({
           showBackButton={!!onBack}
           onBack={onBack}
           compareYear={compareYear}
-          onCompareYearChange={dataExtractor && comparisonStrategy ? setCompareYear : undefined}
+          onCompareYearChange={
+            dataExtractor && comparisonStrategy ? handleCompareYearChange : undefined
+          }
           availableCompareYears={dataExtractor && comparisonStrategy ? availableYears : []}
         >
           <div className="h-[520px]">
@@ -289,6 +302,15 @@ export const GenericChart = <T,>({
   const processorLayout = 'layout' in processorResult ? processorResult.layout : {};
   const mergedLayout = { ...layout, ...processorLayout };
 
+  // Calculate container height logic
+  const hasExplicitHeight = mergedLayout.height !== undefined;
+  const containerClass = containerClassName
+    ? containerClassName
+    : hasExplicitHeight
+      ? ''
+      : 'h-[520px]';
+  const containerStyle = hasExplicitHeight ? { height: mergedLayout.height } : undefined;
+
   return (
     <div className="flex flex-col">
       {(import.meta.env.DEV || new URLSearchParams(window.location.search).get('debug')) && (
@@ -309,11 +331,14 @@ export const GenericChart = <T,>({
         showBackButton={!!onBack}
         onBack={onBack}
         compareYear={compareYear}
-        onCompareYearChange={dataExtractor && comparisonStrategy ? setCompareYear : undefined}
+        onCompareYearChange={
+          dataExtractor && comparisonStrategy ? handleCompareYearChange : undefined
+        }
         availableCompareYears={dataExtractor && comparisonStrategy ? availableYears : []}
       >
-        <div className="h-[520px]">
+        <div className={containerClass} style={containerStyle}>
           <Plot
+            key={compareYear ?? 'single'}
             data={traces as Data[]}
             layout={
               enableInteractions

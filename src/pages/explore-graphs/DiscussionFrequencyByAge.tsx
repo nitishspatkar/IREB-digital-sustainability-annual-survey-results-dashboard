@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const FREQUENCY_TEMPLATE = ['daily', 'weekly', 'monthly', 'every few months', 'never', 'other'];
@@ -102,6 +104,108 @@ const processDiscussionFrequency: ChartProcessor = (responses, palette) => {
   };
 };
 
+// --- Comparison Strategy Setup ---
+const discussionFrequencyByAgeExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const ageStats = new Map<string, Map<string, number>>();
+  const ageTotals = new Map<string, number>();
+
+  responses.forEach((r) => {
+    const ageGroup = normalize(r.raw.ageGroup ?? '');
+    let frequency = normalize(r.raw.discussionFrequency ?? '').toLowerCase();
+
+    if (!ageGroup || ageGroup.toLowerCase() === 'n/a' || !frequency || frequency === 'n/a') return;
+
+    if (frequency.includes('every few months')) frequency = 'every few months';
+    else if (frequency === 'monthly') frequency = 'monthly';
+
+    if (!FREQUENCY_TEMPLATE.includes(frequency) && frequency !== 'other') {
+      frequency = 'other';
+    }
+
+    if (!ageStats.has(ageGroup)) {
+      ageStats.set(ageGroup, new Map());
+      ageTotals.set(ageGroup, 0);
+    }
+    const freqs = ageStats.get(ageGroup)!;
+    freqs.set(frequency, (freqs.get(frequency) ?? 0) + 1);
+
+    ageTotals.set(ageGroup, (ageTotals.get(ageGroup) ?? 0) + 1);
+  });
+
+  const items: { label: string; value: number }[] = [];
+  const validResponses = Array.from(ageTotals.values()).reduce((a, b) => a + b, 0);
+
+  ageStats.forEach((freqMap, ageGroup) => {
+    const groupTotal = ageTotals.get(ageGroup) ?? 0;
+    if (groupTotal === 0) return;
+
+    freqMap.forEach((count, freq) => {
+      // Percentage based on TOTAL valid responses, not group total
+      const pct = (count / validResponses) * 100;
+      let freqLabel = freq;
+      if (freq === 'every few months') freqLabel = 'Every few months';
+      else freqLabel = freq.charAt(0).toUpperCase() + freq.slice(1);
+
+      items.push({
+        label: `${ageGroup} - ${freqLabel}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: { numberOfResponses: validResponses },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        // @ts-expect-error - title can be a string or object in Plotly types
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment based on number of items
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 40 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
 // --- The Component ---
 export const DiscussionFrequencyByAge = ({
   onBack,
@@ -135,6 +239,8 @@ export const DiscussionFrequencyByAge = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={discussionFrequencyByAgeExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };
