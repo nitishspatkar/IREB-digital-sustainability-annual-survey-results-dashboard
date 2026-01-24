@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyRecord } from '../../data/data-parsing-logic/SurveyCsvParser';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Shared Constants ---
 const QUESTIONS = [
@@ -22,6 +24,110 @@ const getOrgGroup = (raw: SurveyRecord) => {
   if (t.includes('university') || t.includes('research')) return 'Research';
   if (!t || t === 'n/a') return null;
   return 'Other organizations';
+};
+
+// --- Data Extractor (Comparison) ---
+const extractOrganizationalPracticesByOrgTypeData: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
+  const statsMap = new Map<
+    string,
+    Map<string, { yes: number; no: number; notSure: number; total: number }>
+  >();
+
+  // Initialize Map
+  ORG_GROUPS.forEach((g) => {
+    const qMap = new Map();
+    QUESTIONS.forEach((q) => qMap.set(q.key, { yes: 0, no: 0, notSure: 0, total: 0 }));
+    statsMap.set(g, qMap);
+  });
+
+  // Aggregate
+  responses.forEach((r) => {
+    const groupName = getOrgGroup(r.raw);
+    if (!groupName || !statsMap.has(groupName)) return;
+
+    const qMap = statsMap.get(groupName)!;
+    QUESTIONS.forEach((question) => {
+      const val = norm(r.raw[question.key] as unknown as string);
+      if (val === '' || val === 'n/a') return;
+
+      const s = qMap.get(question.key)!;
+      s.total++;
+      if (val === 'yes') s.yes++;
+      else if (val === 'no') s.no++;
+      else if (val === 'not sure') s.notSure++;
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  ORG_GROUPS.forEach((g) => {
+    QUESTIONS.forEach((question) => {
+      const s = statsMap.get(g)!.get(question.key)!;
+      if (s.total > 0) {
+        const yesPct = (s.yes / s.total) * 100;
+        const noPct = (s.no / s.total) * 100;
+        const notSurePct = (s.notSure / s.total) * 100;
+
+        items.push({ label: `${g}<br>${question.label} - Yes`, value: yesPct });
+        items.push({ label: `${g}<br>${question.label} - No`, value: noPct });
+        items.push({ label: `${g}<br>${question.label} - Not sure`, value: notSurePct });
+      }
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: responses.length,
+    },
+  };
+};
+
+// --- Comparison Strategy ---
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
 };
 
 interface Props {
@@ -160,6 +266,8 @@ export const OrganizationalPracticesByOrgType = ({ onBack, showBackButton = true
       isEmbedded={showBackButton}
       onBack={showBackButton ? onBack : undefined}
       showResponseStats={false}
+      dataExtractor={extractOrganizationalPracticesByOrgTypeData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

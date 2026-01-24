@@ -1,8 +1,10 @@
 import { GenericChart } from '../../components/GraphViews';
-import type { ChartProcessor } from '../../components/GraphViews';
+import type { ChartProcessor, DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
 import type { SurveyColumnKey } from '../../data/data-parsing-logic/SurveyColumnDefinitions';
 import type { Data } from 'plotly.js';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -40,6 +42,99 @@ const measures: OrganizationMeasure[] = [
     label: 'Sustainability reporting',
   },
 ];
+
+const extractOrganizationMeasuresData: DataExtractor<HorizontalBarData> = (responses) => {
+  const measureStats = measures.map((m) => ({
+    label: m.label,
+    yes: 0,
+    no: 0,
+    notSure: 0,
+    total: 0,
+  }));
+
+  responses.forEach((r) => {
+    measures.forEach((m, index) => {
+      if (m.filter && !m.filter(r)) {
+        return;
+      }
+
+      const rawValue = normalize(r.raw[m.key] ?? '');
+      const lower = rawValue.toLowerCase();
+
+      if (lower === 'yes' || lower === 'no' || lower === 'not sure') {
+        measureStats[index].total++;
+        if (lower === 'yes') measureStats[index].yes++;
+        else if (lower === 'no') measureStats[index].no++;
+        else if (lower === 'not sure') measureStats[index].notSure++;
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  measureStats.forEach((stat) => {
+    if (stat.total > 0) {
+      const yesPct = (stat.yes / stat.total) * 100;
+      const noPct = (stat.no / stat.total) * 100;
+      const notSurePct = (stat.notSure / stat.total) * 100;
+
+      items.push({ label: `${stat.label} - Yes`, value: yesPct });
+      items.push({ label: `${stat.label} - No`, value: noPct });
+      items.push({ label: `${stat.label} - Not sure`, value: notSurePct });
+    }
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: responses.length,
+    },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
 
 const processData: ChartProcessor = (responses, palette) => {
   const data = measures.map((m) => ({
@@ -183,6 +278,8 @@ const OrganizationMeasures = ({
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
       showResponseStats={false}
+      dataExtractor={extractOrganizationMeasuresData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

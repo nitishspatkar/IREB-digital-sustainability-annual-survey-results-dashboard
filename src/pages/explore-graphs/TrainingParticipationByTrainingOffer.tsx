@@ -103,10 +103,50 @@ const processTrainingParticipationByTrainingOffer: ChartProcessor = (responses, 
   };
 };
 
-const comparisonStrategy = createDumbbellComparisonStrategy({
+// --- Comparison Strategy ---
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
   normalizeToPercentage: false,
   formatAsPercentage: true,
 });
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
 
 // --- The Component ---
 export const TrainingParticipationByTrainingOffer = ({
@@ -176,13 +216,20 @@ export const TrainingParticipationByTrainingOffer = ({
 
     const items: { label: string; value: number }[] = [];
 
-    offerStats.forEach((counts, status) => {
-      // Calculate percentages based on TOTAL valid responses (Grand Total)
-      const yesPct = totalValidResponses > 0 ? (counts.yes / totalValidResponses) * 100 : 0;
-      const noPct = totalValidResponses > 0 ? (counts.no / totalValidResponses) * 100 : 0;
+    // Use predefined order: Yes, Not sure, No (or Yes, No, Not sure) - sticking to common logic
+    const statusOrder = ['Yes', 'No', 'Not sure'];
 
-      if (yesPct > 0) items.push({ label: `Offers: ${status} - Participated`, value: yesPct });
-      if (noPct > 0) items.push({ label: `Offers: ${status} - Did Not Participate`, value: noPct });
+    statusOrder.forEach((status) => {
+      const counts = offerStats.get(status);
+      if (counts) {
+        // Calculate percentages based on TOTAL valid responses (Grand Total)
+        const yesPct = totalValidResponses > 0 ? (counts.yes / totalValidResponses) * 100 : 0;
+        const noPct = totalValidResponses > 0 ? (counts.no / totalValidResponses) * 100 : 0;
+
+        if (yesPct > 0) items.push({ label: `Offers: ${status}<br>Participated`, value: yesPct });
+        if (noPct > 0)
+          items.push({ label: `Offers: ${status}<br>Did Not Participate`, value: noPct });
+      }
     });
 
     return {
