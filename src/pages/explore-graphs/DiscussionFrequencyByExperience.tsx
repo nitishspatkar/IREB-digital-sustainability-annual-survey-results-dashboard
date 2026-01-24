@@ -197,7 +197,6 @@ const comparisonStrategy: typeof baseComparisonStrategy = (
       ...result.layout.xaxis,
       automargin: true,
       title: {
-        // @ts-expect-error - title can be a string or object in Plotly types
         ...(result.layout.xaxis?.title || {}),
         standoff: 20,
       },
