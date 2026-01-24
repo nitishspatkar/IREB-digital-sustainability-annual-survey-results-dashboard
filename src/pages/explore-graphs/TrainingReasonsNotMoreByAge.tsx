@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const TRAINING_REASONS_NOT_MORE_TEMPLATE = [
@@ -24,6 +26,138 @@ const sortAgeGroups = (a: string, b: string) => {
   }
 
   return a.localeCompare(b);
+};
+
+// --- Data Extractor for Comparison ---
+const extractTrainingReasonsNotMoreByAgeData: DataExtractor<HorizontalBarData> = (responses) => {
+  const ageGroupReasonCounts = new Map<string, Map<string, number>>();
+  let totalValidResponses = 0;
+
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  // Helper to check if respondent gave a valid answer
+  const hasValidAnswer = (r: any) => {
+    const raw = r.raw;
+    if (norm(raw.notMoreTrainingNotAware) === 'yes') return true;
+    if (norm(raw.notMoreTrainingNoOrganization) === 'yes') return true;
+    if (norm(raw.notMoreTrainingNoOpportunity) === 'yes') return true;
+    if (norm(raw.notMoreTrainingNoNeed) === 'yes') return true;
+    if (norm(raw.notMoreTrainingTooExpensive) === 'yes') return true;
+
+    // Explicit "No" to all specific options counts as an answer (valid 'none')
+    if (
+      norm(raw.notMoreTrainingNotAware) === 'no' &&
+      norm(raw.notMoreTrainingNoOrganization) === 'no' &&
+      norm(raw.notMoreTrainingNoOpportunity) === 'no' &&
+      norm(raw.notMoreTrainingNoNeed) === 'no' &&
+      norm(raw.notMoreTrainingTooExpensive) === 'no'
+    ) {
+      return true;
+    }
+
+    const oVal = norm(raw.notMoreTrainingOther);
+    if (oVal.length > 0 && oVal !== 'n/a') return true;
+
+    return false;
+  };
+
+  responses.forEach((r) => {
+    const ageGroup = normalize(r.raw.ageGroup ?? '');
+    const participatedInTraining = norm(r.raw.participatedInTraining);
+
+    if (!ageGroup || ageGroup.toLowerCase() === 'n/a' || participatedInTraining !== 'yes') {
+      return;
+    }
+
+    if (hasValidAnswer(r)) {
+      totalValidResponses++;
+
+      if (!ageGroupReasonCounts.has(ageGroup)) {
+        ageGroupReasonCounts.set(ageGroup, new Map());
+      }
+      const reasons = ageGroupReasonCounts.get(ageGroup)!;
+
+      TRAINING_REASONS_NOT_MORE_TEMPLATE.forEach((reasonDef) => {
+        let isReasonSelected = false;
+        if (reasonDef.key === 'notMoreTrainingOther') {
+          const otherValue = norm(r.raw[reasonDef.key as keyof typeof r.raw]);
+          isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
+        } else {
+          isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
+        }
+
+        if (isReasonSelected) {
+          reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
+        }
+      });
+    }
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  ageGroupReasonCounts.forEach((reasonsMap, ageGroup) => {
+    reasonsMap.forEach((count, reasonLabel) => {
+      // Calculate percentage of TOTAL valid responses (participants who answered)
+      const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+      items.push({
+        label: `${ageGroup}<br>${reasonLabel}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
 };
 
 // --- The Processor Logic ---
@@ -202,6 +336,8 @@ export const TrainingReasonsNotMoreByAge = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractTrainingReasonsNotMoreByAgeData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const SATISFACTION_TEMPLATE = [
@@ -9,6 +11,108 @@ const SATISFACTION_TEMPLATE = [
 ];
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
+
+// --- Data Extractor for Comparison ---
+const extractTrainingSatisfactionByOrgTypeData: DataExtractor<HorizontalBarData> = (responses) => {
+  const orgSatisfactionStats = new Map<string, Map<string, number>>();
+  let totalValidResponses = 0;
+
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  responses.forEach((r) => {
+    // Filter: Only those who participated in training
+    if (norm(r.raw.participatedInTraining) !== 'yes') {
+      return;
+    }
+
+    const orgType = normalize(r.raw.organizationType ?? '');
+    if (!orgType || orgType.toLowerCase() === 'n/a') {
+      return;
+    }
+
+    const satisfaction = norm(r.raw.trainingSatisfaction ?? '');
+    // Only count explicit Yes/No
+    if (satisfaction !== 'yes' && satisfaction !== 'no') {
+      return;
+    }
+
+    totalValidResponses++;
+
+    if (!orgSatisfactionStats.has(orgType)) {
+      orgSatisfactionStats.set(orgType, new Map());
+    }
+
+    const statMap = orgSatisfactionStats.get(orgType)!;
+    const label = satisfaction === 'yes' ? 'Yes' : 'No';
+    statMap.set(label, (statMap.get(label) ?? 0) + 1);
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  orgSatisfactionStats.forEach((statMap, orgType) => {
+    statMap.forEach((count, label) => {
+      // Calculate percentage of TOTAL valid responses
+      const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+      items.push({
+        label: `${orgType}<br>${label}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
 
 // --- The Processor Logic ---
 const processTrainingSatisfactionByOrgType: ChartProcessor = (responses, palette) => {
@@ -147,6 +251,8 @@ export const TrainingSatisfactionByOrgType = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractTrainingSatisfactionByOrgTypeData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

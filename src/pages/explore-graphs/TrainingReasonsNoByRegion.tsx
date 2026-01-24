@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const TRAINING_REASONS_TEMPLATE = [
@@ -105,6 +107,117 @@ const getRegion = (country: string): string => {
   if (['australia', 'new zealand'].includes(c)) return 'Oceania';
 
   return 'Other';
+};
+
+// --- Data Extractor for Comparison ---
+const extractTrainingReasonsNoByRegionData: DataExtractor<HorizontalBarData> = (responses) => {
+  const regionReasonCounts = new Map<string, Map<string, number>>();
+  let totalValidResponses = 0;
+
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  responses.forEach((r) => {
+    const country = r.getCountryOfResidence();
+    if (!country || country.toLowerCase() === 'n/a') {
+      return;
+    }
+
+    const region = getRegion(country);
+    const participatedInTraining = norm(r.raw.participatedInTraining);
+
+    if (participatedInTraining !== 'no') {
+      return;
+    }
+
+    if (hasValidTrainingReasonAnswer(r)) {
+      totalValidResponses++;
+
+      if (!regionReasonCounts.has(region)) {
+        regionReasonCounts.set(region, new Map());
+      }
+      const reasons = regionReasonCounts.get(region)!;
+
+      TRAINING_REASONS_TEMPLATE.forEach((reasonDef) => {
+        let isReasonSelected = false;
+        if (reasonDef.key === 'trainingOtherReason') {
+          const otherValue = norm(r.raw.trainingOtherReason);
+          isReasonSelected = otherValue.length > 0 && otherValue !== 'n/a';
+        } else {
+          isReasonSelected = norm(r.raw[reasonDef.key as keyof typeof r.raw]) === 'yes';
+        }
+
+        if (isReasonSelected) {
+          reasons.set(reasonDef.label, (reasons.get(reasonDef.label) ?? 0) + 1);
+        }
+      });
+    }
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  regionReasonCounts.forEach((reasonsMap, region) => {
+    reasonsMap.forEach((count, reasonLabel) => {
+      // Calculate percentage of TOTAL valid "No-Training" population
+      const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+      items.push({
+        label: `${region}<br>${reasonLabel}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1, // Force display of all labels
+    };
+
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    // Dynamic height adjustment
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
 };
 
 // --- The Processor Logic ---
@@ -263,6 +376,8 @@ export const TrainingReasonsNoByRegion = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractTrainingReasonsNoByRegionData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };
