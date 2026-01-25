@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const DIMENSIONS_TEMPLATE = [
@@ -15,16 +17,113 @@ const DIMENSIONS_TEMPLATE = [
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
-// Check if user answered "Yes" to incorporating sustainability (Q28)
-// and provided at least one dimension or explicitly said "No" to all
+// --- Data Extractor for Comparison ---
+const sustainabilityDimensionsByRoleExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const roleStats = new Map<string, Map<string, number>>();
+  let totalEligible = 0; // Denominator: People who incorporate sustainability
+
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  responses.forEach((r) => {
+    // Precondition 1: Must incorporate sustainability
+    if (norm(r.raw.personIncorporatesSustainability) !== 'yes') {
+      return;
+    }
+
+    totalEligible++;
+
+    // Precondition 2: Valid Role
+    const role = normalize(r.raw.role ?? '');
+    if (!role || role.toLowerCase() === 'n/a') return;
+
+    if (!roleStats.has(role)) {
+      roleStats.set(role, new Map());
+    }
+    const stats = roleStats.get(role)!;
+
+    // Count Dimensions
+    DIMENSIONS_TEMPLATE.forEach((dimDef) => {
+      let isSelected = false;
+      if (dimDef.key === 'roleConsiderOther') {
+        const otherValue = norm(r.raw.roleConsiderOther);
+        isSelected = otherValue.length > 0 && otherValue !== 'n/a';
+      } else {
+        isSelected = norm(r.raw[dimDef.key as keyof typeof r.raw]) === 'yes';
+      }
+
+      if (isSelected) {
+        stats.set(dimDef.label, (stats.get(dimDef.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  roleStats.forEach((dimMap, role) => {
+    dimMap.forEach((count, dimLabel) => {
+      // Return raw count. Strategy will divide by totalEligible.
+      items.push({
+        label: `${role} - ${dimLabel}`,
+        value: count,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalEligible,
+      totalEligible: totalEligible,
+    },
+  };
+};
+
+// --- Comparison Strategy ---
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: true, // Divides raw count by totalEligible
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    // Dynamic height adjustment
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 35 + 100);
+
+    result.layout.height = dynamicHeight;
+
+    // Ensure labels are readable (Role names can be long)
+    result.layout.margin = {
+      ...(result.layout.margin || {}),
+      l: 250,
+    };
+  }
+
+  return result;
+};
+
+// --- Original Processor Logic (Kept for Single Year View) ---
 const hasValidDimensionAnswer = (r: SurveyResponse): boolean => {
   const raw = r.raw;
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
-  // Precondition: Must incorporate sustainability
   if (norm(raw.personIncorporatesSustainability) !== 'yes') return false;
 
-  // Check if any dimension is 'yes'
   if (norm(raw.roleConsiderEnvironmental) === 'yes') return true;
   if (norm(raw.roleConsiderSocial) === 'yes') return true;
   if (norm(raw.roleConsiderIndividual) === 'yes') return true;
@@ -37,7 +136,6 @@ const hasValidDimensionAnswer = (r: SurveyResponse): boolean => {
   return true;
 };
 
-// --- The Processor Logic ---
 const processSustainabilityDimensionsInTasksByRole: ChartProcessor = (responses, palette) => {
   const roleStats = new Map<string, Map<string, number>>();
   const roleEligibleTotals = new Map<string, number>();
@@ -45,18 +143,10 @@ const processSustainabilityDimensionsInTasksByRole: ChartProcessor = (responses,
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
-  // 1. Parse Data
   responses.forEach((r) => {
     const role = normalize(r.raw.role ?? '');
-
-    if (!role || role.toLowerCase() === 'n/a') {
-      return;
-    }
-
-    // Filter: Only those who incorporate sustainability
-    if (norm(r.raw.personIncorporatesSustainability) !== 'yes') {
-      return;
-    }
+    if (!role || role.toLowerCase() === 'n/a') return;
+    if (norm(r.raw.personIncorporatesSustainability) !== 'yes') return;
 
     if (!roleStats.has(role)) {
       roleStats.set(role, new Map());
@@ -64,10 +154,8 @@ const processSustainabilityDimensionsInTasksByRole: ChartProcessor = (responses,
       roleAnsweredTotals.set(role, 0);
     }
 
-    // Eligible (Denominator - everyone who said "Yes" to Q28 in this role)
     roleEligibleTotals.set(role, (roleEligibleTotals.get(role) ?? 0) + 1);
 
-    // Answered (Numerator) & Dimensions
     if (hasValidDimensionAnswer(r)) {
       roleAnsweredTotals.set(role, (roleAnsweredTotals.get(role) ?? 0) + 1);
       const stats = roleStats.get(role)!;
@@ -88,7 +176,6 @@ const processSustainabilityDimensionsInTasksByRole: ChartProcessor = (responses,
     }
   });
 
-  // 2. Sort & Filter (Sort by total eligible count)
   const sortedRoles = Array.from(roleEligibleTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map(([role]) => role);
@@ -96,7 +183,6 @@ const processSustainabilityDimensionsInTasksByRole: ChartProcessor = (responses,
   const totalEligible = Array.from(roleEligibleTotals.values()).reduce((a, b) => a + b, 0);
   const totalAnswered = Array.from(roleAnsweredTotals.values()).reduce((a, b) => a + b, 0);
 
-  // 3. Define Colors
   const dimColors: Record<string, string> = {
     Environmental: palette.spring,
     Social: palette.mandarin,
@@ -106,7 +192,6 @@ const processSustainabilityDimensionsInTasksByRole: ChartProcessor = (responses,
     Other: palette.grey,
   };
 
-  // 4. Build Traces
   const traces: Data[] = DIMENSIONS_TEMPLATE.map((dimDef) => {
     const label = dimDef.label;
     const xValues = sortedRoles.map((role) => roleStats.get(role)?.get(label) ?? 0);
@@ -128,7 +213,7 @@ const processSustainabilityDimensionsInTasksByRole: ChartProcessor = (responses,
         size: 13,
         color: '#FFFFFF',
       },
-      hoverinfo: 'x+y+name',
+      hovertemplate: '%{x} responses<extra></extra>',
     };
   });
 
@@ -153,7 +238,7 @@ export const SustainabilityDimensionsInTasksByRole = ({
     () => ({
       barmode: 'stack',
       bargap: 0.15,
-      margin: { t: 40, r: 20, b: 60, l: 200 }, // Left margin for Roles
+      margin: { t: 40, r: 20, b: 60, l: 200 },
       uniformtext: { mode: 'show', minsize: 10 },
       xaxis: {
         title: { text: 'Number of Respondents' },
@@ -184,6 +269,8 @@ export const SustainabilityDimensionsInTasksByRole = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={sustainabilityDimensionsByRoleExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };
