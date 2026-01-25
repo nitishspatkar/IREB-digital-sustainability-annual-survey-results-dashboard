@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -13,6 +15,126 @@ const DRIVER_COLUMNS = [
   { key: 'driveLegalRequirements', label: 'Legal reqs' },
 ] as const;
 
+// --- Data Extractor for Comparison ---
+const driversByOrgTypeExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const orgStats = new Map<string, { totalInGroup: number; drivers: Map<string, number> }>();
+  let totalResponses = 0;
+  let eligiblePopulation = 0;
+
+  responses.forEach((r) => {
+    // Precondition 1: Must incorporate sustainability
+    const incorporates = normalize(r.raw.personIncorporatesSustainability ?? '').toLowerCase();
+    if (incorporates === 'yes') {
+      eligiblePopulation++;
+    } else {
+      return;
+    }
+
+    // Precondition 2: Valid Org Type
+    const rawOrgType = r.raw.organizationType ?? '';
+    if (!rawOrgType || rawOrgType.toLowerCase() === 'n/a') return;
+
+    // Precondition 3: Has Answer
+    let hasAnswer = false;
+    for (const col of DRIVER_COLUMNS) {
+      const val = normalize(r.raw[col.key as keyof typeof r.raw] ?? '').toLowerCase();
+      if (val === 'yes' || val === 'no') {
+        hasAnswer = true;
+        break;
+      }
+    }
+    if (!hasAnswer) {
+      const otherVal = normalize(r.raw.driveOther ?? '');
+      if (otherVal.length > 0 && otherVal !== 'n/a') hasAnswer = true;
+    }
+
+    if (!hasAnswer) return;
+
+    // Process Record
+    const orgType = normalize(rawOrgType);
+
+    if (!orgStats.has(orgType)) {
+      orgStats.set(orgType, { totalInGroup: 0, drivers: new Map() });
+      DRIVER_COLUMNS.forEach((d) => {
+        orgStats.get(orgType)!.drivers.set(d.label, 0);
+      });
+    }
+
+    const stats = orgStats.get(orgType)!;
+    stats.totalInGroup++;
+    totalResponses++;
+
+    DRIVER_COLUMNS.forEach((d) => {
+      if (normalize(r.raw[d.key as keyof typeof r.raw] ?? '').toLowerCase() === 'yes') {
+        stats.drivers.set(d.label, (stats.drivers.get(d.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  orgStats.forEach((stats, orgType) => {
+    if (stats.totalInGroup === 0) return;
+
+    stats.drivers.forEach((count, driverLabel) => {
+      // CHANGE: Push raw count here.
+      // The Strategy will divide this by totalResponses (55) to get your expected %.
+      items.push({
+        label: `${orgType}<br>${driverLabel}`,
+        value: count,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalResponses,
+      totalEligible: eligiblePopulation,
+    },
+  };
+};
+
+// --- Comparison Strategy ---
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: true, // CHANGE: Set to true to divide by Total Responses (55)
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    // Dynamic height adjustment based on number of items
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+
+    result.layout.height = dynamicHeight;
+
+    // Ensure labels are readable
+    result.layout.margin = {
+      ...(result.layout.margin || {}),
+      l: 250,
+    };
+  }
+
+  return result;
+};
+
+// --- Main Component ---
 export const DriversToIncorporateSustainabilityByOrgType = ({
   onBack,
   showBackButton = true,
@@ -26,12 +148,9 @@ export const DriversToIncorporateSustainabilityByOrgType = ({
       const orgStats = new Map<string, { totalInGroup: number; drivers: Map<string, number> }>();
 
       let totalResponses = 0;
-      // We need to count the eligible base population to calculate a correct response rate relative to the parent chart logic
-      // Parent chart base: PersonIncorporatesSustainability == 'Yes'
       let eligiblePopulation = 0;
 
       responses.forEach((r) => {
-        // Precondition 1: Must incorporate sustainability (Same base as parent chart)
         const incorporates = normalize(r.raw.personIncorporatesSustainability ?? '').toLowerCase();
 
         if (incorporates === 'yes') {
@@ -40,14 +159,11 @@ export const DriversToIncorporateSustainabilityByOrgType = ({
           return;
         }
 
-        // Precondition 2: Must have a valid Org Type
         const rawOrgType = r.raw.organizationType ?? '';
         if (!rawOrgType || rawOrgType.toLowerCase() === 'n/a') return;
 
-        // Precondition 3: Must have answered the driver question block (at least one Yes/No or Other)
         let hasAnswer = false;
 
-        // Check standard columns
         for (const col of DRIVER_COLUMNS) {
           const val = normalize(r.raw[col.key as keyof typeof r.raw] ?? '').toLowerCase();
           if (val === 'yes' || val === 'no') {
@@ -55,7 +171,6 @@ export const DriversToIncorporateSustainabilityByOrgType = ({
             break;
           }
         }
-        // Check Other
         if (!hasAnswer) {
           const otherVal = normalize(r.raw.driveOther ?? '');
           if (otherVal.length > 0 && otherVal !== 'n/a') {
@@ -65,7 +180,6 @@ export const DriversToIncorporateSustainabilityByOrgType = ({
 
         if (!hasAnswer) return;
 
-        // Process Record
         const orgType = normalize(rawOrgType);
 
         if (!orgStats.has(orgType)) {
@@ -79,7 +193,6 @@ export const DriversToIncorporateSustainabilityByOrgType = ({
         stats.totalInGroup++;
         totalResponses++;
 
-        // Count each driver (Yes only)
         DRIVER_COLUMNS.forEach((d) => {
           if (normalize(r.raw[d.key as keyof typeof r.raw] ?? '').toLowerCase() === 'yes') {
             stats.drivers.set(d.label, (stats.drivers.get(d.label) ?? 0) + 1);
@@ -87,12 +200,10 @@ export const DriversToIncorporateSustainabilityByOrgType = ({
         });
       });
 
-      // Sort Org Types by total count (descending)
       const sortedOrgTypes = Array.from(orgStats.keys()).sort((a, b) => {
         return orgStats.get(a)!.totalInGroup - orgStats.get(b)!.totalInGroup;
       });
 
-      // Build traces
       const traces: Data[] = DRIVER_COLUMNS.map((driver, index) => {
         const yValues = sortedOrgTypes;
         const xValues = sortedOrgTypes.map((orgType) => {
@@ -132,7 +243,7 @@ export const DriversToIncorporateSustainabilityByOrgType = ({
         traces,
         stats: {
           numberOfResponses: totalResponses,
-          totalEligible: eligiblePopulation, // Set the base population correctly
+          totalEligible: eligiblePopulation,
         },
       };
     },
@@ -171,6 +282,8 @@ export const DriversToIncorporateSustainabilityByOrgType = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={driversByOrgTypeExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };
