@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const DIMENSIONS_TEMPLATE = [
@@ -80,11 +82,11 @@ const getRegion = (country: string): string => {
   return 'Other';
 };
 
+const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
 // Check if user answered "Yes" to incorporating sustainability (Q28)
-// and provided at least one dimension or explicitly said "No" to all (though the latter is rare if Q28 is Yes)
 const hasValidDimensionAnswer = (r: SurveyResponse): boolean => {
   const raw = r.raw;
-  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
   // Precondition: Must incorporate sustainability
   if (norm(raw.personIncorporatesSustainability) !== 'yes') return false;
@@ -99,18 +101,118 @@ const hasValidDimensionAnswer = (r: SurveyResponse): boolean => {
   const oVal = norm(raw.roleConsiderOther);
   if (oVal.length > 0 && oVal !== 'n/a') return true;
 
-  // Case where they said Yes to Q28 but didn't check any specific boxes (or checked 'no' for all if that was an option)
-  // We consider this valid "Answered" but with 0 counts for dimensions.
   return true;
 };
 
-// --- The Processor Logic ---
+// --- Data Extractor for Comparison ---
+const sustainabilityDimensionsByRegionExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  const regionStats = new Map<string, Map<string, number>>();
+  let totalResponses = 0; // Count of people who incorporate sustainability (Eligible)
+
+  responses.forEach((r) => {
+    // 1. Filter: Only those who incorporate sustainability
+    if (norm(r.raw.personIncorporatesSustainability) !== 'yes') {
+      return;
+    }
+
+    // 2. Filter: Must have a valid region
+    const country = r.getCountryOfResidence();
+    if (!country || country.toLowerCase() === 'n/a') {
+      return;
+    }
+    const region = getRegion(country);
+
+    // 3. Filter: Must have answered the dimensions block
+    if (!hasValidDimensionAnswer(r)) return;
+
+    totalResponses++;
+
+    if (!regionStats.has(region)) {
+      regionStats.set(region, new Map());
+    }
+    const stats = regionStats.get(region)!;
+
+    // 4. Count Dimensions
+    DIMENSIONS_TEMPLATE.forEach((dimDef) => {
+      let isSelected = false;
+      if (dimDef.key === 'roleConsiderOther') {
+        const otherValue = norm(r.raw.roleConsiderOther);
+        isSelected = otherValue.length > 0 && otherValue !== 'n/a';
+      } else {
+        isSelected = norm(r.raw[dimDef.key as keyof typeof r.raw]) === 'yes';
+      }
+
+      if (isSelected) {
+        stats.set(dimDef.label, (stats.get(dimDef.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  regionStats.forEach((dimMap, region) => {
+    dimMap.forEach((count, dimLabel) => {
+      // Push RAW count. The Strategy will divide by totalResponses.
+      items.push({
+        label: `${region} - ${dimLabel}`,
+        value: count,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalResponses,
+      totalEligible: totalResponses,
+    },
+  };
+};
+
+// --- Comparison Strategy ---
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: true, // Divides raw count by Total Eligible Responses
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    // Dynamic height: Regions (approx 8) * Dimensions (6) = ~48 potential rows
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(600, itemCount * 30 + 100);
+
+    result.layout.height = dynamicHeight;
+
+    // Extra margin for "Region - Dimension" labels
+    result.layout.margin = {
+      ...(result.layout.margin || {}),
+      l: 250,
+    };
+  }
+
+  return result;
+};
+
+// --- The Processor Logic (Standard View) ---
 const processSustainabilityDimensionsInTasksByRegion: ChartProcessor = (responses, palette) => {
   const regionStats = new Map<string, Map<string, number>>();
   const regionEligibleTotals = new Map<string, number>();
   const regionAnsweredTotals = new Map<string, number>();
-
-  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
   // 1. Parse Data
   responses.forEach((r) => {
@@ -252,6 +354,8 @@ export const SustainabilityDimensionsInTasksByRegion = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={sustainabilityDimensionsByRegionExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };
