@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyRecord } from '../../data/data-parsing-logic/SurveyCsvParser';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const HINDRANCES = [
   { key: 'hindranceLackInterest', label: 'Lack of personal interest' },
@@ -22,9 +24,7 @@ const normalize = (value: string | undefined | null) =>
   (value ?? '').replace(/\s+/g, ' ').trim().toLowerCase();
 
 const getAgeGroup = (raw: SurveyRecord) => {
-  const age = (raw.ageGroup ?? '').trim(); // Don't normalize completely to preserve case matching with AGE_GROUPS if needed, but here we check strictly.
-  // Actually the raw data usually matches the labels exactly or needs simple trim.
-  // Let's use exact match or normalized check.
+  const age = (raw.ageGroup ?? '').trim();
   const normAge = normalize(age);
   if (normAge === '18 - 28') return '18 - 28';
   if (normAge === '29 - 44') return '29 - 44';
@@ -32,6 +32,119 @@ const getAgeGroup = (raw: SurveyRecord) => {
   if (normAge === 'above 60') return 'Above 60';
   return null;
 };
+
+// --- Comparison Strategy & Data Extractor ---
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+const extractHindrancesToIncorporateSustainabilityByAgeData: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
+  const statsMap = new Map<string, Map<string, number>>();
+  const groupTotals = new Map<string, number>();
+  let totalValidResponses = 0;
+
+  AGE_GROUPS.forEach((g) => {
+    const map = new Map<string, number>();
+    HINDRANCES.forEach((h) => map.set(h.label, 0));
+    statsMap.set(g, map);
+    groupTotals.set(g, 0);
+  });
+
+  // 1. Filter: Q28 = No
+  const filteredResponses = responses.filter(
+    (r) => normalize(r.raw.personIncorporatesSustainability) === 'no'
+  );
+
+  totalValidResponses = filteredResponses.length;
+
+  filteredResponses.forEach((r) => {
+    const group = getAgeGroup(r.raw);
+    if (!group || !statsMap.has(group)) return;
+
+    groupTotals.set(group, (groupTotals.get(group) ?? 0) + 1);
+    const stats = statsMap.get(group)!;
+
+    HINDRANCES.forEach((h) => {
+      let isSelected = false;
+      if (h.key === 'hindranceOther') {
+        const val = normalize(r.raw.hindranceOther);
+        isSelected = val === 'yes' || (val.length > 0 && val !== 'n/a');
+      } else {
+        isSelected = normalize(r.raw[h.key as keyof SurveyRecord]) === 'yes';
+      }
+
+      if (isSelected) {
+        stats.set(h.label, (stats.get(h.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  statsMap.forEach((stats, group) => {
+    if ((groupTotals.get(group) ?? 0) > 0) {
+      stats.forEach((count, hindranceLabel) => {
+        // Calculate percentage relative to TOTAL valid responses (subset Q28=No)
+        const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+        items.push({
+          label: `${group}<br>${hindranceLabel}`,
+          value: pct,
+        });
+      });
+    }
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+// --- Processor (Single Year) ---
 
 const processData: ChartProcessor = (responses, palette) => {
   // 1. Filter: Q28 = No
@@ -74,8 +187,6 @@ const processData: ChartProcessor = (responses, palette) => {
   });
 
   const activeGroups = AGE_GROUPS.filter((g) => (groupTotals.get(g) ?? 0) > 0);
-  // Sort age groups naturally (they are already sorted in array, so just keep them?)
-  // Usually age groups should remain in chronological order.
 
   const colors = [
     palette.berry,
@@ -164,6 +275,8 @@ export const HindrancesToIncorporateSustainabilityByAge = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractHindrancesToIncorporateSustainabilityByAgeData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

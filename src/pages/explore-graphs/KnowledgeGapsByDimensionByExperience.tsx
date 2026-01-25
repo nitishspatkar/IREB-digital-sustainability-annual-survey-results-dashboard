@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const DIMENSIONS_TEMPLATE = [
@@ -26,7 +28,6 @@ const hasValidDimensionAnswer = (r: SurveyResponse): boolean => {
   if (norm(raw.lackKnowledgeTechnical) === 'yes') return true;
   if (norm(raw.lackKnowledgeNone) === 'yes') return true;
 
-  // Also count as valid if all are explicitly 'no' (matching main graph logic)
   if (
     norm(raw.lackKnowledgeEnvironmental) === 'no' &&
     norm(raw.lackKnowledgeSocial) === 'no' &&
@@ -44,18 +45,147 @@ const hasValidDimensionAnswer = (r: SurveyResponse): boolean => {
   return false;
 };
 
-// --- The Processor Logic ---
-const processKnowledgeGapsByDimensionByExperience: ChartProcessor = (responses, palette) => {
+const sortExperience = (aLabel: string, bLabel: string) => {
+  const aMatch = aLabel.match(/^(\d+)/);
+  const bMatch = bLabel.match(/^(\d+)/);
+
+  if (aLabel.startsWith('Less than')) return -1;
+  if (bLabel.startsWith('Less than')) return 1;
+  if (aLabel.startsWith('More than')) return 1;
+  if (bLabel.startsWith('More than')) return -1;
+  if (aMatch && bMatch) return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
+  return aLabel.localeCompare(bLabel);
+};
+
+// --- Comparison Strategy & Data Extractor ---
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+const extractKnowledgeGapsByDimensionByExperienceData: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
   const groupStats = new Map<string, Map<string, number>>();
-  const groupEligibleTotals = new Map<string, number>();
-  const groupAnsweredTotals = new Map<string, number>();
+  const groupTotals = new Map<string, number>();
+  let totalValidResponses = 0; // Global denominator
 
   const norm = (v: string) => v?.trim().toLowerCase() ?? '';
 
-  // 1. Parse Data
+  // First pass: Calculate global denominator (total valid responses across all groups)
   responses.forEach((r) => {
+    if (hasValidDimensionAnswer(r)) {
+      totalValidResponses++;
+    }
+  });
+
+  // Second pass: Populate groups
+  responses.forEach((r) => {
+    // Only process if valid answer (to be consistent with denominator population)
+    if (!hasValidDimensionAnswer(r)) return;
+
     let exp = normalize(r.raw.professionalExperienceYears ?? '');
-    // Normalize experience labels (remove " years")
+    exp = exp.replace(' years', '').trim();
+
+    if (!exp || exp.toLowerCase() === 'n/a' || exp === '') return;
+
+    if (!groupStats.has(exp)) {
+      groupStats.set(exp, new Map());
+      groupTotals.set(exp, 0);
+    }
+
+    groupTotals.set(exp, (groupTotals.get(exp) ?? 0) + 1);
+
+    const stats = groupStats.get(exp)!;
+    DIMENSIONS_TEMPLATE.forEach((dimDef) => {
+      const isSelected = norm(r.raw[dimDef.key as keyof typeof r.raw]) === 'yes';
+      if (isSelected) {
+        stats.set(dimDef.label, (stats.get(dimDef.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  groupStats.forEach((stats, exp) => {
+    // Note: totalInGroup is unused for pct calc here, we use totalValidResponses
+    stats.forEach((count, dimLabel) => {
+      // Percentage = (Count in Group / Total Global Valid Responses) * 100
+      const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+      items.push({
+        label: `${exp}<br>${dimLabel}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+// --- The Processor Logic ---
+const processKnowledgeGapsByDimensionByExperience: ChartProcessor = (responses, palette) => {
+  const groupStats = new Map<string, Map<string, number>>();
+  const groupTotals = new Map<string, number>(); // Used for sorting mostly
+  let totalValidResponses = 0; // Global denominator
+
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  // 1. Calculate Global Denominator
+  responses.forEach((r) => {
+    if (hasValidDimensionAnswer(r)) {
+      totalValidResponses++;
+    }
+  });
+
+  // 2. Parse Data
+  responses.forEach((r) => {
+    if (!hasValidDimensionAnswer(r)) return;
+
+    let exp = normalize(r.raw.professionalExperienceYears ?? '');
     exp = exp.replace(' years', '').trim();
 
     if (!exp || exp.toLowerCase() === 'n/a' || exp === '') {
@@ -64,46 +194,24 @@ const processKnowledgeGapsByDimensionByExperience: ChartProcessor = (responses, 
 
     if (!groupStats.has(exp)) {
       groupStats.set(exp, new Map());
-      groupEligibleTotals.set(exp, 0);
-      groupAnsweredTotals.set(exp, 0);
+      groupTotals.set(exp, 0);
     }
 
-    // Eligible
-    groupEligibleTotals.set(exp, (groupEligibleTotals.get(exp) ?? 0) + 1);
+    groupTotals.set(exp, (groupTotals.get(exp) ?? 0) + 1);
+    const stats = groupStats.get(exp)!;
 
-    // Answered
-    if (hasValidDimensionAnswer(r)) {
-      groupAnsweredTotals.set(exp, (groupAnsweredTotals.get(exp) ?? 0) + 1);
-      const stats = groupStats.get(exp)!;
-
-      DIMENSIONS_TEMPLATE.forEach((dimDef) => {
-        const isSelected = norm(r.raw[dimDef.key as keyof typeof r.raw]) === 'yes';
-        if (isSelected) {
-          stats.set(dimDef.label, (stats.get(dimDef.label) ?? 0) + 1);
-        }
-      });
-    }
+    DIMENSIONS_TEMPLATE.forEach((dimDef) => {
+      const isSelected = norm(r.raw[dimDef.key as keyof typeof r.raw]) === 'yes';
+      if (isSelected) {
+        stats.set(dimDef.label, (stats.get(dimDef.label) ?? 0) + 1);
+      }
+    });
   });
 
-  // 2. Sort Groups (Lowest to Highest, which Plotly renders as Bottom to Top)
-  const sortedGroups = Array.from(groupEligibleTotals.keys()).sort((a, b) => {
-    const aLabel = a;
-    const bLabel = b;
-    const aMatch = aLabel.match(/^(\d+)/);
-    const bMatch = bLabel.match(/^(\d+)/);
+  // 3. Sort Groups
+  const sortedGroups = Array.from(groupTotals.keys()).sort((a, b) => sortExperience(a, b));
 
-    if (aLabel.startsWith('Less than')) return -1;
-    if (bLabel.startsWith('Less than')) return 1;
-    if (aLabel.startsWith('More than')) return 1;
-    if (bLabel.startsWith('More than')) return -1;
-    if (aMatch && bMatch) return parseInt(aMatch[1], 10) - parseInt(bMatch[1], 10);
-    return aLabel.localeCompare(bLabel);
-  });
-
-  const totalEligible = Array.from(groupEligibleTotals.values()).reduce((a, b) => a + b, 0);
-  const totalAnswered = Array.from(groupAnsweredTotals.values()).reduce((a, b) => a + b, 0);
-
-  // 3. Define Colors
+  // 4. Define Colors
   const dimColors: Record<string, string> = {
     Environmental: palette.spring,
     Social: palette.mandarin,
@@ -113,7 +221,7 @@ const processKnowledgeGapsByDimensionByExperience: ChartProcessor = (responses, 
     'Sufficient resources': palette.grey,
   };
 
-  // 4. Build Traces
+  // 5. Build Traces
   const traces: Data[] = DIMENSIONS_TEMPLATE.map((dimDef) => {
     const label = dimDef.label;
     const xValues = sortedGroups.map((g) => groupStats.get(g)?.get(label) ?? 0);
@@ -141,8 +249,8 @@ const processKnowledgeGapsByDimensionByExperience: ChartProcessor = (responses, 
 
   return {
     stats: {
-      numberOfResponses: totalAnswered,
-      totalEligible: totalEligible,
+      numberOfResponses: totalValidResponses,
+      totalEligible: totalValidResponses,
     },
     traces: traces,
   };
@@ -191,6 +299,8 @@ export const KnowledgeGapsByDimensionByExperience = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractKnowledgeGapsByDimensionByExperienceData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

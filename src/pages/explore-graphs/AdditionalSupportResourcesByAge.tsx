@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants ---
 const SUPPORT_TYPES = [
@@ -34,12 +36,125 @@ const hasValidSupportAnswer = (r: SurveyResponse): boolean => {
   return false;
 };
 
+// --- Comparison Strategy & Data Extractor ---
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+const extractAdditionalSupportResourcesByAgeData: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
+  const groupStats = new Map<string, Map<string, number>>();
+  const groupAnsweredTotals = new Map<string, number>();
+  let totalValidResponses = 0; // Total count of respondents who answered (Global Denominator)
+
+  // 1. Calculate Global Denominator
+  responses.forEach((r) => {
+    if (hasValidSupportAnswer(r)) {
+      totalValidResponses++;
+    }
+  });
+
+  // 2. Parse Data
+  responses.forEach((r) => {
+    if (!hasValidSupportAnswer(r)) return;
+
+    let age = normalize(r.raw.ageGroup ?? '');
+    age = age.replace(' years', '').trim();
+
+    if (!age || age === 'n/a' || age === '') return;
+
+    if (!groupStats.has(age)) {
+      groupStats.set(age, new Map());
+      groupAnsweredTotals.set(age, 0);
+    }
+
+    groupAnsweredTotals.set(age, (groupAnsweredTotals.get(age) ?? 0) + 1);
+    const stats = groupStats.get(age)!;
+
+    SUPPORT_TYPES.forEach((t) => {
+      if (normalize(r.raw[t.key as keyof typeof r.raw]) === 'yes') {
+        stats.set(t.label, (stats.get(t.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  groupStats.forEach((stats, age) => {
+    stats.forEach((count, label) => {
+      // Percentage relative to TOTAL valid responses (Global Denominator)
+      const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+      items.push({
+        label: `${age}<br>${label}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+// --- The Processor Logic ---
 const processAdditionalSupportByAge: ChartProcessor = (responses, palette) => {
   const groupStats = new Map<string, Map<string, number>>();
   const groupEligibleTotals = new Map<string, number>();
   const groupAnsweredTotals = new Map<string, number>();
+  let totalValidResponses = 0; // Global denominator
 
-  // Initialize
+  // 1. Calculate Global Denominator
+  responses.forEach((r) => {
+    if (hasValidSupportAnswer(r)) {
+      totalValidResponses++;
+    }
+  });
+
+  // 2. Initialize & Parse
   responses.forEach((r) => {
     let age = normalize(r.raw.ageGroup ?? '');
     age = age.replace(' years', '').trim();
@@ -67,9 +182,6 @@ const processAdditionalSupportByAge: ChartProcessor = (responses, palette) => {
   });
 
   // Sort groups.
-  // For horizontal bar charts, Plotly renders the first item at the bottom.
-  // We want the youngest ('18-28') at the TOP usually, or at the bottom if following x-axis logic.
-  // Let's reverse the standard order so '18-28' (index 0 in AGE_ORDER) is last in the array, thus rendered at the top.
   const sortedGroups = Array.from(groupEligibleTotals.keys())
     .sort((a, b) => {
       const idxA = AGE_ORDER.indexOf(a);
@@ -97,10 +209,9 @@ const processAdditionalSupportByAge: ChartProcessor = (responses, palette) => {
   const traces: Data[] = SUPPORT_TYPES.map((t, index) => {
     const values = sortedGroups.map((g) => groupStats.get(g)?.get(t.label) ?? 0);
 
-    // Calculate percentages for tooltip
-    const totalInGroup = sortedGroups.map((g) => groupAnsweredTotals.get(g) ?? 0);
-    const percentages = values.map((val, i) =>
-      totalInGroup[i] > 0 ? ((val / totalInGroup[i]) * 100).toFixed(1) + '%' : '0%'
+    // Calculate percentages relative to TOTAL valid responses (Global Denominator)
+    const percentages = values.map((val) =>
+      totalValidResponses > 0 ? ((val / totalValidResponses) * 100).toFixed(1) + '%' : '0%'
     );
 
     return {
@@ -120,7 +231,7 @@ const processAdditionalSupportByAge: ChartProcessor = (responses, palette) => {
       },
       textangle: 0,
       constraintext: 'none',
-      hovertemplate: `<b>${t.label}</b><br>Count: %{y}<br>Share in Age Group: %{customdata}<extra></extra>`,
+      hovertemplate: `<b>${t.label}</b><br>Count: %{y}<br>Share of Total: %{customdata}<extra></extra>`,
       customdata: percentages,
     };
   });
@@ -169,6 +280,8 @@ export const AdditionalSupportResourcesByAge = ({ onBack }: { onBack: () => void
       layout={layout}
       isEmbedded={true}
       onBack={onBack}
+      dataExtractor={extractAdditionalSupportResourcesByAgeData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

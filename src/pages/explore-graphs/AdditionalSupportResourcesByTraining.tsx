@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants ---
 const SUPPORT_TYPES = [
@@ -32,6 +34,107 @@ const hasValidSupportAnswer = (r: SurveyResponse): boolean => {
   return false;
 };
 
+// --- Comparison Strategy & Data Extractor ---
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+const extractAdditionalSupportResourcesByTrainingData: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
+  const statsMap = new Map<string, Map<string, number>>();
+  const totalsMap = new Map<string, number>();
+  const categories = ['With training', 'Without training'];
+
+  categories.forEach((cat) => {
+    statsMap.set(cat, new Map());
+    totalsMap.set(cat, 0);
+  });
+
+  // Parse Data
+  responses.forEach((r) => {
+    const trainingAnswer = normalize(r.raw.participatedInTraining);
+    if (trainingAnswer !== 'yes' && trainingAnswer !== 'no') return;
+    if (!hasValidSupportAnswer(r)) return;
+
+    const category = trainingAnswer === 'yes' ? 'With training' : 'Without training';
+
+    // Increment Group Total (Denominator)
+    totalsMap.set(category, (totalsMap.get(category) ?? 0) + 1);
+
+    const catStats = statsMap.get(category)!;
+
+    SUPPORT_TYPES.forEach((t) => {
+      const val = normalize(r.raw[t.key as keyof typeof r.raw]);
+      if (val === 'yes') {
+        catStats.set(t.label, (catStats.get(t.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  statsMap.forEach((stats, category) => {
+    const totalInGroup = totalsMap.get(category) ?? 0;
+    stats.forEach((count, label) => {
+      // Percentage relative to GROUP total
+      const pct = totalInGroup > 0 ? (count / totalInGroup) * 100 : 0;
+      items.push({
+        label: `${category}<br>${label}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: Array.from(totalsMap.values()).reduce((a, b) => a + b, 0),
+    },
+  };
+};
+
+// --- The Processor Logic ---
 const processAdditionalSupportByTraining: ChartProcessor = (responses, palette) => {
   let trainedCount = 0;
   let untrainedCount = 0;
@@ -150,6 +253,8 @@ export const AdditionalSupportResourcesByTraining = ({ onBack }: { onBack: () =>
       layout={layout}
       isEmbedded={true}
       onBack={onBack}
+      dataExtractor={extractAdditionalSupportResourcesByTrainingData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

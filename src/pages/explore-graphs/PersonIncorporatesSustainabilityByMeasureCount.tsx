@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
 
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
 
@@ -14,6 +16,146 @@ const MEASURE_COLUMNS = [
   'organizationOffersTraining',
 ] as const;
 
+// --- Logic Helpers ---
+
+const getCategory = (raw: any): string | null => {
+  const incPractices = normalize(
+    raw.organizationIncorporatesSustainablePractices ?? ''
+  ).toLowerCase();
+
+  if (incPractices === 'no') return 'No sustainability';
+  if (incPractices === 'not sure') return 'Unclear communication';
+
+  // For others (likely 'yes'), count the specific measures
+  let count = 0;
+  for (const col of MEASURE_COLUMNS) {
+    const val = normalize(raw[col] ?? '').toLowerCase();
+    if (val === 'yes') {
+      count++;
+    }
+  }
+
+  if (count === 1) return 'One measure';
+  if (count === 2) return 'Two measures';
+  if (count === 3) return 'Three measures';
+  if (count >= 4) return 'Four measures';
+
+  return null;
+};
+
+const sortOrder = [
+  'No sustainability',
+  'Unclear communication',
+  'One measure',
+  'Two measures',
+  'Three measures',
+  'Four measures',
+];
+
+// --- Comparison Strategy & Data Extractor ---
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+const extractPersonIncorporatesSustainabilityByMeasureCountData: DataExtractor<
+  HorizontalBarData
+> = (responses) => {
+  const dataMap = new Map<string, { yes: number; no: number; total: number }>();
+
+  responses.forEach((r) => {
+    const category = getCategory(r.raw);
+    const incorporates = normalize(r.raw.personIncorporatesSustainability ?? '').toLowerCase();
+
+    if (!category) return;
+    if (incorporates !== 'yes' && incorporates !== 'no') return;
+
+    if (!dataMap.has(category)) {
+      dataMap.set(category, { yes: 0, no: 0, total: 0 });
+    }
+
+    const entry = dataMap.get(category)!;
+    entry.total++;
+
+    if (incorporates === 'yes') {
+      entry.yes++;
+    } else if (incorporates === 'no') {
+      entry.no++;
+    }
+  });
+
+  const sortedCategories = sortOrder.filter((cat) => dataMap.has(cat));
+
+  const items: { label: string; value: number }[] = [];
+  const globalTotal = sortedCategories.reduce(
+    (acc, cat) => acc + (dataMap.get(cat)?.total ?? 0),
+    0
+  );
+
+  sortedCategories.forEach((category) => {
+    const stats = dataMap.get(category)!;
+    const yesPct = globalTotal > 0 ? (stats.yes / globalTotal) * 100 : 0;
+    const noPct = globalTotal > 0 ? (stats.no / globalTotal) * 100 : 0;
+
+    items.push({
+      label: `${category}<br>Yes`,
+      value: yesPct,
+    });
+    items.push({
+      label: `${category}<br>No`,
+      value: noPct,
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: globalTotal,
+    },
+  };
+};
+
+// --- Component ---
+
 export const PersonIncorporatesSustainabilityByMeasureCount = ({
   onBack,
   showBackButton = true,
@@ -25,54 +167,17 @@ export const PersonIncorporatesSustainabilityByMeasureCount = ({
     () => (responses, palette) => {
       const dataMap = new Map<string, { yes: number; no: number; total: number }>();
 
-      // Pre-fill categories to ensure they all exist even if 0 count (optional, but good for consistent order)
-      const sortOrder = [
-        'No sustainability',
-        'Unclear communication',
-        'One measure',
-        'Two measures',
-        'Three measures',
-        'Four measures',
-      ];
-
+      // Pre-fill categories to ensure they all exist even if 0 count
       sortOrder.forEach((cat) => dataMap.set(cat, { yes: 0, no: 0, total: 0 }));
 
       responses.forEach((r) => {
-        // --- 1. Determine Category ---
-        let category: string | null = null;
-        const incPractices = normalize(
-          r.raw.organizationIncorporatesSustainablePractices ?? ''
-        ).toLowerCase();
-
-        if (incPractices === 'no') {
-          category = 'No sustainability';
-        } else if (incPractices === 'not sure') {
-          category = 'Unclear communication';
-        } else {
-          // For others (likely 'yes'), count the specific measures
-          let count = 0;
-          for (const col of MEASURE_COLUMNS) {
-            const val = normalize(r.raw[col] ?? '').toLowerCase();
-            if (val === 'yes') {
-              count++;
-            }
-          }
-
-          if (count === 1) category = 'One measure';
-          else if (count === 2) category = 'Two measures';
-          else if (count === 3) category = 'Three measures';
-          else if (count >= 4) category = 'Four measures';
-        }
+        const category = getCategory(r.raw);
+        const incorporates = normalize(r.raw.personIncorporatesSustainability ?? '').toLowerCase();
 
         if (!category) return;
-
-        // --- 2. Determine Yes/No ---
-        const incorporates = normalize(r.raw.personIncorporatesSustainability ?? '').toLowerCase();
         if (incorporates !== 'yes' && incorporates !== 'no') return;
 
-        // --- 3. Update Stats ---
         if (!dataMap.has(category)) {
-          // Should be pre-filled, but just in case logic changes
           dataMap.set(category, { yes: 0, no: 0, total: 0 });
         }
 
@@ -84,7 +189,6 @@ export const PersonIncorporatesSustainabilityByMeasureCount = ({
 
       // Prepare data for plotting
       // We reverse the order for horizontal bars so the first item ('No sustainability') appears at the top
-      // Plotly plots Y-axis from bottom (0) to top.
       const plotCategories = [...sortOrder].reverse();
 
       const yesValues = plotCategories.map((cat) => dataMap.get(cat)?.yes ?? 0);
@@ -181,6 +285,8 @@ export const PersonIncorporatesSustainabilityByMeasureCount = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractPersonIncorporatesSustainabilityByMeasureCountData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

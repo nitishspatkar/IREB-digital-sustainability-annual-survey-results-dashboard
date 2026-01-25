@@ -66,6 +66,7 @@ const extractPersonIncorporatesSustainabilityByOrgGoalsData: DataExtractor<Horiz
 const baseComparisonStrategy = createDumbbellComparisonStrategy({
   normalizeToPercentage: false,
   formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
 });
 
 const comparisonStrategy: typeof baseComparisonStrategy = (
@@ -157,7 +158,7 @@ const processPersonIncorporatesSustainabilityByOrgGoals: ChartProcessor = (respo
       textposition: 'inside',
       insidetextanchor: 'middle',
       textfont: { family: 'PP Mori, sans-serif', size: 13, color: '#FFFFFF' },
-      hoverinfo: 'name',
+      hoverinfo: 'name' as const,
     },
     {
       x: categories,
@@ -169,7 +170,7 @@ const processPersonIncorporatesSustainabilityByOrgGoals: ChartProcessor = (respo
       textposition: 'inside',
       insidetextanchor: 'middle',
       textfont: { family: 'PP Mori, sans-serif', size: 13, color: '#FFFFFF' },
-      hoverinfo: 'name',
+      hoverinfo: 'name' as const,
     },
   ];
 

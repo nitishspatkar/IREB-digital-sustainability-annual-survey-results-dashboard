@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants ---
 const SUPPORT_TYPES = [
@@ -69,12 +71,123 @@ const getRoleCategory = (rawRole: string): string | null => {
   return 'Other';
 };
 
+// --- Comparison Strategy & Data Extractor ---
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+const extractAdditionalSupportResourcesByRoleData: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
+  const groupStats = new Map<string, Map<string, number>>();
+  const groupAnsweredTotals = new Map<string, number>();
+  let totalValidResponses = 0; // Global Denominator
+
+  // 1. Calculate Global Denominator
+  responses.forEach((r) => {
+    if (hasValidSupportAnswer(r)) {
+      totalValidResponses++;
+    }
+  });
+
+  // 2. Parse Data
+  responses.forEach((r) => {
+    if (!hasValidSupportAnswer(r)) return;
+
+    const role = getRoleCategory(r.raw.role ?? '');
+    if (!role) return;
+
+    if (!groupStats.has(role)) {
+      groupStats.set(role, new Map());
+      groupAnsweredTotals.set(role, 0);
+    }
+
+    groupAnsweredTotals.set(role, (groupAnsweredTotals.get(role) ?? 0) + 1);
+    const stats = groupStats.get(role)!;
+
+    SUPPORT_TYPES.forEach((t) => {
+      if (normalize(r.raw[t.key as keyof typeof r.raw]) === 'yes') {
+        stats.set(t.label, (stats.get(t.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  groupStats.forEach((stats, role) => {
+    stats.forEach((count, label) => {
+      // Percentage relative to TOTAL valid responses (Global Denominator)
+      const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+      items.push({
+        label: `${role}<br>${label}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
+
+// --- The Processor Logic ---
 const processAdditionalSupportByRole: ChartProcessor = (responses, palette) => {
   const groupStats = new Map<string, Map<string, number>>();
   const groupEligibleTotals = new Map<string, number>();
   const groupAnsweredTotals = new Map<string, number>();
+  let totalValidResponses = 0; // Global Denominator
 
-  // Initialize
+  // 1. Calculate Global Denominator
+  responses.forEach((r) => {
+    if (hasValidSupportAnswer(r)) {
+      totalValidResponses++;
+    }
+  });
+
+  // 2. Initialize & Parse
   responses.forEach((r) => {
     const role = getRoleCategory(r.raw.role ?? '');
 
@@ -102,8 +215,6 @@ const processAdditionalSupportByRole: ChartProcessor = (responses, palette) => {
 
   // Sort by count (Highest to Lowest)
   // Plotly renders horizontal bars bottom-to-top.
-  // To have the Highest at the Top, we need it at the END of the array.
-  // So we sort ASCENDING by value.
   const sortedGroups = Array.from(groupAnsweredTotals.entries())
     .sort((a, b) => a[1] - b[1])
     .map((entry) => entry[0]);
@@ -125,10 +236,9 @@ const processAdditionalSupportByRole: ChartProcessor = (responses, palette) => {
   const traces: Data[] = SUPPORT_TYPES.map((t, index) => {
     const xValues = sortedGroups.map((g) => groupStats.get(g)?.get(t.label) ?? 0);
 
-    // Calculate percentages for tooltip
-    const totalInGroup = sortedGroups.map((g) => groupAnsweredTotals.get(g) ?? 0);
-    const percentages = xValues.map((val, i) =>
-      totalInGroup[i] > 0 ? ((val / totalInGroup[i]) * 100).toFixed(1) + '%' : '0%'
+    // Calculate percentages for tooltip relative to TOTAL Valid Responses
+    const percentages = xValues.map((val) =>
+      totalValidResponses > 0 ? ((val / totalValidResponses) * 100).toFixed(1) + '%' : '0%'
     );
 
     return {
@@ -148,7 +258,7 @@ const processAdditionalSupportByRole: ChartProcessor = (responses, palette) => {
       },
       textangle: 0,
       constraintext: 'none',
-      hovertemplate: `<b>${t.label}</b><br>Count: %{x}<br>Share in Role: %{customdata}<extra></extra>`,
+      hovertemplate: `<b>${t.label}</b><br>Count: %{x}<br>Share of Total: %{customdata}<extra></extra>`,
       customdata: percentages,
     };
   });
@@ -196,6 +306,8 @@ export const AdditionalSupportResourcesByRole = ({ onBack }: { onBack: () => voi
       layout={layout}
       isEmbedded={true}
       onBack={onBack}
+      dataExtractor={extractAdditionalSupportResourcesByRoleData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

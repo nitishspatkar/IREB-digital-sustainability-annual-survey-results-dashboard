@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const DIMENSIONS_TEMPLATE = [
@@ -47,6 +49,110 @@ const hasValidDimensionAnswer = (r: SurveyResponse): boolean => {
   if (oVal.length > 0 && oVal !== 'n/a') return true;
 
   return false;
+};
+
+// --- Comparison Strategy & Data Extractor ---
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+const extractKnowledgeGapsByDimensionByAgeData: DataExtractor<HorizontalBarData> = (responses) => {
+  const groupStats = new Map<string, Map<string, number>>();
+  const groupTotals = new Map<string, number>();
+  let totalValidResponses = 0;
+
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  responses.forEach((r) => {
+    let age = normalize(r.raw.ageGroup ?? '');
+    age = age.replace(' years', '').trim();
+
+    if (!age || age.toLowerCase() === 'n/a' || age === '') return;
+
+    // Filter: Must have a valid answer to the knowledge gap question
+    if (!hasValidDimensionAnswer(r)) return;
+
+    totalValidResponses++;
+
+    if (!groupStats.has(age)) {
+      groupStats.set(age, new Map());
+      groupTotals.set(age, 0);
+    }
+
+    groupTotals.set(age, (groupTotals.get(age) ?? 0) + 1);
+
+    const stats = groupStats.get(age)!;
+
+    DIMENSIONS_TEMPLATE.forEach((dimDef) => {
+      const isSelected = norm(r.raw[dimDef.key as keyof typeof r.raw]) === 'yes';
+      if (isSelected) {
+        stats.set(dimDef.label, (stats.get(dimDef.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  groupStats.forEach((stats, age) => {
+    const totalInGroup = groupTotals.get(age) ?? 0;
+    if (totalInGroup > 0) {
+      stats.forEach((count, dimLabel) => {
+        // Calculate percentage relative to TOTAL valid responses (Global Denominator)
+        const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+        items.push({
+          label: `${age}<br>${dimLabel}`,
+          value: pct,
+        });
+      });
+    }
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
 };
 
 // --- The Processor Logic ---
@@ -193,6 +299,8 @@ export const KnowledgeGapsByDimensionByAge = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractKnowledgeGapsByDimensionByAgeData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

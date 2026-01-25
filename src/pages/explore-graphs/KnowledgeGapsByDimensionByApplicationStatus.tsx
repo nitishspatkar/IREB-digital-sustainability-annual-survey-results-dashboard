@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyResponse } from '../../data/data-parsing-logic/SurveyResponse';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const DIMENSIONS_TEMPLATE = [
@@ -26,7 +28,6 @@ const hasValidDimensionAnswer = (r: SurveyResponse): boolean => {
   if (norm(raw.lackKnowledgeTechnical) === 'yes') return true;
   if (norm(raw.lackKnowledgeNone) === 'yes') return true;
 
-  // Also count as valid if all are explicitly 'no' (matching main graph logic)
   if (
     norm(raw.lackKnowledgeEnvironmental) === 'no' &&
     norm(raw.lackKnowledgeSocial) === 'no' &&
@@ -42,6 +43,107 @@ const hasValidDimensionAnswer = (r: SurveyResponse): boolean => {
   if (oVal.length > 0 && oVal !== 'n/a') return true;
 
   return false;
+};
+
+// --- Comparison Strategy & Data Extractor ---
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+const extractKnowledgeGapsByDimensionByApplicationStatusData: DataExtractor<HorizontalBarData> = (
+  responses
+) => {
+  const statsMap = new Map<string, Map<string, number>>();
+  CATEGORIES.forEach((cat) => statsMap.set(cat, new Map()));
+
+  let totalValidResponses = 0; // Global denominator (respondents who answered the knowledge gap question)
+
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  // 1. Calculate Global Denominator
+  responses.forEach((r) => {
+    if (hasValidDimensionAnswer(r)) {
+      totalValidResponses++;
+    }
+  });
+
+  // 2. Parse Data
+  responses.forEach((r) => {
+    if (!hasValidDimensionAnswer(r)) return;
+
+    // Determine Category
+    const incorporates = norm(r.raw.personIncorporatesSustainability) === 'yes';
+    const category = incorporates ? CATEGORIES[0] : CATEGORIES[1];
+
+    const catStats = statsMap.get(category)!;
+
+    DIMENSIONS_TEMPLATE.forEach((dimDef) => {
+      const isSelected = norm(r.raw[dimDef.key as keyof typeof r.raw]) === 'yes';
+      if (isSelected) {
+        catStats.set(dimDef.label, (catStats.get(dimDef.label) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  statsMap.forEach((stats, category) => {
+    stats.forEach((count, dimLabel) => {
+      // Percentage relative to TOTAL valid responses (Global Denominator)
+      const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+      items.push({
+        label: `${category}<br>${dimLabel}`,
+        value: pct,
+      });
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
 };
 
 // --- The Processor Logic ---
@@ -75,10 +177,6 @@ const processKnowledgeGapsByDimensionByApplicationStatus: ChartProcessor = (resp
   });
 
   // 2. Build Traces
-  // We want grouped bars.
-  // X-axis: Dimensions
-  // Traces: Categories ("Applies", "Does not apply")
-
   const xLabels = DIMENSIONS_TEMPLATE.map((d) => d.label);
 
   const traces: Data[] = CATEGORIES.map((cat, index) => {
@@ -95,7 +193,7 @@ const processKnowledgeGapsByDimensionByApplicationStatus: ChartProcessor = (resp
       textfont: {
         family: 'PP Mori, sans-serif',
         size: 13,
-        color: '#FFFFFF', // White text for better contrast on colors
+        color: '#FFFFFF',
       },
       marker: {
         color: index === 0 ? palette.spring : palette.mandarin,
@@ -154,6 +252,8 @@ export const KnowledgeGapsByDimensionByApplicationStatus = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractKnowledgeGapsByDimensionByApplicationStatusData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };

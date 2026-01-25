@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants & Helpers ---
 const ANSWERS_TEMPLATE = [
@@ -10,6 +12,109 @@ const ANSWERS_TEMPLATE = [
 ];
 
 const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
+
+// --- Comparison Strategy & Data Extractor ---
+
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: false,
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    result.layout.yaxis = {
+      ...result.layout.yaxis,
+      dtick: 1,
+    };
+    result.layout.xaxis = {
+      ...result.layout.xaxis,
+      automargin: true,
+      title: {
+        ...(result.layout.xaxis?.title || {}),
+        standoff: 20,
+      },
+    };
+
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 50 + 100);
+    result.layout.height = dynamicHeight;
+  }
+
+  return result;
+};
+
+const extractUsesToolsByRoleData: DataExtractor<HorizontalBarData> = (responses) => {
+  const roleStats = new Map<string, Map<string, number>>();
+  const roleTotals = new Map<string, number>();
+  let totalValidResponses = 0;
+
+  const norm = (v: string) => v?.trim().toLowerCase() ?? '';
+
+  responses.forEach((r) => {
+    // 1. Filter: Must incorporate sustainability
+    if (norm(r.raw.personIncorporatesSustainability) !== 'yes') return;
+
+    // 2. Filter: Valid Role
+    const role = normalize(r.raw.role ?? '');
+    if (!role || role.toLowerCase() === 'n/a') return;
+
+    // 3. Filter: Valid Answer
+    const answer = norm(r.raw.usesTools ?? '');
+    if (answer !== 'yes' && answer !== 'no' && answer !== 'not sure') return;
+
+    totalValidResponses++;
+
+    if (!roleStats.has(role)) {
+      roleStats.set(role, new Map());
+      roleTotals.set(role, 0);
+    }
+
+    roleTotals.set(role, (roleTotals.get(role) ?? 0) + 1);
+    const statMap = roleStats.get(role)!;
+
+    // Normalize answer label
+    const label = answer === 'yes' ? 'Yes' : answer === 'no' ? 'No' : 'Not sure';
+    statMap.set(label, (statMap.get(label) ?? 0) + 1);
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  roleStats.forEach((stats, role) => {
+    const totalInGroup = roleTotals.get(role) ?? 0;
+    if (totalInGroup > 0) {
+      stats.forEach((count, answerLabel) => {
+        // Calculate percentage relative to TOTAL valid responses, not just the group
+        const pct = totalValidResponses > 0 ? (count / totalValidResponses) * 100 : 0;
+        items.push({
+          label: `${role}<br>${answerLabel}`,
+          value: pct,
+        });
+      });
+    }
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalValidResponses,
+    },
+  };
+};
 
 // --- The Processor Logic ---
 const processUsesToolsByRole: ChartProcessor = (responses, palette) => {
@@ -144,6 +249,8 @@ export const UsesToolsByRole = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={extractUsesToolsByRoleData}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };
