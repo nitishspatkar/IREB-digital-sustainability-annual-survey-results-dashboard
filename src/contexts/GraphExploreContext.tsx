@@ -1,25 +1,43 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useMemo } from 'react';
+import type { ReactNode } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import type { GraphId } from '../hooks/useGraphDescription';
 
 interface GraphExploreContextType {
-  activeExploreId: string | null;
-  setActiveExploreId: (id: string | null) => void;
+  activeExploreId: GraphId | null;
+  setActiveExploreId: (id: GraphId | null) => void;
 }
 
 const GraphExploreContext = createContext<GraphExploreContextType | undefined>(undefined);
 
 export const GraphExploreProvider = ({ children }: { children: ReactNode }) => {
-  const [activeExploreId, setActiveExploreId] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  return (
-    <GraphExploreContext.Provider value={{ activeExploreId, setActiveExploreId }}>
-      {children}
-    </GraphExploreContext.Provider>
+  // Read state directly from URL
+  const activeExploreId = (searchParams.get('explore') as GraphId) || null;
+
+  const setActiveExploreId = (id: GraphId | null) => {
+    if (id) {
+      // Set URL param
+      setSearchParams({ explore: id }, { replace: false });
+    } else {
+      // Remove URL param to go back
+      searchParams.delete('explore');
+      setSearchParams(searchParams, { replace: false });
+    }
+  };
+
+  const value = useMemo(
+    () => ({ activeExploreId, setActiveExploreId }),
+    [activeExploreId, setSearchParams] // eslint-disable-line react-hooks/exhaustive-deps
   );
+
+  return <GraphExploreContext.Provider value={value}>{children}</GraphExploreContext.Provider>;
 };
 
-export const useGraphExplore = (): GraphExploreContextType => {
+export const useGraphExplore = () => {
   const context = useContext(GraphExploreContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useGraphExplore must be used within a GraphExploreProvider');
   }
   return context;

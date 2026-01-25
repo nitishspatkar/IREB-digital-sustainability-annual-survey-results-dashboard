@@ -2,7 +2,7 @@ import Plot from 'react-plotly.js';
 import type { Data, Layout } from 'plotly.js';
 import GraphWrapper from './GraphWrapper';
 import useThemeColor from '../hooks/useThemeColor';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { useSurveyData } from '../data/data-parsing-logic/SurveyContext';
 import { useYear } from '../data/data-parsing-logic/YearContext';
 import { SurveyRepository } from '../data/data-parsing-logic/SurveyRepository';
@@ -143,6 +143,17 @@ export const GenericChart = <T,>({
       }, 100);
     }
   };
+
+  // --- E. Deep Link Scroll Handling ---
+  // If the user loads the page with ?explore=GraphId, scroll to this graph automatically
+  useEffect(() => {
+    if (activeExploreId === graphId && graphRef.current) {
+      // Small timeout to ensure layout is stable
+      setTimeout(() => {
+        graphRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [activeExploreId, graphId]);
 
   // --- B. Fetch Theme Colors once ---
   const palette = {
