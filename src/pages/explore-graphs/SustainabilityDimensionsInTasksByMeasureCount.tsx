@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { Data, Layout } from 'plotly.js';
-import { GenericChart, type ChartProcessor } from '../../components/GraphViews';
+import { GenericChart, type ChartProcessor, type DataExtractor } from '../../components/GraphViews';
 import type { SurveyRecord } from '../../data/data-parsing-logic/SurveyCsvParser';
+import { createDumbbellComparisonStrategy } from '../../components/comparision-components/DumbbellComparisonStrategy';
+import type { HorizontalBarData } from '../../components/comparision-components/HorizontalBarComparisonStrategy';
 
 // --- Constants ---
 const MEASURE_GROUPS = [
@@ -43,7 +45,6 @@ const getMeasureGroup = (raw: SurveyRecord): string | null => {
     return 'Unclear communication';
   }
 
-  // Count positive measures
   let count = 0;
   for (const col of MEASURE_COLUMNS) {
     const val = normalize(raw[col]);
@@ -57,11 +58,105 @@ const getMeasureGroup = (raw: SurveyRecord): string | null => {
   if (count === 3) return 'Three measures';
   if (count >= 4) return 'Four measures';
 
-  // Fallback for cases where they said Yes to practices but 0 to specific measures
-  // Analysis suggests treating this as 'One measure' or broadly part of the 'Yes' group
   return 'One measure';
 };
 
+// --- Data Extractor ---
+const sustainabilityDimensionsExtractor: DataExtractor<HorizontalBarData> = (responses) => {
+  // Map<Group, Map<DimensionKey, Count>>
+  const groupStats = new Map<string, Map<string, number>>();
+
+  // Initialize map
+  MEASURE_GROUPS.forEach((g) => {
+    const dimMap = new Map<string, number>();
+    ROLE_DIMENSIONS.forEach((d) => dimMap.set(d.key, 0));
+    groupStats.set(g, dimMap);
+  });
+
+  let totalResponses = 0;
+
+  responses.forEach((r) => {
+    // Filter: Must incorporate sustainability
+    const incorporates = normalize(r.raw.personIncorporatesSustainability) === 'yes';
+    if (!incorporates) return;
+
+    const group = getMeasureGroup(r.raw);
+    if (!group) return;
+
+    totalResponses++;
+    const entry = groupStats.get(group)!;
+
+    ROLE_DIMENSIONS.forEach((d) => {
+      // Check if this dimension is selected
+      if (normalize((r.raw as any)[d.key]) === 'yes') {
+        entry.set(d.key, (entry.get(d.key) ?? 0) + 1);
+      }
+    });
+  });
+
+  const items: { label: string; value: number }[] = [];
+
+  groupStats.forEach((dimMap, groupName) => {
+    dimMap.forEach((count, dimKey) => {
+      if (count > 0) {
+        const dimLabel = ROLE_DIMENSIONS.find((d) => d.key === dimKey)?.label || dimKey;
+        items.push({
+          label: `${groupName} - ${dimLabel}`,
+          value: count, // Raw count, strategy will normalize
+        });
+      }
+    });
+  });
+
+  return {
+    items,
+    stats: {
+      numberOfResponses: totalResponses,
+      totalEligible: totalResponses,
+    },
+  };
+};
+
+// --- Comparison Strategy ---
+const baseComparisonStrategy = createDumbbellComparisonStrategy({
+  normalizeToPercentage: true, // Divide raw count by total responses
+  formatAsPercentage: true,
+  sortBy: 'absoluteDifference',
+});
+
+const comparisonStrategy: typeof baseComparisonStrategy = (
+  currentYearData,
+  compareYearData,
+  currentYear,
+  compareYear,
+  palette
+) => {
+  const result = baseComparisonStrategy(
+    currentYearData,
+    compareYearData,
+    currentYear,
+    compareYear,
+    palette
+  );
+
+  if (result && 'layout' in result && result.layout) {
+    // Dynamic height: This chart can have many items (6 groups * 6 dims = 36 max)
+    const itemCount = (result.traces[1] as Data & { y: string[] }).y?.length || 0;
+    const dynamicHeight = Math.max(520, itemCount * 35 + 100);
+
+    result.layout.height = dynamicHeight;
+
+    // Adjust margin for long labels (e.g., "Unclear communication - Environmental")
+    result.layout.margin = {
+      ...(result.layout.margin || {}),
+      l: 260,
+    };
+  }
+
+  return result;
+};
+
+// --- Component ---
 export const SustainabilityDimensionsInTasksByMeasureCount = ({
   onBack,
   showBackButton = true,
@@ -71,15 +166,12 @@ export const SustainabilityDimensionsInTasksByMeasureCount = ({
 }) => {
   const processor: ChartProcessor = useMemo(
     () => (responses, palette) => {
-      // 1. Filter: Only people who incorporate sustainability in their tasks (Target Population)
-      // AND who have a valid Measure Group
       const targetPopulation = responses.filter((r) => {
         const incorporates = normalize(r.raw.personIncorporatesSustainability) === 'yes';
         const group = getMeasureGroup(r.raw);
         return incorporates && group !== null;
       });
 
-      // 2. Initialize Data Structure
       const groupStats = new Map<string, Map<string, number>>();
       MEASURE_GROUPS.forEach((g) => {
         const dimMap = new Map<string, number>();
@@ -87,22 +179,17 @@ export const SustainabilityDimensionsInTasksByMeasureCount = ({
         groupStats.set(g, dimMap);
       });
 
-      // 3. Aggregate
       targetPopulation.forEach((r) => {
-        const group = getMeasureGroup(r.raw)!; // Checked in filter
+        const group = getMeasureGroup(r.raw)!;
         const entry = groupStats.get(group)!;
 
         ROLE_DIMENSIONS.forEach((d) => {
-          // Type assertion needed for dynamic key access on SurveyRecord
           if (normalize((r.raw as any)[d.key]) === 'yes') {
             entry.set(d.key, (entry.get(d.key) ?? 0) + 1);
           }
         });
       });
 
-      // 4. Build Traces
-      // Stacked bar chart of counts
-      // Y-axis: Measure Groups (reversed)
       const plotGroups = [...MEASURE_GROUPS].reverse();
 
       const dimColors: Record<string, string> = {
@@ -131,9 +218,8 @@ export const SustainabilityDimensionsInTasksByMeasureCount = ({
           textfont: {
             family: 'PP Mori, sans-serif',
             size: 13,
-            color: '#FFFFFF', // White text for better contrast on colors
+            color: '#FFFFFF',
           },
-          // Custom hover info
           hovertemplate: `<b>%{y}</b><br>${dim.label}: %{x}<extra></extra>`,
         };
       });
@@ -141,7 +227,7 @@ export const SustainabilityDimensionsInTasksByMeasureCount = ({
       return {
         stats: {
           numberOfResponses: targetPopulation.length,
-          totalEligible: targetPopulation.length, // Rate is relative to the filtered population
+          totalEligible: targetPopulation.length,
         },
         traces: traces,
       };
@@ -187,6 +273,8 @@ export const SustainabilityDimensionsInTasksByMeasureCount = ({
       layout={layout}
       isEmbedded={true}
       onBack={showBackButton ? onBack : undefined}
+      dataExtractor={sustainabilityDimensionsExtractor}
+      comparisonStrategy={comparisonStrategy}
     />
   );
 };
