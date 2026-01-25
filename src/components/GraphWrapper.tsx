@@ -1,4 +1,5 @@
 import { forwardRef, type ReactNode } from 'react';
+import { HelpTip } from './HelpTip';
 
 interface GraphWrapperProps {
   question: string;
@@ -92,12 +93,17 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
             Results
           </div>
           {showExploreButton && (
-            <button
-              onClick={onExplore}
-              className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
+            <HelpTip
+              text="Click to drill down into details by Role, Age, or Experience."
+              position="top"
             >
-              Explore
-            </button>
+              <button
+                onClick={onExplore}
+                className="font-mori font-bold flex items-center cursor-pointer justify-between rounded-none border-3 px-4 py-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ireb-light-berry/50 bg-ireb-superlight-berry text-ireb-berry border-ireb-berry hover:bg-ireb-light-berry hover:text-ireb-berry"
+              >
+                Explore
+              </button>
+            </HelpTip>
           )}
           {showBackButton && (
             <button
@@ -110,32 +116,40 @@ const GraphWrapper = forwardRef<HTMLDivElement, GraphWrapperProps>(
 
           {/* Comparison controls */}
           {availableCompareYears.length > 0 && onCompareYearChange && (
-            <div className="flex items-center gap-3 ml-auto">
-              <span className="font-mori font-bold text-ireb-berry">Compare:</span>
-              <label className="flex items-center gap-2 cursor-pointer font-mori">
-                <input
-                  type="radio"
-                  name={radioGroupName}
-                  checked={compareYear === null}
-                  onChange={() => onCompareYearChange(null)}
-                  className="w-4 h-4 text-ireb-berry border-ireb-berry focus:ring-ireb-berry"
-                  style={{ accentColor: 'var(--color-ireb-berry)' }}
-                />
-                <span className="text-ireb-berry">None</span>
-              </label>
-              {availableCompareYears.map((year) => (
-                <label key={year} className="flex items-center gap-2 cursor-pointer font-mori">
-                  <input
-                    type="radio"
-                    name={radioGroupName}
-                    checked={compareYear === year}
-                    onChange={() => onCompareYearChange(year)}
-                    className="w-4 h-4 text-ireb-berry border-ireb-berry focus:ring-ireb-berry"
-                    style={{ accentColor: 'var(--color-ireb-berry)' }}
-                  />
-                  <span className="text-ireb-berry">{year}</span>
-                </label>
-              ))}
+            <div className="ml-auto">
+              <HelpTip
+                text="Select a year to see how this data point changed over time."
+                position="top"
+                tooltipClassName="w-40"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-mori font-bold text-ireb-berry">Compare:</span>
+                  <label className="flex items-center gap-2 cursor-pointer font-mori">
+                    <input
+                      type="radio"
+                      name={radioGroupName}
+                      checked={compareYear === null}
+                      onChange={() => onCompareYearChange(null)}
+                      className="w-4 h-4 text-ireb-berry border-ireb-berry focus:ring-ireb-berry"
+                      style={{ accentColor: 'var(--color-ireb-berry)' }}
+                    />
+                    <span className="text-ireb-berry">None</span>
+                  </label>
+                  {availableCompareYears.map((year) => (
+                    <label key={year} className="flex items-center gap-2 cursor-pointer font-mori">
+                      <input
+                        type="radio"
+                        name={radioGroupName}
+                        checked={compareYear === year}
+                        onChange={() => onCompareYearChange(year)}
+                        className="w-4 h-4 text-ireb-berry border-ireb-berry focus:ring-ireb-berry"
+                        style={{ accentColor: 'var(--color-ireb-berry)' }}
+                      />
+                      <span className="text-ireb-berry">{year}</span>
+                    </label>
+                  ))}
+                </div>
+              </HelpTip>
             </div>
           )}
         </div>
