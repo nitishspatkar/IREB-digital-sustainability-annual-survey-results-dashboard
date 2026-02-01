@@ -1,8 +1,8 @@
-> [!warning] TO DO THESE CHANGES YOU NEED TO BE ALLOWED UPLOAD CHANGES!!
-> To be allowed to this either:
+> [!WARNING]
+> TO DO THESE CHANGES YOU NEED TO BE ALLOWED UPLOAD CHANGES!! To be allowed to this either:
 >
-> 1. Nitish gives you access to the project (account needed)
-> 2. You make a copy of the project.
+> Nitish gives you access to the project (account needed)
+> You make a copy of the project.
 
 # How to add new data (GitHub)
 
@@ -51,4 +51,5 @@ There are 2 solutions to this:
 2. Configure the application to know which questions still are the same, even if the wording changed.
    1. Go to:
    2. Edit the file
-   3. Add the new wording e.g. ![[Pasted image 20260201154655.png]]
+   3. Add the new wording e.g. <img width="2966" height="1052" alt="image" src="https://github.com/user-attachments/assets/1f96a0a9-0ac3-4f0d-8c66-dd975f7de2c8" />
+
