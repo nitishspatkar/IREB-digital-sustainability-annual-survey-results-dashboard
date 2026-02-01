@@ -1,6 +1,6 @@
 export type ColumnDefinition<K extends string> = {
   readonly key: K;
-  readonly header: string;
+  readonly header: string | string[];
 };
 
 export const columnDefinitions = [
@@ -11,7 +11,7 @@ export const columnDefinitions = [
   { key: 'seed', header: 'Seed' },
   {
     key: 'ageGroup',
-    header: 'Which age group do you belong to?',
+    header: ['Which age group do you belong to?', 'Which age group do you belong to2?'],
   },
   {
     key: 'professionalExperienceYears',

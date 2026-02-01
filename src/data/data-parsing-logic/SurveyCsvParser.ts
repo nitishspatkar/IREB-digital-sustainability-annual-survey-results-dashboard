@@ -86,22 +86,34 @@ export class SurveyCsvParser {
     const usedIndices = new Set<number>();
 
     columnDefinitions.forEach((definition) => {
-      const expectedHeader = normalizeCell(definition.header);
+      const expectedHeaders = Array.isArray(definition.header)
+        ? definition.header
+        : [definition.header];
+      const normalizedExpectedHeaders = expectedHeaders.map(normalizeCell);
 
-      // Search for the next available column that matches the header.
-      let searchFromIndex = 0;
-      let foundIndex = -1;
+      let keyFound = false;
 
-      // Loop to find a matching header that hasn't been used yet.
-      while ((foundIndex = normalizedCsvHeaders.indexOf(expectedHeader, searchFromIndex)) !== -1) {
-        if (!usedIndices.has(foundIndex)) {
-          // Found an unused column, map it and mark it as used.
-          headerIndexMap.set(definition.key, foundIndex);
-          usedIndices.add(foundIndex);
-          break; // Stop searching for this definition.
+      for (const expectedHeader of normalizedExpectedHeaders) {
+        if (keyFound) break;
+
+        // Search for the next available column that matches the header.
+        let searchFromIndex = 0;
+        let foundIndex = -1;
+
+        // Loop to find a matching header that hasn't been used yet.
+        while (
+          (foundIndex = normalizedCsvHeaders.indexOf(expectedHeader, searchFromIndex)) !== -1
+        ) {
+          if (!usedIndices.has(foundIndex)) {
+            // Found an unused column, map it and mark it as used.
+            headerIndexMap.set(definition.key, foundIndex);
+            usedIndices.add(foundIndex);
+            keyFound = true;
+            break; // Stop searching for this definition.
+          }
+          // This index was taken, continue searching from the next position.
+          searchFromIndex = foundIndex + 1;
         }
-        // This index was taken, continue searching from the next position.
-        searchFromIndex = foundIndex + 1;
       }
     });
 

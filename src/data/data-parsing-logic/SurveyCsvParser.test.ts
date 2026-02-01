@@ -117,4 +117,11 @@ describe('SurveyCsvParser', () => {
 
     expect(record).toEqual(expectedRecord);
   });
+
+  it('parses ageGroup from alternative header', () => {
+    const csv = `Response ID,"Which age group do you belong to2?"\n1,25-34`;
+    const parser = SurveyCsvParser.fromCsv(csv);
+    const record = parser.findByResponseId('1');
+    expect(record?.ageGroup).toBe('25-34');
+  });
 });
