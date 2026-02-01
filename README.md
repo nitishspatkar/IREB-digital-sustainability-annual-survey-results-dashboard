@@ -1,8 +1,8 @@
 > [!WARNING]
-> TO DO THESE CHANGES YOU NEED TO BE ALLOWED UPLOAD CHANGES!! To be allowed to this either:
->
-> Nitish gives you access to the project (account needed)
+> TO DO THESE CHANGES YOU NEED TO BE ALLOWED UPLOAD CHANGES!! To be allowed to do this either:
+> 
 > You make a copy of the project.
+> Nitish has to give your github account access to the project.
 
 # How to add new data (GitHub)
 
