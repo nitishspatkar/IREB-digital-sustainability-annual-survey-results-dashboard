@@ -1,0 +1,493 @@
+{
+  "DemographicAgeGroup": {
+    "question": "2026 Which age group do you belong to? 2026",
+    "description": "This chart shows the distribution of survey respondents across different age groups. The data helps us understand the demographic composition of the survey participants and identify which age groups are most represented in the responses."
+  },
+  "DemographicApplicationDomain": {
+    "question": "In which application domain do you currently primarily work?",
+    "description": "Breaks down the primary application domains represented by respondents."
+  },
+  "DemographicApplicationDomainDetails": {
+    "title": "In which application domain do you currently primarily work?",
+    "question": "In which application domain do you currently primarily work? [Other]",
+    "description": "Lists the free-text application domains supplied under the Other option."
+  },
+  "DemographicChoropleth": {
+    "question": "What is your current country of residence?",
+    "description": "Visualizes the geographic distribution of respondents using a world map."
+  },
+  "DemographicCountryTable": {
+    "question": "What is your current country of residence?",
+    "description": "Tabulates how many respondents we received from each country."
+  },
+  "DemographicByRegion": {
+    "question": "What is your current country of residence?",
+    "description": "Shows how respondents distribute across the provided regions."
+  },
+  "DemographicOrganizationalRole": {
+    "question": "Which of the following best describes your current role in the organization?",
+    "description": "Shows how respondents distribute across the provided organizational role options."
+  },
+  "DemographicOrganizationalRoleDetails": {
+    "title": "Which of the following best describes your current role in the organization?",
+    "question": "Which of the following best describes your current role in the organization? [Other]",
+    "description": "Lists the free-text role descriptions supplied under the Other option."
+  },
+  "DemographicOrganizationType": {
+    "question": "Which of the following organizational types best describes your organization?",
+    "description": "Visualizes how respondents classify their organizations across the provided types."
+  },
+  "DemographicProfessionalExperience": {
+    "question": "How many years of professional experience do you have in IT/software engineering?",
+    "description": "Shows how respondents distribute across professional experience brackets."
+  },
+  "DefinitionAwareness": {
+    "question": "Have you heard of the term 'digital sustainability'?",
+    "description": "We consider Digital Sustainability an umbrella term for two aspects: Sustainable Software and Sustainable by Software. Sustainable Software concerns the sustainability of digital solutions in terms of their impact on environmental, economic, technical, social, and individual dimensions, including carbon footprint (Green IT) and process resources. Sustainable by Software describes digital solutions designed to achieve positive sustainability impacts to help individuals and organizations reach sustainability goals, such as such as the United Nations Sustainable Development Goals (SDGs) more effectively. Have you heard of this or a similar definition of digital sustainability before?"
+  },
+  "DefinitionAwarenessByRole": {
+    "question": "Have you heard of the term 'digital sustainability'?",
+    "description": "A clear majority of practitioners in RE indicate that they are not familiar with the definition, while stakeholders in all other roles (management, technical, and research) have a clear majority indicating that they are familiar with the definition"
+  },
+  "PersonIncorporatesSustainabilityByAge": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks? (By Age Group)",
+    "description": "This chart shows the breakdown of respondents who incorporate digital sustainability considerations in their role-specific tasks, segmented by age group. Each age group displays the count of 'Yes' and 'No' responses in a stacked horizontal bar format."
+  },
+  "DefinitionAwarenessByAge": {
+    "question": "Have you heard of the term 'digital sustainability'?",
+    "description": "Factors related to better familiarity with the definition were respondents over 60 years old or working at a research organization."
+  },
+  "DefinitionAwarenessByExperience": {
+    "question": "Have you heard of the term 'digital sustainability'?",
+    "description": "Less familiarity was observed with respondents with 10 or fewer years of experience, or who responded to many questions about their organization’s sustainability practices that they were not sure. Familiarity was independent of region."
+  },
+  "DiscussionFrequency": {
+    "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
+    "description": "Shows the frequency of digital sustainability discussions among respondents."
+  },
+  "DiscussionFrequencyByRole": {
+    "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
+    "description": "Shows the discussion frequency of digital sustainability discussions among respondents by role."
+  },
+  "DiscussionFrequencyByAge": {
+    "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
+    "description": "Shows the discussion frequency of digital sustainability discussions among respondents by age group."
+  },
+  "DiscussionFrequencyByExperience": {
+    "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment?",
+    "description": "Shows the discussion frequency of digital sustainability discussions among respondents by professional experience."
+  },
+  "DiscussionFrequencyDetails": {
+    "title": "How often do you discuss digital sustainability in your professional environment?",
+    "question": "How frequently do you encounter (e.g., coming across or taking part in) discussions about digital sustainability in your professional environment? [Other]",
+    "description": "Lists the free-text entries for the discussion frequency."
+  },
+  "TrainingDescriptionList": {
+    "question": "Please tell us a little about the training or educational programs on digital sustainability you participated in.",
+    "description": "Descriptions of training programs attended by respondents."
+  },
+  "TrainingParticipation": {
+    "question": "Have you participated in one or more training or educational programs on digital sustainability?",
+    "description": "Shows whether respondents have participated in digital sustainability training programs."
+  },
+  "TrainingParticipationByRole": {
+    "question": "Have you participated in one or more training or educational programs on digital sustainability?",
+    "description": "Shows whether respondents have participated in digital sustainability training programs by role."
+  },
+  "TrainingParticipationByRegion": {
+    "question": "Have you participated in one or more training or educational programs on digital sustainability?",
+    "description": "Shows whether respondents have participated in digital sustainability training programs by region."
+  },
+  "TrainingParticipationByTrainingOffer": {
+    "question": "Have you participated in one or more training or educational programs on digital sustainability?",
+    "description": "Shows whether respondents have participated in digital sustainability training programs, broken down by whether the organization currently offers training."
+  },
+  "TrainingPrivateCapacity": {
+    "question": "Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)?",
+    "description": "Shows whether respondents attended training on their own or through their organization."
+  },
+  "TrainingPrivateCapacityByRole": {
+    "question": "Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)?",
+    "description": "Shows whether respondents attended training on their own or through their organization by organizational role."
+  },
+  "TrainingPrivateCapacityByRegion": {
+    "question": "Did you participate in the training(s) or educational program(s) in your private capacity (i.e., you paid for it and participated out of personal interest)?",
+    "description": "Shows whether respondents attended training on their own or through their organization by region."
+  },
+  "TrainingProgramsCount": {
+    "question": "How many training(s) or educational program(s) on digital sustainability did you participate in?",
+    "description": "Distribution of the number of training programs attended by respondents."
+  },
+  "TrainingProgramsCountByRegion": {
+    "question": "How many training(s) or educational program(s) on digital sustainability did you participate in?",
+    "description": "Distribution of the number of training programs attended by respondents by region."
+  },
+  "TrainingProgramsCountByRole": {
+    "question": "How many training(s) or educational program(s) on digital sustainability did you participate in?",
+    "description": "Distribution of the number of training programs attended by respondents by organizational role."
+  },
+  "TrainingReasonsNo": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
+    "description": "Reasons why respondents haven't participated in digital sustainability training."
+  },
+  "TrainingReasonsNoDetails": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before? [Other]",
+    "description": "Lists the free-text reasons supplied under the Other option."
+  },
+  "TrainingReasonsNoByAge": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
+    "description": "Reasons why respondents haven't participated in digital sustainability training by age group."
+  },
+  "TrainingReasonsNoByExperience": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
+    "description": "Reasons why respondents haven't participated in digital sustainability training by professional experience."
+  },
+  "TrainingReasonsNoByRole": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
+    "description": "Reasons why respondents haven't participated in digital sustainability training by organizational role."
+  },
+  "TrainingReasonsNoByRegion": {
+    "question": "What are the reasons you haven’t participated in a training or educational program on digital sustainability before?",
+    "description": "Reasons why respondents haven't participated in digital sustainability training by region."
+  },
+  "TrainingReasonsNotMore": {
+    "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?",
+    "description": "Reasons why respondents haven't participated in more digital sustainability training."
+  },
+  "TrainingReasonsNotMoreDetails": {
+    "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability? [Other]",
+    "description": "Lists the free-text reasons supplied under the Other option."
+  },
+  "TrainingReasonsNotMoreByAge": {
+    "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?",
+    "description": "Reasons why respondents haven't participated in more digital sustainability training by age group."
+  },
+  "TrainingReasonsNotMoreByExperience": {
+    "question": "What are the reasons you haven’t participated in more training or educational programs on digital sustainability?",
+    "description": "Reasons why respondents haven't participated in more digital sustainability training by professional experience."
+  },
+  "TrainingSatisfaction": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs."
+  },
+  "TrainingSatisfactionByRole": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by organizational role."
+  },
+  "TrainingSatisfactionByRegion": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by region."
+  },
+  "TrainingSatisfactionByAge": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by age group."
+  },
+  "TrainingSatisfactionByExperience": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by professional experience."
+  },
+  "TrainingSatisfactionByOrgType": {
+    "question": "Are you satisfied with the number of trainings or educational programs you participated in? ",
+    "description": "Shows satisfaction levels with digital sustainability training programs by organizational type."
+  },
+  "CustomerNotRequestingReasons": {
+    "question": "Why do you think that your customers and users have not asked explicitly to build sustainable digital solutions?",
+    "description": "Open-text responses from those who selected 'Rarely' or 'Never' for customer requirements."
+  },
+  "CustomerRequirementFrequency": {
+    "question": "How often is the sustainability of your digital solutions an explicit requirement of the customer or the users?",
+    "description": "Shows the frequency with which customers request sustainable digital solutions."
+  },
+  "NoTrainingReasons": {
+    "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?",
+    "description": "Shows the reasons why organizations do not offer training on sustainable digital solutions."
+  },
+  "NoTrainingReasonsByTrainingOffer": {
+    "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?",
+    "description": "Shows the reasons why organizations do not offer training, broken down by whether the organization currently offers training."
+  },
+  "NoTrainingReasonsByRole": {
+    "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?",
+    "description": "Shows the reasons why organizations do not offer training, broken down by organizational role."
+  },
+  "NoTrainingReasonsByAge": {
+    "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions?",
+    "description": "Shows the reasons why organizations do not offer training, broken down by age group."
+  },
+  "NoTrainingReasonsDetails": {
+    "question": "What might be the reasons your organization does not offer any or more training or resources on the design or development of sustainable digital solutions? [Other]",
+    "description": "Lists the free-text reasons provided under the Other option."
+  },
+  "OrganizationMeasures": {
+    "question": "Summary of Organizational Sustainability Measures",
+    "description": "A consolidated view of various organizational sustainability measures, including goals, teams, practices, coordination, reporting, and training."
+  },
+  "OrganizationDepartmentCoordination": {
+    "question": "Do different departments in your organization coordinate on sustainability for software development projects?",
+    "description": "Shows whether organizations coordinate between departments on sustainability goals (filtered for organizations with goals)."
+  },
+  "OrganizationHasGoals": {
+    "question": "Does your organization have specific digital sustainability goals or benchmarks for software development projects?",
+    "description": "Shows whether organizations have specific digital sustainability goals."
+  },
+  "OrganizationHasSustainabilityTeam": {
+    "question": "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?",
+    "description": "Shows whether organizations have a sustainability team."
+  },
+  "OrganizationIncorporatesPractices": {
+    "question": "Does your organization incorporate sustainable development practices?",
+    "description": "Shows whether organizations incorporate sustainable practices in their software development."
+  },
+  "OrganizationOffersTraining": {
+    "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
+    "description": "Shows whether organizations offer training or resources on sustainable digital solutions."
+  },
+  "OrganizationReportsOnSustainability": {
+    "question": "Does your organization report on sustainability practices? ",
+    "description": "Shows whether organizations report on their sustainability efforts."
+  },
+  "OrganizationTrainingDescriptionList": {
+    "question": "Can you tell us a little about the training or resources your organization offers? ",
+    "description": "Open-text descriptions from organizations that offer training on sustainable digital solutions."
+  },
+  "SustainabilityDimensions": {
+    "question": "Which dimensions of sustainability are actively considered in your organization's software development projects?",
+    "description": "Shows which dimensions of sustainability are actively considered in software development projects."
+  },
+  "SustainabilityDimensionsDetails": {
+    "question": "Which dimensions of sustainability are actively considered in your organization's software development projects? [Other]",
+    "description": "Lists the free-text dimensions supplied under the Other option."
+  },
+  "AdditionalSupportResources": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work?",
+    "description": "Shows what additional support or resources respondents need to integrate digital sustainability."
+  },
+  "AdditionalSupportResourcesByTraining": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work? (By Training Status)",
+    "description": "Percentage of Additional Support Needed by Training Status. This shows that those who have had training have less interest in receiving theoretical knowledge, structures or curricula, probably because they already have these; their demand is greater especially for positive case studies, and slightly higher for the more applied aspects of practical knowledge and tutorials."
+  },
+  "AdditionalSupportResourcesByAge": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work? (By Age Group)",
+    "description": "Breakdown of needed support resources by age group. More junior respondents (18-28) tend to prefer tools and show less interest in theoretical knowledge or positive case studies, while those aged 29-44 frequently indicate a need for positive case studies."
+  },
+  "AdditionalSupportResourcesByRole": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work? (By Role)",
+    "description": "Breakdown of needed support resources by organizational role. Respondents in management roles notably express a higher preference for tools compared to other support types."
+  },
+  "AdditionalSupportResourcesByOrgType": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work? (By Organization Type)",
+    "description": "Breakdown of needed support resources by organization type. Respondents from medium- and small-sized organizations show a stronger emphasis on theoretical knowledge compared to those from other organization types."
+  },
+  "AdditionalSupportResourcesDetails": {
+    "question": "What additional support or resources would help you integrate digital sustainability into your work? [Other]",
+    "description": "Lists the free-text resources provided under the Other option."
+  },
+  "DriversToIncorporateSustainability": {
+    "question": "What drives you to incorporate digital sustainability in your role-related tasks?",
+    "description": "Shows which factors motivate respondents to integrate digital sustainability into their role-specific tasks."
+  },
+  "DriversToIncorporateSustainabilityDetails": {
+    "question": "What drives you to incorporate digital sustainability in your role-related tasks? [Other]",
+    "description": "Lists the free-text drivers supplied under the Other option."
+  },
+  "HindrancesToIncorporateSustainability": {
+    "question": "What hinders you from incorporating sustainability in your role-specific tasks?",
+    "description": "Shows barriers preventing respondents from incorporating sustainability in their tasks."
+  },
+  "HindrancesToIncorporateSustainabilityDetails": {
+    "question": "What hinders you from incorporating sustainability in your role-specific tasks? [Other]",
+    "description": "Lists the free-text hindrances provided under the Other option."
+  },
+  "HindrancesToIncorporateSustainabilityByRole": {
+    "question": "What hinders you from incorporating sustainability in your role-specific tasks? (By Role)",
+    "description": "Shows barriers preventing respondents from incorporating sustainability in their tasks, broken down by organizational role."
+  },
+  "HindrancesToIncorporateSustainabilityByAge": {
+    "question": "What hinders you from incorporating sustainability in your role-specific tasks? (By Age Group)",
+    "description": "Shows barriers preventing respondents from incorporating sustainability in their tasks, broken down by age group."
+  },
+  "HindrancesToIncorporateSustainabilityByExperience": {
+    "question": "What hinders you from incorporating sustainability in your role-specific tasks? (By Professional Experience)",
+    "description": "Shows barriers preventing respondents from incorporating sustainability in their tasks, broken down by professional experience."
+  },
+  "KnowledgeGapsByDimension": {
+    "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address?",
+    "description": "Shows which sustainability dimensions respondents feel they lack knowledge or tools to address."
+  },
+  "KnowledgeGapsByDimensionByAge": {
+    "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? (By Age Group)",
+    "description": "Shows which sustainability dimensions respondents feel they lack knowledge or tools to address by age group."
+  },
+  "KnowledgeGapsByDimensionByExperience": {
+    "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? (By Professional Experience)",
+    "description": "Shows which sustainability dimensions respondents feel they lack knowledge or tools to address by professional experience."
+  },
+  "KnowledgeGapsByDimensionByApplicationStatus": {
+    "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? (By Application of Sustainability)",
+    "description": "Shows which sustainability dimensions respondents feel they lack knowledge or tools to address by application status."
+  },
+  "KnowledgeGapsByDimensionDetails": {
+    "question": "Which sustainability dimension(s) do you feel you lack sufficient knowledge or tools to effectively address? [Other]",
+    "description": "Lists the free-text dimensions provided under the Other option."
+  },
+  "PersonIncorporatesSustainability": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks? ",
+    "description": "Shows the proportion of respondents who incorporate digital sustainability in their tasks."
+  },
+  "PersonIncorporatesSustainabilityByRole": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks?",
+    "description": "Shows whether respondents incorporate digital sustainability considerations in their role-specific tasks, broken down by organizational role. Each role displays the count of 'Yes' and 'No' responses in a stacked horizontal bar format."
+  },
+  "PersonIncorporatesSustainabilityByOrgGoals": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks?",
+    "description": "Shows the relationship between organizational sustainability goals and individual sustainability practices. This chart reveals whether respondents incorporate digital sustainability into their work, grouped by whether their organization has sustainability goals or benchmarks. The data demonstrates how organizational support influences individual adoption of sustainability practices."
+  },
+  "SustainabilityDimensionsInTasks": {
+    "question": "Which sustainability dimensions do you consider in your role-specific tasks?",
+    "description": "Shows which sustainability dimensions respondents consider in their role-specific tasks."
+  },
+  "SustainabilityDimensionsInTasksByRegion": {
+    "question": "Which sustainability dimensions do you consider in your role-specific tasks?",
+    "description": "Shows which sustainability dimensions respondents consider in their role-specific tasks, broken down by region."
+  },
+  "SustainabilityDimensionsInTasksByRole": {
+    "question": "Which sustainability dimensions do you consider in your role-specific tasks?",
+    "description": "Shows which sustainability dimensions respondents consider in their role-specific tasks, broken down by organizational role."
+  },
+  "SustainabilityDimensionsInTasksByMeasureCount": {
+    "question": "Which sustainability dimensions do you consider in your role-specific tasks?",
+    "description": "Shows which sustainability dimensions respondents consider in their role-specific tasks, broken down by the number of organizational sustainability measures they have set."
+  },
+  "SusAFDimensionsComparison": {
+    "question": "Which of the following sustainability dimensions do you consider most important for your organization?",
+    "description": "Shows which sustainability dimensions respondents consider most important for their organization."
+  },
+  "SustainabilityDimensionsInTasksDetails": {
+    "question": "Which sustainability dimensions do you consider in your role-specific tasks? [Other]",
+    "description": "Lists the free-text dimensions provided under the Other option."
+  },
+  "ToolsDescriptionList": {
+    "question": "Can you name the tools, software, and/or frameworks, and tell us how and for what you use them?",
+    "description": "Free-text responses from tool users describing the tools and methods they employ."
+  },
+  "UsesTools": {
+    "question": "Are there specific tools, software, or frameworks that help you incorporate sustainability into your tasks? (E.g., gathering and managing requirements, writing sustainability-focused tests, optimizing code for less energy consumption.)",
+    "description": "Shows whether respondents use specific tools or methods for digital sustainability."
+  },
+  "UsesToolsByOrgType": {
+    "question": "Are there specific tools, software, or frameworks that help you incorporate sustainability into your tasks? (E.g., gathering and managing requirements, writing sustainability-focused tests, optimizing code for less energy consumption.)",
+    "description": "Shows whether respondents use specific tools or methods for digital sustainability, broken down by organizational type."
+  },
+  "UsesToolsByRole": {
+    "question": "Are there specific tools, software, or frameworks that help you incorporate sustainability into your tasks? (E.g., gathering and managing requirements, writing sustainability-focused tests, optimizing code for less energy consumption.)",
+    "description": "Shows whether respondents use specific tools or methods for digital sustainability, broken down by organizational role."
+  },
+  "OrganizationHasGoalsByAge": {
+    "question": "Does your organization have specific digital sustainability goals or benchmarks for software development projects?",
+    "description": "Shows whether organizations have specific digital sustainability goals, broken down by age group."
+  },
+  "OrganizationHasGoalsByRole": {
+    "question": "Does your organization have specific digital sustainability goals or benchmarks for software development projects?",
+    "description": "Shows whether organizations have specific digital sustainability goals, broken down by organizational role."
+  },
+  "OrganizationHasGoalsByOrgType": {
+    "question": "Does your organization have specific digital sustainability goals or benchmarks for software development projects?",
+    "description": "Shows whether organizations have specific digital sustainability goals, broken down by organization type."
+  },
+  "OrganizationHasSustainabilityTeamByAge": {
+    "question": "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?",
+    "description": "Shows whether organizations have a sustainability team, broken down by age group."
+  },
+  "OrganizationHasSustainabilityTeamByRole": {
+    "question": "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?",
+    "description": "Shows whether organizations have a sustainability team, broken down by organizational role."
+  },
+  "OrganizationHasSustainabilityTeamByOrgType": {
+    "question": "Does your organization have a dedicated sustainability or Corporate Social Responsibility (CSR) expert, team or department?",
+    "description": "Shows whether organizations have a sustainability team, broken down by organization type."
+  },
+  "OrganizationIncorporatesPracticesByAge": {
+    "question": "Does your organization incorporate sustainable development practices?",
+    "description": "Shows whether organizations incorporate sustainable practices in their software development, broken down by age group."
+  },
+  "OrganizationIncorporatesPracticesByRole": {
+    "question": "Does your organization incorporate sustainable development practices?",
+    "description": "Shows whether organizations incorporate sustainable practices in their software development, broken down by organizational role."
+  },
+  "OrganizationIncorporatesPracticesByOrgType": {
+    "question": "Does your organization incorporate sustainable development practices?",
+    "description": "Shows whether organizations incorporate sustainable practices in their software development, broken down by organization type."
+  },
+  "OrganizationIncorporatesPracticesByRegion": {
+    "question": "Does your organization incorporate sustainable development practices?",
+    "description": "Shows whether organizations incorporate sustainable practices in their software development, broken down by region."
+  },
+  "OrganizationDepartmentCoordinationByAge": {
+    "question": "Do different departments in your organization coordinate on sustainability for software development projects?",
+    "description": "Shows whether organizations coordinate between departments on sustainability goals, broken down by age group."
+  },
+  "OrganizationDepartmentCoordinationByRole": {
+    "question": "Do different departments in your organization coordinate on sustainability for software development projects?",
+    "description": "Shows whether organizations coordinate between departments on sustainability goals, broken down by organizational role."
+  },
+  "OrganizationDepartmentCoordinationByOrgType": {
+    "question": "Do different departments in your organization coordinate on sustainability for software development projects?",
+    "description": "Shows whether organizations coordinate between departments on sustainability goals, broken down by organization type."
+  },
+  "OrganizationReportsOnSustainabilityByAge": {
+    "question": "Does your organization report on sustainability practices?",
+    "description": "Shows whether organizations report on their sustainability efforts, broken down by age group."
+  },
+  "OrganizationReportsOnSustainabilityByRole": {
+    "question": "Does your organization report on sustainability practices?",
+    "description": "Shows whether organizations report on their sustainability efforts, broken down by organizational role."
+  },
+  "OrganizationReportsOnSustainabilityByOrgType": {
+    "question": "Does your organization report on sustainability practices?",
+    "description": "Shows whether organizations report on their sustainability efforts, broken down by organization type."
+  },
+  "OrganizationOffersTrainingByAge": {
+    "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
+    "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by age group."
+  },
+  "OrganizationOffersTrainingByRole": {
+    "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
+    "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by organizational role."
+  },
+  "OrganizationOffersTrainingByOrgType": {
+    "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
+    "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by organization type."
+  },
+  "OrganizationOffersTrainingByRegion": {
+    "question": "Does your organization offer training or resources to employees on sustainable software development practices?",
+    "description": "Shows whether organizations offer training or resources on sustainable digital solutions, broken down by region."
+  },
+  "SustainabilityDimensionsByOrgType": {
+    "question": "Which dimensions of sustainability are actively considered in your organization's software development projects?",
+    "description": "This 100% stacked bar chart visualizes which sustainability dimensions (Environmental, Social, Individual, Economic, and Technical) are considered by different types of organizations. Organizations are grouped into three categories: Large companies (large enterprises), Research institutions (universities and research institutes), and Other organizations (all remaining types). Each group displays five bars representing the five sustainability dimensions, showing the percentage of organizations that actively consider each dimension. The green section represents organizations that consider the dimension, while the pink section represents those that do not. Only respondents whose organizations incorporate sustainable practices are included in this analysis."
+  },
+  "SustainabilityDimensionsByAge": {
+    "question": "Which dimensions of sustainability are actively considered in your organization's software development projects?",
+    "description": "This 100% stacked bar chart visualizes which sustainability dimensions (Environmental, Social, Individual, Economic, and Technical) are considered by respondents across different age groups. The chart groups respondents into four age categories: 18-28, 29-44, 45-60, and Above 60. Each age group displays five bars representing the five sustainability dimensions, showing the percentage of respondents in that age group whose organizations actively consider each dimension. The green section represents organizations that consider the dimension, while the pink section represents those that do not. Only respondents whose organizations incorporate sustainable practices are included in this analysis."
+  },
+  "SustainabilityDimensionsByExperience": {
+    "question": "Which dimensions of sustainability are actively considered in your organization's software development projects?",
+    "description": "This 100% stacked bar chart visualizes which sustainability dimensions (Environmental, Social, Individual, Economic, and Technical) are considered by respondents across different professional experience levels. The chart groups respondents into three experience categories: 0-10 years, 11-20 years, and More than 20 years. Each experience group displays five bars representing the five sustainability dimensions, showing the percentage of respondents in that experience level whose organizations actively consider each dimension. The green section represents organizations that consider the dimension, while the pink section represents those that do not. Only respondents whose organizations incorporate sustainable practices are included in this analysis."
+  },
+  "OrganizationalPracticesByOrgType": {
+    "question": "Organizational Practices by Organization Type",
+    "description": "This 100% stacked bar chart visualizes responses to five key organizational questions across different organization types. Organizations are grouped into three categories: Other organizations, Large company, and Research. Each group displays five bars representing: (1) Has specific digital sustainability goals or benchmarks, (2) Has a dedicated sustainability or CSR team/department, (3) Incorporates sustainable development practices, (4) Reports on sustainability practices, and (5) Offers training or resources on sustainable software development. The bars show the percentage breakdown of responses: Yes (green), No (pink), and Not sure (grey). This chart helps identify how organizational sustainability practices vary across different types of organizations."
+  },
+  "PersonIncorporatesSustainabilityByExperience": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks? (By Professional Experience)",
+    "description": "This chart shows the breakdown of respondents who incorporate digital sustainability considerations in their role-specific tasks, segmented by professional experience. Each experience group displays the count of 'Yes' and 'No' responses in a grouped vertical bar format."
+  },
+  "PersonIncorporatesSustainabilityByMeasureCount": {
+    "question": "Do you incorporate digital sustainability considerations in your role-specific tasks? (By Organizational Context)",
+    "description": "This chart illustrates the relationship between the organizational context and whether employees incorporate sustainability into their work. Respondents are categorized by their organization's stance: 'No sustainability' (organization does not incorporate practices), 'Unclear communication' (respondent is unsure), or by the number of specific measures in place (1 to 4+). Generally, as organizations adopt more measures (goals, teams, practices, coordination, reporting, training), employees are more likely to incorporate sustainability. An exception is observed at three measures, where a specific combination often lacks training/resources, highlighting the importance of employee support."
+  },
+  "DriversToIncorporateSustainabilityByOrgType": {
+    "question": "What drives you to incorporate digital sustainability in your role-related tasks?",
+    "description": "This grouped bar chart shows the percentage of respondents motivated by different drivers (Organizational policies, Personal beliefs, Client requirements, User requirements, Legal requirements), broken down by organization type (Large company, Research, Other organizations). The data highlights how drivers vary across sectors, specifically confirming that client and user requirements play a negligible role in research settings compared to industry."
+  }
+}
