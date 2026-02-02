@@ -49,7 +49,7 @@ There are 2 solutions to this:
 1. Simply edit the csv so that the name matches to the last year :D.
 
 2. Configure the application to know which questions still are the same, even if the wording changed.
-   1. Go to:
+   1. Go to: https://github.com/nitishspatkar/IREB-digital-sustainability-annual-survey-results-dashboard/blob/main/src/data/data-parsing-logic/SurveyColumnDefinitions.ts
    2. Edit the file
    3. Add the new wording e.g. <img width="2966" height="1052" alt="image" src="https://github.com/user-attachments/assets/1f96a0a9-0ac3-4f0d-8c66-dd975f7de2c8" />
 
