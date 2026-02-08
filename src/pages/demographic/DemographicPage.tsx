@@ -20,7 +20,6 @@ const Demographic = () => {
   const year = surveyResponses.length > 0 ? surveyResponses[0].year : '';
 
   const respondentStats = useMemo<RespondentStat[]>(() => {
-    // ... deine existierende Logik ...
     const counts = new Map<string, number>();
     surveyResponses.forEach((r) => {
       const c = normalizeCountry(r.getCountryOfResidence());
