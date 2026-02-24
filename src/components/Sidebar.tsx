@@ -135,7 +135,12 @@ function Sidebar({ activeYear }: SidebarProps) {
           </div>
         )}
         <div className="mt-auto pt-4 text-sm md:text-lg leading-tight text-ireb-berry">
-          <div className="mb-4 flex flex-col gap-2">
+          <div>IREB GmbH</div>
+          <div>Mahlbergstrasse 25</div>
+          <div>76189 Karlsruhe (Germany)</div>
+          <div>+49 (0) 721 98 23 45 90</div>
+          <div>info@ireb.org</div>
+          <div className="mt-4 flex flex-row flex-wrap gap-x-4 gap-y-2 text-xs md:text-sm">
             <a
               href="https://ireb.org/en/privacy"
               target="_blank"
@@ -148,7 +153,7 @@ function Sidebar({ activeYear }: SidebarProps) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-4 h-4 mr-2 shrink-0"
+                className="w-3 h-3 mr-1 shrink-0"
               >
                 <path
                   strokeLinecap="round"
@@ -170,7 +175,7 @@ function Sidebar({ activeYear }: SidebarProps) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-4 h-4 mr-2 shrink-0"
+                className="w-3 h-3 mr-1 shrink-0"
               >
                 <path
                   strokeLinecap="round"
@@ -192,7 +197,7 @@ function Sidebar({ activeYear }: SidebarProps) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-4 h-4 mr-2 shrink-0"
+                className="w-3 h-3 mr-1 shrink-0"
               >
                 <path
                   strokeLinecap="round"
@@ -203,11 +208,6 @@ function Sidebar({ activeYear }: SidebarProps) {
               Disclaimer
             </a>
           </div>
-          <div>IREB GmbH</div>
-          <div>Mahlbergstrasse 25</div>
-          <div>76189 Karlsruhe (Germany)</div>
-          <div>+49 (0) 721 98 23 45 90</div>
-          <div>info@ireb.org</div>
         </div>
       </aside>
     </>
