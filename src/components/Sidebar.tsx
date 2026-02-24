@@ -135,6 +135,74 @@ function Sidebar({ activeYear }: SidebarProps) {
           </div>
         )}
         <div className="mt-auto pt-4 text-sm md:text-lg leading-tight text-ireb-berry">
+          <div className="mb-4 flex flex-col gap-2">
+            <a
+              href="https://ireb.org/en/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center hover:underline"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-4 h-4 mr-2 shrink-0"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                />
+              </svg>
+              Privacy
+            </a>
+            <a
+              href="https://ireb.org/en/imprint"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center hover:underline"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-4 h-4 mr-2 shrink-0"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                />
+              </svg>
+              Imprint
+            </a>
+            <a
+              href="https://ireb.org/en/disclaimer"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center hover:underline"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-4 h-4 mr-2 shrink-0"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                />
+              </svg>
+              Disclaimer
+            </a>
+          </div>
           <div>IREB GmbH</div>
           <div>Mahlbergstrasse 25</div>
           <div>76189 Karlsruhe (Germany)</div>
