@@ -83,7 +83,7 @@ function Sidebar({ activeYear }: SidebarProps) {
             className="mb-4 mt-8 w-64 max-w-full h-auto md:mt-0"
           />
         </Link>
-        <div className="text-4xl md:text-4xl tracking-tight text-ireb-berry font-bold">
+        <div className="text-4xl md:text-3xl tracking-tight text-ireb-berry font-bold">
           Digital Sustainability Survey {activeYear}
         </div>
         <nav className="mt-6">
