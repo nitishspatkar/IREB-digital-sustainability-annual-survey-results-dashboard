@@ -41,7 +41,9 @@ const GuideToggle = () => {
     <button
       onClick={toggleHelp}
       className={`fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-colors ${
-        isHelpVisible ? 'bg-ireb-sky text-white' : 'bg-white text-ireb-sky border border-ireb-sky'
+        isHelpVisible
+          ? 'bg-ireb-sky text-white animate-wiggle'
+          : 'bg-white text-ireb-sky border border-ireb-sky'
       }`}
       title="Toggle User Guide"
     >
